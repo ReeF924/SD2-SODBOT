@@ -8,10 +8,12 @@ const div = require("./general/division-functions");
 const results = require("./results/results-main");
 const extract = require("./results/replayParser");
 const register = require("./results/registerUser");
+const init = require("./init.js");
 
 const token = config.token;
 const bot = new Discord.Client();
 
+//Command function to identify all $commands
 function findCommand(message, command) {
   let input = message.content.substr(message.content.indexOf(" ") + 1);
   input = input.split(/,/);
@@ -22,7 +24,7 @@ function findCommand(message, command) {
       .trim();
   }
   switch (command) {
-    // Admin functions
+    // Admin Commands
     case "blacklist":
       config.adminCommands
         ? admin.blackList(message, bot)
@@ -64,7 +66,7 @@ function findCommand(message, command) {
     //     : common.moduleDisabledMsg(message, "results");
     //   break;
 
-    // Misc functions
+    // Misc Commands
     case "help":
       config.help
         ? misc.help(message, input[0])
@@ -117,7 +119,8 @@ function findCommand(message, command) {
         ? register.registerUser(message, input[0])
         : common.moduleDisabledMsg(message, "results");
       break;
-    // Map functions
+
+    // Map Commands
     case "rmap":
       config.rmap
         ? map.rmap(message, input[0])
@@ -155,7 +158,7 @@ function findCommand(message, command) {
         : common.moduleDisabledMsg(message, "random");
       break;
 
-    // Div functions
+    // Division Commands
     case "rdiv":
       config.rdiv
         ? div.rdiv(message, input[0])
@@ -190,10 +193,12 @@ function findCommand(message, command) {
   }
 }
 
+//Parsing the Bot Message
 bot.on("message", async message => {
   const userIsBlackListed = await admin.isBlackListed(message.author.id);
   if (!userIsBlackListed) {
     if (message.content.startsWith(config.prefix)) {
+      console.log("Command Entered");
       const inputList = message.content
         .substr(1, message.content.length)
         .toLowerCase()
@@ -222,6 +227,7 @@ bot.on("message", async message => {
   }
 });
 
+
 bot.on("ready", async () => {
   console.log("Bot Online!");
   bot.user.setActivity("Use " + config.prefix + "help to see commands!", {
@@ -230,9 +236,10 @@ bot.on("ready", async () => {
   try {
     await common.sql(`SELECT * FROM players`);
   } catch (err) {
-    admin.createTables();
+    init.createTables();
   }
 });
 
+// Bot logon by passing token from config
 bot.on("error", console.error);
 bot.login(token);
