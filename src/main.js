@@ -198,7 +198,6 @@ bot.on("message", async message => {
   const userIsBlackListed = await admin.isBlackListed(message.author.id);
   if (!userIsBlackListed) {
     if (message.content.startsWith(config.prefix)) {
-      console.log("Command Entered");
       const inputList = message.content
         .substr(1, message.content.length)
         .toLowerCase()
