@@ -14,7 +14,6 @@ for comparison, 1 unit deck:
   
 */
 
-
 const alliesDivs = {
   "10000100": "2nd Guards",
   "100000100": "3rd Guards Tank",
@@ -35,14 +34,7 @@ const alliesDivs = {
   "11111111": "1st Polish Infantry",
   "101100101": "358 Strelkovy",
   "101100000": "126th Strelki",
-  "101011111": "Gruppa Vyborg",
-  "110110101": "7th Guards Mech",
-  "110110100": "3rd VDV",
-  "110110011": "5th Cavaleri",
-  "110110110": "Morskaya",
-  "100001000": "1st Pancerna",
-  "1001110011": "6th Airborne",
-  "1001110100": "2nd US"
+  "101011111": "Gruppa Vyborg"
 };
 
 const axisDivs = {
@@ -63,16 +55,9 @@ const axisDivs = {
   "100001101": "25th Panzergrenadier",
   "100000110": "5 Panzer Wiking",
   "100000111": "Fallschrim Panzer H G",
-  "101100100": "122 Infantry",
+  "101100100": "112. Infantry",
   "101011110": "Panssaridivisioona",
-  "101100010": "Ryhma Raapppana",
-  "110110001": "1st Blindata",
-  "110110010": "4th Munte",
-  "110101111": "97th Guards",
-  "110101110": "16th Panzer",
-  "1001110000": "17th SS",
-  "1001101111": "12th Panzer",
-  "1001110010": "3rd Fallschirmjäger"
+  "101100010": "Ryhma Raapppana"
 };
 
 const incomeLevel = {

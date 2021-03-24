@@ -133,7 +133,7 @@ module.exports.axis = {
   "5 Panzer Wiking": true,
   "Fallschrim Panzer H G": true,
   "25th Panzergrenadier": true,
-  "122 Infantry": true,
+  "112. Infantry": true,
   Panssaridivisioona: true,
   "Ryhma Raapppana": true
 };

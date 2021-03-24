@@ -1,5 +1,5 @@
 {
-  "prefix": "!",
+  "prefix": "$",
   "logFileName": "log.txt",
   "botName": "SODBOT II ",
   "version": "1.1.0",
