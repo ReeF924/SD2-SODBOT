@@ -2,7 +2,7 @@ export class SqlHelper{
 
 
     static getBlacklist(): Map<string, boolean> {
-        throw new Error("Method not implemented.");
+       throw new Error("Method not implemented.");
     }
 
     constructor() {

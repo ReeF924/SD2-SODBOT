@@ -1,8 +1,11 @@
+`use strict`
+
 import { CommonUtil } from "./common";
 import {APIMessageContentResolvable, Client, Message} from "discord.js";
 import { SqlHelper } from "./sqlHelper";
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
+import { strict } from "node:assert";
 
 
 export type BotCommand = (message:Message,input:string[])=>void;
@@ -10,16 +13,15 @@ export type BotCommand = (message:Message,input:string[])=>void;
 export class DiscordBot {
 
     bot:Client;
-    blacklist:Map<string,boolean>;
-    commands:Map<string,BotCommand>
+    commands:Map<string,BotCommand> = new Map<string,BotCommand>();
     
 
     constructor(){
-        this.loadBlacklist();
+        //this.loadBlacklist();
         this.bot = new Client();
-        this.bot.on("message", this.onMessage);
-        this.bot.on("ready",this.onReady);
-        this.bot.on("error",this.onError);
+        this.bot.on("message", this.onMessage.bind(this));
+        this.bot.on("ready",this.onReady.bind(this));
+        this.bot.on("error",this.onError.bind(this));
     }
 
     login():void{
@@ -27,6 +29,7 @@ export class DiscordBot {
     }
 
     registerCommand(command:string, funct:BotCommand){
+
         this.commands[command] = funct;
     }
 
@@ -38,23 +41,18 @@ export class DiscordBot {
         Logs.error(message)
     }
 
-    private loadBlacklist(){
-        this.blacklist = SqlHelper.getBlacklist();
-    }
-
-    private isBlackListed(id:string){
-        if(this.blacklist[id]) return true;
-        return false;
-    }
-
     private runCommand(message:Message,command:string){
-        let i = message.content.substr(message.content.indexOf(" ") + 1);
-        let input = i.split(/,/);
-        for (let index in input) {
-          input[index] = input[index]
-            //.replace(/&/g, "&amp;")
-            //.replace(/"/g, "&quot;") //why we do this?
-            .trim();
+        let input:string[] = [];
+        let ii = message.content.indexOf(" ");
+        if(ii>0){
+            let i = message.content.substr(ii + 1);
+            input = i.split(/,/);
+            for (let index in input) {
+            input[index] = input[index]
+                //.replace(/&/g, "&amp;")
+                //.replace(/"/g, "&quot;") //why we do this?
+                .trim();
+            }
         }
         if(this.commands[command]){
             this.commands[command](message,input);
@@ -62,8 +60,6 @@ export class DiscordBot {
     }
 
     private async onMessage(message:Message){
-        const userIsBlackListed = await this.isBlackListed(message.author.id);
-        if (!userIsBlackListed) {
         if (message.content.startsWith(CommonUtil.config("prefix"))) {
             const inputList = message.content
             .substr(1, message.content.length)
@@ -84,7 +80,6 @@ export class DiscordBot {
                 Replays.extractReplayInfo(message);
             }
             }
-        }
         }
     }
 

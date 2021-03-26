@@ -28,7 +28,7 @@ node_modules/
 src/Output.txt
 src/resultsDB.db
 src/config.json
-obj
-obj/
+dist
+dist/
 
 coverage/

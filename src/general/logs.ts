@@ -1,11 +1,11 @@
-import winston from "winston";
+import * as winston  from "winston";
 import { CommonUtil } from "./common";
 
 
 export class Logs {
     static logger: winston.Logger;
     static init(){
-        this.logger.configure({
+        this.logger = winston.createLogger({
             level:CommonUtil.config("logLevel","verbose"),
             transports: [
                 new winston.transports.Console()
