@@ -3,7 +3,7 @@
     "logFileName": "log.txt",
     "botName": "SODBOT II ",
     "version": "1.1.0",
-    "discordToken": "ODI0ODE0NTg3MDYzODI4NDkw.YF02cQ.x-C7XmWy0wWl2KelqyiW03FV98M",
+    "discordToken": "ODI0ODE0NTg3MDYzODI4NDkw.YF02cQ.8wTA4SA2LRvkhJyg8lcm6Ezc3_g",
     "tts_enabled_global": true,
     "max_purge_num": 20,
     "k_value": 32,
