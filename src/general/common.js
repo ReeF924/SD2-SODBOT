@@ -2,6 +2,8 @@ const config = require("../config");
 const levenshtein = require("js-levenshtein");
 const sqlite3 = require("sqlite3").verbose();
 
+
+
 module.exports.reply = reply = (message, content, tts) => {
   config.tts_enabled_global
     ? message.reply(content, { tts: tts })

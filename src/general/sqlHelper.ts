@@ -6,14 +6,9 @@ export class SqlHelper{
     }
 
     constructor() {
-      throw new Error("Method not implemented.");
-        try {
-            await SqlHelper.(`SELECT * FROM players`);
-          } catch (err) {
-            admin.createTables();
-          }
+      //await SqlHelper.(`SELECT * FROM players`);
     }
-    
+
     static exec(string){
       throw new Error("Method not implemented.");
     }

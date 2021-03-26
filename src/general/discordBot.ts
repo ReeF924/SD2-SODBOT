@@ -5,7 +5,7 @@ import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 
 
-export type BotCommand = (message:Message,input:string[])=>{};
+export type BotCommand = (message:Message,input:string[])=>void;
 
 export class DiscordBot {
 
@@ -52,8 +52,8 @@ export class DiscordBot {
         let input = i.split(/,/);
         for (let index in input) {
           input[index] = input[index]
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
+            //.replace(/&/g, "&amp;")
+            //.replace(/"/g, "&quot;") //why we do this?
             .trim();
         }
         if(this.commands[command]){

@@ -1,6 +1,6 @@
 import { Logs } from "./logs";
 import * as fs from 'fs';
-import { getDefaultSettings } from "node:http2";
+import * as levenshtein from 'js-levenshtein';
 
 export class CommonUtil {
 
@@ -23,6 +23,20 @@ export class CommonUtil {
             return String(this.configData[key]);
         return defaultSetting;
     }
+
+    static lexicalGuesser = (input, obj) => {
+        let closestWord = "";
+        let closestNumber = 9999999;
+      
+        Object.keys(obj).forEach(i => {
+          if (levenshtein(input, i) < closestNumber) {
+            closestNumber = levenshtein(input, i);
+            closestWord = i;
+          }
+        });
+        closestNumber = 99999999;
+        return closestWord;
+      };
 
 
 }
