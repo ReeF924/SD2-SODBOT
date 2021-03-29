@@ -7,11 +7,14 @@
     "test": "jest",
     "build": "tsc",
     "watch": "tsc --watch",
-    "start": "npm run build && node dist/main.js"
+    "start": "npm run build && node dist/main.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/winston": "2.4.4",
     "ascii-table3": "0.5.1",
     "discord.js": "^12.5.1",
     "file-type": "^16.3.0",
@@ -20,13 +23,15 @@
     "lodash": "^4.17.21",
     "mysql": "^2.18.0",
     "node-fetch": "^2.6.1",
+    "sd2-data": "^0.2.3",
     "sqlite3": "^5.0.2",
-    "winston": "3.3.3",
-    "@types/winston": "2.4.4",
-    "sd2-data": "0.1.5"
+    "winston": "3.3.3"
   },
   "devDependencies": {
     "@types/node": "^14.14.36",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/parser": "^4.20.0",
+    "eslint": "^7.23.0",
     "jest": "^26.6.3",
     "source-map-support": "^0.5.19",
     "ts-jest": "^26.5.4",
