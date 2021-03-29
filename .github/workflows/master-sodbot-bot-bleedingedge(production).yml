@@ -43,7 +43,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: sodbot-bot-bleedingedge
-        slot-name: Dev-BleedingEdge
+        slot-name: Production
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B8DA93E905884B9485A0790676CCEBC7 }}
         package: .
 
