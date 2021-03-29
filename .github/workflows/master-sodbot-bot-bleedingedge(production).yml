@@ -4,9 +4,11 @@
 name: Azure App Service - sodbot-bot-bleedingedge(Production), Build and deploy NodeJS app
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [created]
+  schedule:
+    - cron:  '0 5,17 * * *'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -23,6 +25,14 @@ jobs:
       with:
         node-version: '12.x'
 
+    - name: create config files
+      uses: schdck/create-env-json@v2
+      with:
+        file-name: config.json
+        prefix: $
+        logFileName: log.txt
+        discordToken: $ {{secrets.DiscordBotBleedingEdge}}
+      
     - name: npm install, build, and test
       run: |
         npm install
