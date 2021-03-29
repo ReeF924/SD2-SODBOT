@@ -5,7 +5,6 @@ import {APIMessageContentResolvable, Client, Message} from "discord.js";
 import { SqlHelper } from "./sqlHelper";
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
-import { strict } from "node:assert";
 
 
 export type BotCommand = (message:Message,input:string[])=>void;
@@ -28,26 +27,26 @@ export class DiscordBot {
         this.bot.login(CommonUtil.config("discordToken"));
     }
 
-    registerCommand(command:string, funct:BotCommand){
+    registerCommand(command:string, funct:BotCommand):void{
 
         this.commands[command] = funct;
     }
 
-    removeCommand(command:string){
+    removeCommand(command:string):void{
         this.commands.delete(command);
     }
 
-    private onError(message:any){
+    private onError(message:unknown){
         Logs.error(message)
     }
 
     private runCommand(message:Message,command:string){
         let input:string[] = [];
-        let ii = message.content.indexOf(" ");
+        const ii = message.content.indexOf(" ");
         if(ii>0){
-            let i = message.content.substr(ii + 1);
+            const i = message.content.substr(ii + 1);
             input = i.split(/,/);
-            for (let index in input) {
+            for (const index in input) {
             input[index] = input[index]
                 //.replace(/&/g, "&amp;")
                 //.replace(/"/g, "&quot;") //why we do this?
@@ -56,6 +55,8 @@ export class DiscordBot {
         }
         if(this.commands[command]){
             this.commands[command](message,input);
+        }else{
+            MsgHelper.reply(message, "Unknown Command. Did you mean " +CommonUtil.config("prefix") + CommonUtil.lexicalGuesser(command,Object.keys(this.commands)))
         }
     }
 
@@ -93,23 +94,23 @@ export class DiscordBot {
 
 export class MsgHelper{
     
-    static reply (message:Message, content:APIMessageContentResolvable, tts?:any){
-        let opts = {};
+    static reply (message:Message, content:APIMessageContentResolvable, tts?:unknown):void{
+        const opts = {};
         if(CommonUtil.configBoolean("tts_enabled_global")){
             opts["tts"] = tts;
         }
         message.reply(content, opts);
     }
 
-    static say (message:Message, content:APIMessageContentResolvable, tts?:any){
-        let opts = {};
+    static say (message:Message, content:APIMessageContentResolvable, tts?:unknown):void{
+        const opts = {};
         if(CommonUtil.configBoolean("tts_enabled_global")){
             opts["tts"] = tts;
         }
         message.channel.send(content, opts);
     }
 
-    static dmUser(message:Message, content:APIMessageContentResolvable){
+    static dmUser(message:Message, content:APIMessageContentResolvable):void{
         message.author.send(content);
     }
 

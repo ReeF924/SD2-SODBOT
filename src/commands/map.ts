@@ -4,6 +4,7 @@ import * as Data from "sd2-data"
 import { AsciiTable3 } from "ascii-table3/ascii-table3";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
+import { MessageEmbed } from "discord.js";
 
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
@@ -23,7 +24,7 @@ export class MapCommand {
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
-
+                return
             }
         }
         //check for bans
@@ -46,9 +47,14 @@ export class MapCommand {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static allMaps(message:Message,input:string[]):void {
         const importedMapData = Data.maps;
-        const table = new AsciiTable3("Maps");
+        console.log(JSON.stringify(importedMapData));
         const bannedMaps = MapCommand.bans[message.author.id];
-        table.setHeading("1v1","2v2","3v3","4v4");
+        //Set up discord embed
+        let embed = new MessageEmbed().setTitle(message.author.username + '\'s Maps')
+        let text1v1 = "";
+        let text2v2 = "";
+        let text3v3 = "";
+        let text4v4 = "";
         for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) {
             let maps1 = importedMapData.mapData.byPlayerSize[2][i];
             let maps2 = importedMapData.mapData.byPlayerSize[4][i];
@@ -75,10 +81,19 @@ export class MapCommand {
             }else if(bannedMaps && bannedMaps[maps4]){
                 maps4 = '~~'+maps4+'~~';
             }
-            table.addRow(maps1, maps2, maps3, maps4);
+            text1v1 += maps1 + "\n";
+            text2v2 += maps2 + "\n";
+            text3v3 += maps3 + "\n";
+            text4v4 += maps4 + "\n";
           }
-        Logs.log(table.toString());
-        MsgHelper.say(message,"``" + table.toString() + "``");
+        embed = embed.addFields(
+            {name:"1v1", value: text1v1,inline:true},
+            {name:"2v2", value: text2v2,inline:true},
+            {name:"3v3", value: text3v3,inline:true},
+            {name:"4v4", value: text4v4,inline:true}
+        )
+        embed = embed.setFooter("Maps are stike-through'd when banned")
+        message.channel.send(embed);
     }
     static unbanMap(message:Message,input:string[]):void{
         if(input.length == 0) {
@@ -110,10 +125,10 @@ export class MapCommand {
                 Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]) )
                 MsgHelper.reply(message,line + " has been unbanned.")
                 let all = false;
-                for(const z of MapCommand.bans[message.author.id]){
-                    all = z || all;
+                for(const z of Object.values(MapCommand.bans[message.author.id])){
+                    console.log(z);
+                    all = !!z || all;
                 }
-                console.log(all);
                 if(!all) MapCommand.bans[message.author.id] = null;
             }
         }
