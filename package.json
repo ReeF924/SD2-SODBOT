@@ -7,7 +7,8 @@
     "test": "jest",
     "build": "tsc",
     "watch": "tsc --watch",
-    "start": "npm run build && node dist/main.js",
+    "dev": "npm run build && node run start",
+    "start": "node dist/main.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
