@@ -115,8 +115,8 @@ export class MiscCommand {
                 if(unit.raw.transportid != -1){
                     u += " in " + unit.transport
                 }
-                if( unit.xp == 1) u += ":star:"
-                if( unit.xp == 2) u += ":star::star:"
+                if( unit.xp == 1) u += "☆"
+                if( unit.xp == 2) u += "☆☆"
                 if(unit.phase == 0){
                     a.push(u)
                 }else if(unit.phase == 1){
@@ -137,9 +137,9 @@ export class MiscCommand {
             for(const i of c){
                 cstr += i + "\n"
             }
-            embed = embed.addField("A Phase",astr)
-            embed = embed.addField("B Phase",bstr)
-            embed = embed.addField("C Phase",cstr)
+            embed = embed.addField("A Phase",astr,true)
+            embed = embed.addField("B Phase",bstr,true)
+            embed = embed.addField("C Phase",cstr,true)
             embed = embed.setFooter("counts are in # of cards, not # of units")
             message.channel.send(embed);
         }
