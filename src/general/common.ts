@@ -9,17 +9,23 @@ export class CommonUtil {
 
     static init():void{
         //load config file;
-        this.configData = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
+        const load = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
+        for(const key of Object.keys(load)){
+            this.configData[key.toLocaleLowerCase()] = load[key];
+        }
+        //this.configData = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
         Logs.init();
     }
 
     static configBoolean(key:string,defaultSetting = false):boolean {
+        key = key.toLocaleLowerCase();
         if(this.configData[key]) 
             return Boolean(this.configData[key]);
         return defaultSetting;
     }
 
     static config(key:string, defaultSetting = ''):string {
+        key = key.toLocaleLowerCase();
         if(this.configData[key]) 
             return String(this.configData[key]);
         return defaultSetting;
