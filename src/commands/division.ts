@@ -6,7 +6,7 @@ import { AsciiTable3 } from "ascii-table3/ascii-table3";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 export class DivisionCommand {
-    static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
+    static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
     static randomDiv(message:Message,input:string[]):void {
         
@@ -27,7 +27,7 @@ export class DivisionCommand {
         if(DivisionCommand.bans[message.member.id]){
             for (const key of Object.keys(DivisionCommand.bans[message.member.id])){
                 divs = divs.filter((x)=>{
-                    return x.id != key;
+                    return x.id != Number(key);
                 })
             }
         }
@@ -131,7 +131,7 @@ export class DivisionCommand {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static bannedDivisions(message:Message,input:string[]):void{
-        const bannedDivs:Map<string,boolean> = DivisionCommand.bans[message.author.id];
+        const bannedDivs:Map<number,boolean> = DivisionCommand.bans[message.author.id];
         if(!bannedDivs){
             MsgHelper.reply(message,"You have no banned Divisions");
             return;
@@ -142,7 +142,7 @@ export class DivisionCommand {
             for(const x of Object.keys(bannedDivs)){
                 console.log(x);
                 divString.push(divs.find((y)=>{
-                    return y["id"] == String(x);
+                    return y["id"] == Number(x);
                 }).name);
             }
             let ret = "You have Banned: ";

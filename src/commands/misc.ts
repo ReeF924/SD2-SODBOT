@@ -1,6 +1,7 @@
 import { Message, MessageEmbed } from "discord.js";
 import { CommonUtil } from "../general/common";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
+import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
 
 export class MiscCommand {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -96,6 +97,53 @@ export class MiscCommand {
                     }, 10000));
                 }
     }
+    static deck(message: Message, input: string[]): void {
+        let embed = new MessageEmbed();
+        if(String.length > 0){
+            const deck = DeckParser.parse(input[0])
+            embed = embed.setTitle(deck.division);
+            embed = embed.setDescription(deck.income);
+            const a = [];
+            const b = [];
+            const c = [];
+            for(const unit of deck.units){
+                let u = "";
+                if(unit.count > 1){
+                    u += unit.count + "x "
+                }
+                u += unit.name;
+                if(unit.raw.transportid != -1){
+                    u += " in " + unit.transport
+                }
+                if( unit.xp == 1) u += ":star:"
+                if( unit.xp == 2) u += ":star::star:"
+                if(unit.phase == 0){
+                    a.push(u)
+                }else if(unit.phase == 1){
+                    b.push(u)
+                }else if(unit.phase == 2){
+                    c.push(u)
+                }
+            }
+            let astr = "";
+            for(const i of a){
+                astr += i + "\n"
+            }
+            let bstr = ''
+            for(const i of b){
+                bstr += i + "\n"
+            }
+            let cstr = ""
+            for(const i of c){
+                cstr += i + "\n"
+            }
+            embed = embed.addField("A Phase",astr)
+            embed = embed.addField("B Phase",bstr)
+            embed = embed.addField("C Phase",cstr)
+            embed = embed.setFooter("counts are in # of cards, not # of units")
+            message.channel.send(embed);
+        }
+    }
 }
 
 export class MiscCommandHelper {
@@ -104,5 +152,6 @@ export class MiscCommandHelper {
         bot.registerCommand("faction", MiscCommand.faction);
         bot.registerCommand("help", MiscCommand.help);
         bot.registerCommand("piat",MiscCommand.piat);
+        bot.registerCommand("deck",MiscCommand.deck);
     }
 }
