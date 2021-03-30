@@ -33,3 +33,4 @@ dist/
 
 coverage/
 config.json
+app.log

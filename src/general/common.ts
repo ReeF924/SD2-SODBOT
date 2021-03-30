@@ -5,7 +5,7 @@ import * as Levenshtein from  'levenshtein';
 
 export class CommonUtil {
 
-    static configData:Map<string,unknown>;
+    static configData:Map<string,unknown> = new Map<string,unknown>();
 
     static init():void{
         //load config file;

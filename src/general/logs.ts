@@ -4,18 +4,19 @@ import { CommonUtil } from "./common";
 
 export class Logs {
     static logger: winston.Logger;
-    static init(){
+    static init():void{
         this.logger = winston.createLogger({
             level:CommonUtil.config("logLevel","verbose"),
             transports: [
-                new winston.transports.Console()
+                new winston.transports.Console(),
+                new winston.transports.File({filename:"app.log",maxsize:20000000,maxFiles:3})
             ]
         })
     }
-    static log(message:any){
+    static log(message:unknown):void{
         this.logger.log("info",message);
     }
-    static error(message:any){
+    static error(message:unknown):void{
         this.logger.log("error",message);
     }
 }
