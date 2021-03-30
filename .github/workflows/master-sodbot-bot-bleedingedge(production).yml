@@ -31,7 +31,7 @@ jobs:
         file-name: config.json
         prefix: $
         logFileName: log.txt
-        discordToken: ${{ secrets.DiscordBotBleedingEdge }}
+        discordToken: ${{ secrets.DISCORDBOTBLEEDINGEDGE }}
       
     - name: npm install, build, and test
       run: |
