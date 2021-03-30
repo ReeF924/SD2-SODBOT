@@ -16,7 +16,8 @@ DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
 bot.login();
-http.createServer(function (req,res){
+const healthcheck = http.createServer(function (req,res){
     res.write("pong");
     res.end();
 });
+healthcheck.listen(8080);
