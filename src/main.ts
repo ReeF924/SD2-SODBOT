@@ -5,6 +5,7 @@ import { CommonUtil } from "./general/common";
 import { DiscordBot } from "./general/discordBot";
 
 import * as smp from 'source-map-support';
+import * as http from 'http';
 
 
 smp.install();
@@ -15,3 +16,7 @@ DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
 bot.login();
+http.createServer(function (req,res){
+    res.write("pong");
+    res.end();
+});
