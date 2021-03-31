@@ -49,15 +49,35 @@ export class Replays {
                     .addField('Starting Points', g.initMoney + " pts", true)
                     .addField('Map', g.map_raw, true)
 
-                for (const player of g.players) {
-                    embed = embed.addField("-------------------------------------------------", "\u200B")
-                        .addField("Player", player.name, true)
-                        .addField("Division", player.deck.division, true)
-                        .addField("Level", player.level, true)
-                        .addField("Deck Code", player.deck.raw.code, true)
-                }
-
+                if(g.players.length < 4)
+                    for (const player of g.players) {
+                        embed = embed.addField("-------------------------------------------------", "\u200B")
+                            .addField("Player", player.name, true)
+                            .addField("Division", player.deck.division, true)
+                            .addField("Level", player.level, true)
+                            .addField("Deck Code", player.deck.raw.code, true)
+                    }
                 message.channel.send(embed)
+                if(g.players.length >= 4){
+                    embed = new MessageEmbed()
+                    .setColor("#0099ff")
+                    let counter = 0;
+                    for (const player of g.players) {
+                        embed = embed.addField("-------------------------------------------------", "\u200B")
+                            .addField("Player", player.name, true)
+                            .addField("Division", player.deck.division, true)
+                            .addField("Level", player.level, true)
+                            .addField("Deck Code", player.deck.raw.code, true)
+                            counter ++;
+                            if(counter == 5){
+                                message.channel.send(embed)
+                                embed = new MessageEmbed()
+                                    .setColor("#0099ff")
+                                counter = 0;
+                            }
+                    }
+                    message.channel.send(embed)
+                }
         })
     }
 
