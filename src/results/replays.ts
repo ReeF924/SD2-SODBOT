@@ -13,7 +13,7 @@ export class Replays {
             const replayPlayer = g.players[g.ingamePlayerId];
             let winners = "noone"
             let loosers = "everyone"
-            if (g.result.victory < 3) {
+            if (g.result.victory > 3) {
                 //replay creator lost
                 for (const player of g.players) {
                     if (player.alliance == replayPlayer.alliance)
@@ -21,7 +21,7 @@ export class Replays {
                     else
                         winners += player.name + "\n"
                 }
-            } else if (g.result.victory > 3) {
+            } else if (g.result.victory < 3) {
                 //replay creator won
                 for (const player of g.players) {
                     if (player.alliance != replayPlayer.alliance)
