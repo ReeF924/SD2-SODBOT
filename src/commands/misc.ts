@@ -115,8 +115,8 @@ export class MiscCommand {
                 if(unit.raw.transportid != -1){
                     u += " in " + unit.transport
                 }
-                if( unit.xp == 1) u += "☆"
-                if( unit.xp == 2) u += "☆☆"
+                if( unit.xp == 1) u += " ☆"
+                if( unit.xp == 2) u += " ☆☆"
                 if(unit.phase == 0){
                     a.push(u)
                 }else if(unit.phase == 1){
