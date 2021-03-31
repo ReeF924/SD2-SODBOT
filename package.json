@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "test": "jest",
     "build": "tsc",
     "watch": "tsc --watch",
     "dev": "npm run build && npm run start",
