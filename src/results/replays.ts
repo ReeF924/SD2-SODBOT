@@ -58,13 +58,10 @@ export class Replays {
                     let playerid = player.name;
                     let discordId = ""
                     const discordUser = await SqlHelper.getDiscordUserFromEugenId(player.id);
-                    console.log(discordUser)
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
                         const user = await DiscordBot.bot.users.fetch(String(discordId))
-                        console.log(String(discordId))
-                        console.log(user)
                         if(!user)
                             playerid =  "BORKED! Please yell at @kuriosly#8303"
                         else
@@ -87,7 +84,6 @@ export class Replays {
                     let playerid = player.name;
                     let discordId = ""
                     const discordUser = await SqlHelper.getDiscordUserFromEugenId(player.id);
-                    console.log(discordUser)
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
