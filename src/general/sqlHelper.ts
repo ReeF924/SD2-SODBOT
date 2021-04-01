@@ -2,6 +2,9 @@ import { Connection, Request, TediousType, TYPES } from 'tedious'
 import { CommonUtil } from './common';
 import { Logs } from "./logs";
 import * as fs from 'fs'
+import { Message } from 'discord.js';
+import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
+import { types } from 'node:util';
 export class SqlHelper {
 
   static config = {
@@ -66,9 +69,11 @@ export class SqlHelper {
   }
 
   static setDiscordUserSql = ""
+  static addReplaySql = ""
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
+    SqlHelper.addReplaySql = fs.readFileSync("sql/addReplay.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.authentication.options.userName = CommonUtil.config("sqluser")
     SqlHelper.connection = new Connection(SqlHelper.config);
@@ -88,6 +93,30 @@ export class SqlHelper {
     })
     SqlHelper.connection.connect();
 
+  }
+
+  static async setReplay(message:Message, replay:RawGameData): Promise<DBObject>{
+    //( @discordId, @serverId, @channelId, @replay, @gameId, @uuid )
+    const dbRow = { 
+      discordId: message.author.id,
+      serverId: message.guild.id,
+      channelId: message.channel.id,
+      replay: JSON.stringify(replay),
+      uuid: replay.uniqueSessionId
+    }
+
+    const types = {
+      discordId: TYPES.VarChar,
+      serverId: TYPES.VarChar,
+      channelId: TYPES.VarChar,
+      replay: TYPES.Text,
+      uuid: TYPES.VarChar
+    }
+    console.log(dbRow)
+    console.log(dbRow.replay.length)
+    console.log(SqlHelper.addReplaySql)
+    Logs.log("Committing replay: " + dbRow.uuid)
+    return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
 
   static exec(string: string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {

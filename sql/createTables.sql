@@ -22,12 +22,12 @@ CREATE TABLE discordUsers
 
 CREATE TABLE replays
 (
-    id INT NOT NULL PRIMARY KEY, -- Primary Key column
+    id INT IDENTITY(1,1) PRIMARY KEY, -- Primary Key column
     uploadedAt datetime DEFAULT(getdate()),
-    discordId int not null, -- uploader, linked to discordId
-    serverId int not null, -- what server this was uploaded from
-    channelId int not null,
+    discordId varchar(20) not null, -- uploader, linked to discordId
+    serverId varchar(20) not null, -- what server this was uploaded from
+    channelId varchar(20) not null,
     gameId int null, -- will be used to link pick-ban info with replay info.... hopefully
     replay text not null, -- JSON blob
-    uuid text not null -- unique id to prevent duplciates (is a part of json blob, but pulling it out for this)
+    uuid varchar(40) not null -- unique id to prevent duplciates (is a part of json blob, but pulling it out for this)
 );

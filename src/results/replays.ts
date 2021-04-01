@@ -63,9 +63,9 @@ export class Replays {
                     if (discordId != "") {
                         const user = await DiscordBot.bot.users.fetch(String(discordId))
                         if(!user)
-                            playerid =  "BORKED! Please yell at @kuriosly#8303"
+                            playerid =  "BORKED! Please yell at <@271792666910392325>"
                         else
-                            playerid += " *@" + user.username + "#" + user.discriminator + "*"
+                            playerid += " *<@" + user.id +">*"
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
@@ -89,9 +89,9 @@ export class Replays {
                     if (discordId != "") {
                         const user = await DiscordBot.bot.users.fetch(String(discordId))
                         if(!user)
-                        playerid =  "BORKED! Please yell at @kuriosly#8303"
+                        playerid =  "BORKED! Please yell at <@271792666910392325>"
                     else
-                        playerid += " *@" + user.username + "#" + user.discriminator + "*"
+                        playerid += "*<@" + user.id +">*"
                     } else {
                         playerid += " (id:" + player.id + ")";
                     }
@@ -110,6 +110,8 @@ export class Replays {
                 }
                 message.channel.send(embed)
             }
+            //and we need to commit this to DB....
+            SqlHelper.setReplay(message,g);
         })
     }
 
