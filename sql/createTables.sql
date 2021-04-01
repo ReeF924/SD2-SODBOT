@@ -14,8 +14,8 @@ CREATE TABLE players
 
 CREATE TABLE discordUsers
 (
-    id varchar(20) NOT NULL PRIMARY KEY, -- Primary Key column / discord id
-    playerId int not null, -- map to player/eugenid
+    id varchar(20) NOT NULL , -- Primary Key column / discord id
+    playerId int not null PRIMARY KEY, -- map to player/eugenid
     serverAdmin text null, -- JSON blob of [int, int]... will list servers user has "admin" on.
     globalAdmin bit not null -- will be used mainly on "web app"
 );
