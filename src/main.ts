@@ -8,11 +8,13 @@ import { DiscordBot } from "./general/discordBot";
 import * as smp from 'source-map-support';
 import * as http from 'http';
 import { Logs } from "./general/logs";
+import { SqlHelper } from "./general/sqlHelper";
 
 
 smp.install();
 
 CommonUtil.init();
+SqlHelper.init();
 Logs.log("Starting Bot");
 const bot = new DiscordBot();
 DivisionCommandHelper.addCommands(bot);

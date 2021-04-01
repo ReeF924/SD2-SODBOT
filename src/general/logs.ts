@@ -5,7 +5,7 @@ import { CommonUtil } from "./common";
 export class Logs {
     static logger: winston.Logger;
     static init():void{
-        this.logger = winston.createLogger({
+        Logs.logger = winston.createLogger({
             level:CommonUtil.config("logLevel","verbose"),
             transports: [
                 new winston.transports.Console(),
@@ -14,9 +14,11 @@ export class Logs {
         })
     }
     static log(message:unknown):void{
-        this.logger.log("info",message);
+        if(message)
+            Logs.logger.log("info",message);
     }
     static error(message:unknown):void{
-        this.logger.log("error",message);
+        if(message)
+            Logs.logger.log("error",message);
     }
 }

@@ -11,20 +11,20 @@ export type BotCommand = (message:Message,input:string[])=>void;
 
 export class DiscordBot {
 
-    bot:Client;
+    static bot:Client;
     commands:Map<string,BotCommand> = new Map<string,BotCommand>();
     
 
     constructor(){
         //this.loadBlacklist();
-        this.bot = new Client();
-        this.bot.on("message", this.onMessage.bind(this));
-        this.bot.on("ready",this.onReady.bind(this));
-        this.bot.on("error",this.onError.bind(this));
+        DiscordBot.bot = new Client();
+        DiscordBot.bot.on("message", this.onMessage.bind(this));
+        DiscordBot.bot.on("ready",this.onReady.bind(this));
+        DiscordBot.bot.on("error",this.onError.bind(this));
     }
 
     login():void{
-        this.bot.login(CommonUtil.config("discordToken"));
+        DiscordBot.bot.login(CommonUtil.config("discordToken"));
     }
 
     registerCommand(command:string, funct:BotCommand):void{
@@ -86,7 +86,7 @@ export class DiscordBot {
 
     private async onReady(){
         Logs.log("Bot Online!");
-        this.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
+        DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
           type: "LISTENING"
         });
     }
