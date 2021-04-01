@@ -32,7 +32,7 @@ jobs:
         prefix: $
         logFileName: log.txt
         discordToken: ${{ secrets.DISCORDBOTBLEEDINGEDGE }}
-        sqluser: kuriosly
+        sqluser: kurios
         sqlpassword: ${{ secrets.SQLPASSWORD }}
       
     - name: npm install, build, and test
