@@ -1,9 +1,7 @@
 import { Connection, Request, TediousType, TYPES } from 'tedious'
 import { CommonUtil } from './common';
-import { DiscordBot } from "./discordBot";
 import { Logs } from "./logs";
 import * as fs from 'fs'
-import { types } from 'node:util';
 export class SqlHelper {
 
   static config = {
