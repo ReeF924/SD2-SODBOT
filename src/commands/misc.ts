@@ -3,6 +3,17 @@ import { CommonUtil } from "../general/common";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
 
+var sodbotReplies:string[];
+sodbotReplies = [
+    "hit! Target destroyed!",
+    "miss! Mission failed. We'll get em next time!",
+    "miss! Are you even trying to hit anymore?",
+    "oh come on, that shot was pathetic... Put your back into it!",
+    "ping! Your shot bounced!",
+    "you miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
+    "miss! Your shot couldn't hit the broad side of a barn!"
+  ];
+
 export class MiscCommand {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static flip(message: Message, input: string[]): void {
@@ -35,36 +46,24 @@ export class MiscCommand {
                 { name: "Misc", value: '', inline: true }
             ])
         message.channel.send(embed);
-    }
-
-    static sodbotReplies = [
-        "hit! Target destroyed!",
-        "miss! Mission failed. We'll get em next time!",
-        "miss! Are you even trying to hit anymore?",
-        "oh come on, that shot was pathetic... Put your back into it!",
-        "ping! Your shot bounced!",
-        "you miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
-        "miss! Your shot couldn't hit the broad side of a barn!"
-      ];
-
-      
+    } 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static piat(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.98) {
+        if (i > 0.98){
             MsgHelper.reply(
                 message,
-                this.sodbotReplies[Math.floor(Math.random() * this.sodbotReplies.length)],
+                sodbotReplies[Math.floor(Math.random() * sodbotReplies.length)],
                 true
             );
-        } else if (i > 0.001) {
+        } else if (i > 0.005) {
             MsgHelper.reply(message, "Miss!");
             return;
         } else {
-            k < 0.9
+            k < 0.7
                 ? (MsgHelper.reply(message, `You hit!`, true),
                     setTimeout(() => {
                         MsgHelper.reply(message, `Just kidding, you didn't.`, true);
@@ -97,6 +96,7 @@ export class MiscCommand {
                     }, 10000));
                 }
     }
+
     static deck(message: Message, input: string[]): void {
         let embed = new MessageEmbed();
         if(String.length > 0){
