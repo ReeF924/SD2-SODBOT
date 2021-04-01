@@ -1,7 +1,6 @@
 import { DivisionCommandHelper } from "./commands/division";
 import { MapCommandHelper } from "./commands/map";
 import { MiscCommandHelper } from "./commands/misc";
-import { RegisterCommandHelper } from "./commands/register";
 import { CommonUtil } from "./general/common";
 import { DiscordBot } from "./general/discordBot";
 
@@ -20,7 +19,6 @@ const bot = new DiscordBot();
 DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
-RegisterCommandHelper.addCommands(bot);
 bot.login();
 const healthcheck = http.createServer(function (req,res){
     Logs.log(req);

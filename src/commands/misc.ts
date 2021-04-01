@@ -147,6 +147,8 @@ export class MiscCommand {
             message.channel.send(embed);
         }
     }
+
+    //Register a player to the bot
     static register(message:Message, input:string[]):void{
         if(input.length == 1 && Number(input[0])){
             (async () => {
@@ -165,7 +167,7 @@ export class MiscCommand {
                         globalAdmin: false
                     }
                     await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"added")
+                    MsgHelper.reply(message,"added to Player Database")
                     Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
                 }
             })()
