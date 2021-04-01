@@ -2,6 +2,9 @@ import { Message, MessageEmbed } from "discord.js";
 import { CommonUtil } from "../general/common";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
+import { SqlHelper } from "../general/sqlHelper";
+import { loggers } from "winston";
+import { Logs } from "../general/logs";
 
 export class MiscCommand {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -144,6 +147,30 @@ export class MiscCommand {
             message.channel.send(embed);
         }
     }
+    static register(message:Message, input:string[]):void{
+        if(input.length == 1 && Number(input[0])){
+            (async () => {
+                let user = await SqlHelper.getDiscordUserFromEugenId(Number(input[0]))
+                if(user){
+                    user.id =(message.author.id)
+                    await SqlHelper.setDiscordUser(user);
+                    MsgHelper.reply(message,"updated")
+                    Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
+                }else{
+                    console.log(Number(message.author.id))
+                    user = {
+                        id: (message.author.id),
+                        playerId: Number(input[0]),
+                        serverAdmin: [],
+                        globalAdmin: false
+                    }
+                    await SqlHelper.setDiscordUser(user);
+                    MsgHelper.reply(message,"added")
+                    Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
+                }
+            })()
+        }
+    }
 }
 
 export class MiscCommandHelper {
@@ -153,5 +180,6 @@ export class MiscCommandHelper {
         bot.registerCommand("help", MiscCommand.help);
         bot.registerCommand("piat",MiscCommand.piat);
         bot.registerCommand("deck",MiscCommand.deck);
+        bot.registerCommand("register",MiscCommand.register)
     }
 }
