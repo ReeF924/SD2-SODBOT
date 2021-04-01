@@ -2,7 +2,6 @@
 
 import { CommonUtil } from "./common";
 import {APIMessageContentResolvable, Client, Message} from "discord.js";
-import { SqlHelper } from "./sqlHelper";
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 
