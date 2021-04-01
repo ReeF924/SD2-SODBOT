@@ -21,6 +21,7 @@ export class DiscordBot {
         DiscordBot.bot.on("message", this.onMessage.bind(this));
         DiscordBot.bot.on("ready",this.onReady.bind(this));
         DiscordBot.bot.on("error",this.onError.bind(this));
+        DiscordBot.bot.on('unhandledRejection',this.onError.bind(this));
     }
 
     login():void{

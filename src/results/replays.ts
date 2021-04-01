@@ -62,8 +62,13 @@ export class Replays {
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
-                        const user = DiscordBot.bot.users.resolve(String(discordId))
-                        playerid += " *" + user.username + "#" + user.discriminator + "*"
+                        const user = await DiscordBot.bot.users.fetch(String(discordId))
+                        console.log(String(discordId))
+                        console.log(user)
+                        if(!user)
+                            playerid =  "BORKED! Please yell at @kuriosly#8303"
+                        else
+                            playerid += " *@" + user.username + "#" + user.discriminator + "*"
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
@@ -86,8 +91,11 @@ export class Replays {
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
-                        const user = DiscordBot.bot.users.resolve(String(discordId))
-                        playerid += " *" + user.username + "#" + user.discriminator + "*"
+                        const user = await DiscordBot.bot.users.fetch(String(discordId))
+                        if(!user)
+                        playerid =  "BORKED! Please yell at @kuriosly#8303"
+                    else
+                        playerid += " *@" + user.username + "#" + user.discriminator + "*"
                     } else {
                         playerid += " (id:" + player.id + ")";
                     }
