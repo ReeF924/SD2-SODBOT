@@ -6,6 +6,8 @@ import { SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
 
 const ax = axios.default;
+
+
 export class Replays {
     static extractReplayInfo(message: Message): void {
         const url = message.attachments.first().url
@@ -38,6 +40,7 @@ export class Replays {
                 winners = "noone"
                 loosers = "everyone"
             }
+
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
                 .addField("Winner", `||${winners}||`, true)
@@ -48,10 +51,12 @@ export class Replays {
                 .setFooter(`Game Version: ${g.version}`)
                 .addField("Score Limit", g.scoreLimit, true)
                 .addField("Time Limit", g.timeLimit, true)
-                .addField('Income', misc.incomeLevel[g.incomeRate], true)
+                .addField('Income Rate', misc.incomeLevel[g.incomeRate], true)
                 .addField('Game Mode', misc.mode[g.gameMode], true)
                 .addField('Starting Points', g.initMoney + " pts", true)
                 .addField('Map', g.map_raw, true)
+                //.addField('Map', misc.map[g.map_raw], true)
+                // converts raw map data to more useable map names, once SD2-data has map names 
 
             if (g.players.length < 4)
                 for (const player of g.players) {
@@ -71,9 +76,11 @@ export class Replays {
                     }
                     embed = embed.addField("-------------------------------------------------", "\u200B")
                         .addField("Player", playerid, true)
-                        .addField("Division", player.deck.division, true)
                         .addField("Level", player.level, true)
-                        .addField("Deck Code", player.deck.raw.code, true)
+                        .addField('\u200b', '\u200b', true)
+                        .addField("Division", player.deck.division, true)
+                        .addField("Income", player.deck.income, true)
+                        .addField("Deck Code", player.deck.raw.code, false)
                 }
             message.channel.send(embed)
             if (g.players.length >= 4) {
@@ -96,10 +103,12 @@ export class Replays {
                         playerid += " (id:" + player.id + ")";
                     }
                     embed = embed.addField("-------------------------------------------------", "\u200B")
-                        .addField("Player", playerid, true)
-                        .addField("Division", player.deck.division, true)
-                        .addField("Level", player.level, true)
-                        .addField("Deck Code", player.deck.raw.code, true)
+                    .addField("Player", playerid, true)
+                    .addField("Level", player.level, true)
+                    .addField('\u200b', '\u200b', true)
+                    .addField("Division", player.deck.division, true)
+                    .addField("Income", player.deck.income, true)
+                    .addField("Deck Code", player.deck.raw.code, false)
                     counter++;
                     if (counter == 5) {
                         message.channel.send(embed)

@@ -174,7 +174,6 @@ export class MapCommandHelper {
         bot.registerCommand("unbanmap",MapCommand.unbanMap);
         bot.registerCommand("resetmaps",MapCommand.unbanMapAll);
         bot.registerCommand("banmap",MapCommand.banMap);
-        bot.registerCommand("maps",MapCommand.allMaps);
         //bot.registerCommand("defaultMapPool",MapCommand.defaultMapPool); @todo
     }
 }

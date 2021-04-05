@@ -5,6 +5,7 @@ import * as fs from 'fs'
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { types } from 'node:util';
+
 export class SqlHelper {
 
   static config = {

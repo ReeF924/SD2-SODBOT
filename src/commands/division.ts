@@ -42,19 +42,33 @@ export class DivisionCommand {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static allDivs(message:Message,input:string[]):void {
-        const table = new AsciiTable3("Divisions");
-        table.setHeading("Allies","Axis");
-        for(let i = 0; i < divisions.divisionsAllies.length; i++){
-            let axis = "";
+        const table = new AsciiTable3("All Divisions");
+        table.setHeading("         Allied Divisions         ", "          Axis Divisions          ");
+        for(let i = 0; i < 15; i++){
             let allied = "";
+            let axis = "";
             if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
-            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name; 
+            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
             table.addRow(allied, axis);
         }
         table.setStyle("compact");
         Logs.log(table.toString());
         MsgHelper.say(message,"``" + table.toString() + "``");
+
+        const table2 = new AsciiTable3();
+        for(let i = 15; i < divisions.divisionsAllies.length; i++){
+            let allied = "";
+            let axis = "";
+            if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
+            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
+            table2.addRow(allied, axis);
+        }
+        table2.setStyle("compact");
+        Logs.log(table2.toString());
+        MsgHelper.say(message,"``" + table2.toString() + "``");
+
     }
+
     static unbanDivision(message:Message,input:string[]):void{
         if(input.length == 0) {
             MsgHelper.reply(message,`I don't know what that division is, please use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
@@ -159,7 +173,7 @@ export class DivisionCommand {
 export class DivisionCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("rdiv",DivisionCommand.randomDiv);
-        //bot.registerCommand("alldivs",DivisionCommand.allDivs); this command is toooo huge. Discord complains about message size.
+        bot.registerCommand("alldivs",DivisionCommand.allDivs); //this command is toooo huge. Discord complains about message size.
         bot.registerCommand("unbandiv",DivisionCommand.unbanDivision);
         bot.registerCommand("resetdivs",DivisionCommand.unbanDivisionAll);
         bot.registerCommand("bandiv",DivisionCommand.banDivision);
