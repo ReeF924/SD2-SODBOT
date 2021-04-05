@@ -39,8 +39,13 @@ export class MapCommand {
         else{
             const pick = maplist[Math.floor(Math.random()*maplist.length)]
             Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
-            MsgHelper.reply(message,pick);
+            if(input.length == 0)
+                message.reply(pick, { files: ["./src/general/images/"+pick+"_Alt.png"] });
+            else{
+                MsgHelper.reply(message,pick);
+            }
         }
+        
             
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
