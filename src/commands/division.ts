@@ -5,6 +5,8 @@ import { divisions } from "sd2-data";
 import { AsciiTable3 } from "ascii-table3/ascii-table3";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
+import { MessageEmbed } from "discord.js";
+
 export class DivisionCommand {
     static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
@@ -41,31 +43,23 @@ export class DivisionCommand {
             
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static allDivs(message:Message,input:string[]):void {
-        const table = new AsciiTable3("All Divisions");
-        table.setHeading("         Allied Divisions         ", "          Axis Divisions          ");
-        for(let i = 0; i < 15; i++){
+    static allDivs(message:Message,input:string[]):void {        
+        let embed = new MessageEmbed().setTitle("-- All Divisions --")
+        let allieddivs = "";
+        let axisdivs = "";
+        for(let i = 0; i < divisions.divisionsAllies.length; i++){
             let allied = "";
             let axis = "";
             if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
             if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
-            table.addRow(allied, axis);
-        }
-        table.setStyle("compact");
-        Logs.log(table.toString());
-        MsgHelper.say(message,"``" + table.toString() + "``");
 
-        const table2 = new AsciiTable3();
-        for(let i = 15; i < divisions.divisionsAllies.length; i++){
-            let allied = "";
-            let axis = "";
-            if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
-            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
-            table2.addRow(allied, axis);
+            allieddivs += allied + "\n";
+            axisdivs += axis + "\n";
         }
-        table2.setStyle("compact");
-        Logs.log(table2.toString());
-        MsgHelper.say(message,"``" + table2.toString() + "``");
+        embed = embed.addFields(
+            {name:"Allied Divisions", value: allieddivs,inline:true},
+            {name:"Axis Divisions", value: axisdivs,inline:true})
+        message.channel.send(embed);
 
     }
 

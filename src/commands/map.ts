@@ -84,7 +84,7 @@ export class MapCommand {
             text2v2 += maps2 + "\n";
             text3v3 += maps3 + "\n";
             text4v4 += maps4 + "\n";
-          }
+        }
         embed = embed.addFields(
             {name:"1v1", value: text1v1,inline:true},
             {name:"2v2", value: text2v2,inline:true},
