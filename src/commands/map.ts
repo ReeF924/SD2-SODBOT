@@ -8,6 +8,7 @@ import { MessageEmbed } from "discord.js";
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
 
+    // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message:Message,input:string[]):void {
         
         let maplist:string[] = []
@@ -39,7 +40,7 @@ export class MapCommand {
         else{
             const pick = maplist[Math.floor(Math.random()*maplist.length)]
             Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
-            if(input.length == 0)
+            if(input.length == 0 || input[0].toLowerCase() == "1v1")
                 message.reply(pick, { files: ["./src/general/images/"+pick+"_Alt.png"] });
             else{
                 MsgHelper.reply(message,pick);
@@ -99,8 +100,10 @@ export class MapCommand {
         embed = embed.setFooter("Maps are stike-through'd when banned")
         message.channel.send(embed);
     }
+
+
     static unbanMap(message:Message,input:string[]):void{
-        if(input.length == 0) {
+        if(input.length == 0 ) {
             MsgHelper.reply(message,`I don't know what that map is, please use ${CommonUtil.config("prefix")}maps, to get the list of all maps.`)
             return;
         }
