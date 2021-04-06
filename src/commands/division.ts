@@ -5,6 +5,8 @@ import { divisions } from "sd2-data";
 import { AsciiTable3 } from "ascii-table3/ascii-table3";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
+import { MessageEmbed } from "discord.js";
+
 export class DivisionCommand {
     static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
@@ -41,20 +43,26 @@ export class DivisionCommand {
             
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static allDivs(message:Message,input:string[]):void {
-        const table = new AsciiTable3("Divisions");
-        table.setHeading("Allies","Axis");
+    static allDivs(message:Message,input:string[]):void {        
+        let embed = new MessageEmbed().setTitle("-- All Divisions --")
+        let allieddivs = "";
+        let axisdivs = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
-            let axis = "";
             let allied = "";
+            let axis = "";
             if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
-            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name; 
-            table.addRow(allied, axis);
+            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
+
+            allieddivs += allied + "\n";
+            axisdivs += axis + "\n";
         }
-        table.setStyle("compact");
-        Logs.log(table.toString());
-        MsgHelper.say(message,"``" + table.toString() + "``");
+        embed = embed.addFields(
+            {name:"Allied Divisions", value: allieddivs,inline:true},
+            {name:"Axis Divisions", value: axisdivs,inline:true})
+        message.channel.send(embed);
+
     }
+
     static unbanDivision(message:Message,input:string[]):void{
         if(input.length == 0) {
             MsgHelper.reply(message,`I don't know what that division is, please use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
@@ -159,7 +167,7 @@ export class DivisionCommand {
 export class DivisionCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("rdiv",DivisionCommand.randomDiv);
-        //bot.registerCommand("alldivs",DivisionCommand.allDivs); this command is toooo huge. Discord complains about message size.
+        bot.registerCommand("alldivs",DivisionCommand.allDivs); //this command is toooo huge. Discord complains about message size.
         bot.registerCommand("unbandiv",DivisionCommand.unbanDivision);
         bot.registerCommand("resetdivs",DivisionCommand.unbanDivisionAll);
         bot.registerCommand("bandiv",DivisionCommand.banDivision);

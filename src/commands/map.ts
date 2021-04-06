@@ -39,8 +39,13 @@ export class MapCommand {
         else{
             const pick = maplist[Math.floor(Math.random()*maplist.length)]
             Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
-            MsgHelper.reply(message,pick);
+            if(input.length == 0)
+                message.reply(pick, { files: ["./src/general/images/"+pick+"_Alt.png"] });
+            else{
+                MsgHelper.reply(message,pick);
+            }
         }
+        
             
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -84,7 +89,7 @@ export class MapCommand {
             text2v2 += maps2 + "\n";
             text3v3 += maps3 + "\n";
             text4v4 += maps4 + "\n";
-          }
+        }
         embed = embed.addFields(
             {name:"1v1", value: text1v1,inline:true},
             {name:"2v2", value: text2v2,inline:true},
@@ -174,7 +179,6 @@ export class MapCommandHelper {
         bot.registerCommand("unbanmap",MapCommand.unbanMap);
         bot.registerCommand("resetmaps",MapCommand.unbanMapAll);
         bot.registerCommand("banmap",MapCommand.banMap);
-        bot.registerCommand("maps",MapCommand.allMaps);
         //bot.registerCommand("defaultMapPool",MapCommand.defaultMapPool); @todo
     }
 }

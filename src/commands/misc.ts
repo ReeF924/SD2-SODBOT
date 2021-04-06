@@ -158,7 +158,7 @@ export class MiscCommand {
                 if(user){
                     user.id =(message.author.id)
                     await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"updated")
+                    MsgHelper.reply(message,"account has been updated")
                     Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
                 }else{
                     console.log(Number(message.author.id))
@@ -169,7 +169,7 @@ export class MiscCommand {
                         globalAdmin: false
                     }
                     await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"added to Player Database")
+                    MsgHelper.reply(message,"has been added to the Player Database")
                     Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
                 }
             })()
