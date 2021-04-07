@@ -54,8 +54,7 @@ export class Replays {
                 .addField('Income Rate', misc.incomeLevel[g.incomeRate], true)
                 .addField('Game Mode', misc.mode[g.gameMode], true)
                 .addField('Starting Points', g.initMoney + " pts", true)
-                .addField('Map', g.map_raw, true)
-                //.addField('Map', misc.map[g.map_raw], true)
+                .addField('Map', misc.map[g.map_raw], true)
                 // converts raw map data to more useable map names, once SD2-data has map names 
 
             if (g.players.length < 4)
