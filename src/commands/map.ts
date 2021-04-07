@@ -40,11 +40,8 @@ export class MapCommand {
         else{
             const pick = maplist[Math.floor(Math.random()*maplist.length)]
             Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
-            if(input.length == 0 || input[0].toLowerCase() == "1v1")
-                message.reply(pick, { files: ["./src/general/images/"+pick+"_Alt.png"] });
-            else{
-                MsgHelper.reply(message,pick);
-            }
+            message.reply(pick, { files: ["./src/general/images/"+pick+".png"] });
+        
         }
         
             
