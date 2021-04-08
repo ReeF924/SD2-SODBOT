@@ -34,3 +34,5 @@ dist/
 coverage/
 config.json
 app.log
+
+.package-lock.json
