@@ -46,19 +46,32 @@ export class DivisionCommand {
     static allDivs(message:Message,input:string[]):void {        
         let embed = new MessageEmbed().setTitle("-- All Divisions --")
         let allieddivs = "";
+        let allieddivsalias = "";
         let axisdivs = "";
+        let axisdivsalias = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
             let allied = "";
+            let alliedalias = "";
             let axis = "";
+            let axisalias = "";
             if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
+            if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
             if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
+            if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
+
 
             allieddivs += allied + "\n";
+            allieddivsalias += alliedalias + "\n";
             axisdivs += axis + "\n";
+            axisdivsalias += axisalias + "\n";
         }
         embed = embed.addFields(
             {name:"Allied Divisions", value: allieddivs,inline:true},
-            {name:"Axis Divisions", value: axisdivs,inline:true})
+            {name:"Allied (Alias)", value: allieddivsalias,inline:true},
+            {name:'\u200b', value:'\u200b',inline:false},
+            {name:"Axis Divisions", value: axisdivs,inline:true},
+            {name:"Axis (Alias)", value: axisdivsalias,inline:true}
+            )
         message.channel.send(embed);
 
     }
@@ -109,9 +122,16 @@ export class DivisionCommand {
         }
         for(const line of input){
             const divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
-            const target = divs.filter((x)=>{
+            var target = divs.filter((x)=>{
                 return 0 == line.toLocaleLowerCase().localeCompare(x.name.toLocaleLowerCase());
             })
+            
+            if(target.length == 0){
+                target = divs.filter((x)=>{
+                    return 0 == line.toLocaleLowerCase().localeCompare(x.alias.toLocaleLowerCase());
+                })
+            }
+
             if(target.length == 0){
                 MsgHelper.say(
                     message,
@@ -127,7 +147,7 @@ export class DivisionCommand {
                 }
                 DivisionCommand.bans[message.author.id][target[0].id]=true;
                 Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]) )
-                MsgHelper.reply(message,line + " has been banned.")
+                MsgHelper.reply(message,target[0].name + " has been banned.")
             }
         }
     }
@@ -167,7 +187,8 @@ export class DivisionCommand {
 export class DivisionCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("rdiv",DivisionCommand.randomDiv);
-        bot.registerCommand("alldivs",DivisionCommand.allDivs); //this command is toooo huge. Discord complains about message size.
+        bot.registerCommand("alldivs",DivisionCommand.allDivs);
+        bot.registerCommand("divs",DivisionCommand.allDivs);
         bot.registerCommand("unbandiv",DivisionCommand.unbanDivision);
         bot.registerCommand("resetdivs",DivisionCommand.unbanDivisionAll);
         bot.registerCommand("bandiv",DivisionCommand.banDivision);

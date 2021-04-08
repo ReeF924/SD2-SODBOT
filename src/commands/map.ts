@@ -165,6 +165,7 @@ export class MapCommand {
                 MsgHelper.reply(message,line + " has been banned.")
             }
         }
+        MapCommand.allMaps(message, input);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -175,6 +176,7 @@ export class MapCommand {
 export class MapCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("rmap",MapCommand.randomMap);
+        bot.registerCommand("allmaps",MapCommand.allMaps);
         bot.registerCommand("maps",MapCommand.allMaps);
         bot.registerCommand("unbanmap",MapCommand.unbanMap);
         bot.registerCommand("resetmaps",MapCommand.unbanMapAll);
