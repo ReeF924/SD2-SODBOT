@@ -8,6 +8,7 @@ import * as smp from 'source-map-support';
 import * as http from 'http';
 import { Logs } from "./general/logs";
 import { SqlHelper } from "./general/sqlHelper";
+import { HelpCommandHelper } from "./commands/help";
 
 
 smp.install();
@@ -19,6 +20,7 @@ const bot = new DiscordBot();
 DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
+HelpCommandHelper.addCommands(bot);
 bot.login();
 const healthcheck = http.createServer(function (req,res){
     Logs.log(req);
