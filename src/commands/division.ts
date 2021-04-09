@@ -94,6 +94,11 @@ export class DivisionCommand {
                 return 0 == line.toLocaleLowerCase().localeCompare(x.name.toLocaleLowerCase());
             })
             if(target.length == 0){
+                const target = divs.filter((x)=>{
+                    return 0 == line.toLocaleLowerCase().localeCompare(x.alias.toLocaleLowerCase());
+                })
+            }
+            if(target.length == 0){
                 MsgHelper.say(
                     message,
                     `I don't know what that division is, did you mean ***${
@@ -104,7 +109,7 @@ export class DivisionCommand {
             }else{
                 DivisionCommand.bans[message.author.id][target[0].id]=null;
                 Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]) )
-                MsgHelper.reply(message,line + " has been unbanned.")
+                MsgHelper.reply(message,target[0].name + " has been unbanned.")
                 let all = false;
                 for(const z of DivisionCommand.bans[message.author.id]){
                     all = z || all;
