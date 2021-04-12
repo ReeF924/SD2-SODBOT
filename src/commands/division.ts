@@ -11,7 +11,6 @@ export class DivisionCommand {
     static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
     static randomDiv(message:Message,input:string[]):void {
-        
         let divs:DivisionStruct[];
         Logs.log("command Random Division with Inputs "+JSON.stringify(input));
         if(input.length == 0){
