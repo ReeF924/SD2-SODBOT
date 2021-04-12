@@ -48,11 +48,11 @@ export class HelpCommand {
                             inline: false },
                         { 
                             name: "$help player", 
-                            value: 'Gives help info about all of the commands that relate to the player', 
+                            value: 'Gives help info about all of the commands that relate to the player.', 
                             inline: false },
                         { 
                             name: "$help replays", 
-                            value: 'Gives help info about the submitting of match replay files', 
+                            value: 'Gives help info about the submitting of match replay files.', 
                             inline: false }
                     
                     ])
@@ -71,23 +71,23 @@ export class HelpCommand {
                 inline: false },
             { 
                 name: "$rmap XXX", 
-                value: "In addition to $rampa you can also add the following arguments 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories", 
+                value: "In addition to $rmap you can also add the following arguments 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories", 
                 inline: false },
             { 
                 name: "$maps  or  $allmaps", 
-                value: "Returns a list of all the current maps\nIf a map is currently banned its name will have strike through it", 
+                value: "Returns a list of all the current maps\nIf a map is currently banned this will be indicated by its name being struck out.", 
                 inline: false },
             { 
                 name: "$banmaps", 
-                value: "You can use $banmaps to eliminate a map/maps from the active list of available maps for selection with $rmap\neg. $banmaps Slutsk, Leniana  would remove both Slutsk and Lenina from both the SD2League and 1v1 Lists", 
+                value: "You can use $banmaps to eliminate a map/maps from the active list of available maps for selection with $rmap. You can add multiple maps by using a comma inbetween maps.\nExample Usage: $banmaps Slutsk, Orsha East", 
                 inline: false },
             { 
                 name: "$unbanmaps", 
-                value: "You can use $unbanmaps to unban a map/maps from the list of available maps for selection with $rmap\neg. $unbanmaps Slutsk  would remove the ban from Slutsk from both the SD2League and 1v1 Lists", 
+                value: "You can use $unbanmaps to remove the ban on a map/maps from the list of available maps for selection with $rmap. You can remove the ban from multiple maps by placing a comma between maps.\nExample Usage: $unbanmaps Slutsk, Orsha East", 
                 inline: false },
             { 
                 name: "$resetmaps", 
-                value: "This command will clear all currently banned maps and reset the maps list back to its default state", 
+                value: "This command will clear all currently banned maps and reset the maps list back to its default state.", 
                 inline: false }        
         ])
         message.author.send(embed);
@@ -99,26 +99,26 @@ export class HelpCommand {
         .setTitle("Help - Division Commands")
         .addFields([
             {   name: "$rdiv", 
-                value: "Returns a random div from all of the available division, it exlcudes any banned divisions\nYou may also add the argument Allies or Axis to narrw the random selection down to only that faction.\nie. $rdiv Axis will return a random div from the available axis divisions.",
+                value: "Returns a random division from all of the available divisions, it excludes any banned divisions.\nYou may also add the argument Allies or Axis to narrow the random selection down to only that faction.\nExample Usage $rdiv Axis",
              inline: false },
             {   name: "$divs or $alldivs", 
-                value: "Returns a list of all Divisions, includes the division name and its alias",
+                value: "Returns a list of all divisions, it includes the division name and its alias.",
                 inline: false },
             { 
                 name: "$bandiv", 
-                value: "Allows you to ban a division (or multiple divisions) and remove it from the active list of divisions\nYou may use the offical name of the division or its alias\neg. $bandiv 1. Skijager  and  $bandiv 1SJ  work the same way", 
+                value: "Allows you to ban a division (or multiple divisions) and remove it from the active list of divisions.\nYou may use the offical name of the division or its alias.\nExample Usage: $bandiv 1. Skijager  and  $bandiv 1SJ  (both work the same way)", 
                 inline: false },
             { 
                 name: "$unbandiv", 
-                value: "Allows you to unban a division (or multiple divisions) and make it available again in the list of divisions.\nYou may use the offical name of the division or its alias\neg. $unbandiv 1. Skijager and  $bandiv 1SJ  work the same way", 
+                value: "Allows you to remove the ban on a division (or multiple divisions) and make it available again in the list of divisions.\nYou may use the offical name of the division or its alias.\nExample Usage: $unbandiv 1. Skijager and  $unbandiv 1SJ  (both work the same way)", 
                 inline: false },
             { 
-                name: "$resetdiv", 
-                value: "Will remove all bans and reset the divisions list bck to its default state", 
+                name: "$resetdivs", 
+                value: "Will remove all bans and reset the division's list back to its default state.", 
                 inline: false },
             { 
                 name: "$banneddivs", 
-                value: "Will provide a list of the currently banned divisions", 
+                value: "Will provide a list of the currently banned divisions.", 
                 inline: false }
         ])
         message.author.send(embed);
@@ -130,22 +130,22 @@ export class HelpCommand {
         .setTitle("Help - Misc Commands")
         .addFields([
             {   name: "$piat", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                value: "FIRE the Piat.   Can you get a Hit?",
              inline: false },
             {   name: "$info", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                value: "Shows info about the bot.",
                 inline: false },
             { 
                 name: "$faction", 
-                value: "Returns a d=random faction eg. Returns Allies or Axis", 
+                value: "Returns a random faction, ie. returns Allies or Axis.", 
                 inline: false },
             { 
                 name: "$flip", 
-                value: "Returns Heads or Tails, like a coin toss", 
+                value: "Returns Heads or Tails, like a coin toss.", 
                 inline: false },
             { 
                 name: "$random", 
-                value: "Returns a random sized game from the list of availabe sizes (1v1, 2v2, 3v3, 4v4)", 
+                value: "Returns a random sized game from the list of availabe sizes, ie 1v1, 2v2, 3v3, 4v4.", 
                 inline: false }
         ])
         message.author.send(embed);
@@ -157,18 +157,14 @@ export class HelpCommand {
         .setTitle("Help - Player Commands")
         .addFields([
             {   name: "$register", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                value: "This command will register (if they are unknown to the bot) or update (if they have previously registered) a player to the bot.\n The command makes a link between the Discord User submitting the request and the Eugen Player ID provided in the request.\nExample Usage: $register 123456 (where 123456 is the player's Eugen Player ID).",
              inline: false },
             {   name: "$player", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                inline: false },
-            { 
-                name: "$rating", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", 
+                value: "Provides a summary of the player. When submitted without an argument will return information about the submitter.  When used with the @player argument will return information about that player.\n Exmaple Usage: $player @ExamplePlayer (returns player information for ExamplePlayer)",
                 inline: false },
             { 
                 name: "$allratings", 
-                value: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", 
+                value: "Returns a list of the top 100 active players and their ratings.\nA active player is defined as a player who has been listed in a submitted rated match in the last 6 months.", 
                 inline: false }
         ])
         message.author.send(embed);
@@ -180,16 +176,22 @@ export class HelpCommand {
         .setTitle("Help - Replays")
         .addFields([
             {   name: "Uploading a game replay", 
-                value: "By uploading a game replay into one of the channels supported by the bot will trigger the bot to return a embed of summary information about the match.",
+                value: "Uploading a game replay into one of the channels supported by the bot will trigger the bot to return summary information about the match.",
                 inline: false },
             {   name: "\u200b", 
-                value: "This will includes information about the match (eg. Winner, Loser, VictoryState, Duration, Map etc as well as information about the players themselves (eg Discord and Eugen Names, Lvl, Rating, Deck and Income used)",
-                inline: false },
-            {   name: "Replay Location", 
-                value: "First thing is to navigate in-game to Profile/Replays and ensure the check box \"Cloud\" is unchecked, this will ensure a copy of the game has been saved to your local device.",
+                value: "This includes information about the match (eg. Winner, Loser, VictoryState, Duration, Map etc as well as information about the players themselves (eg Discord and Eugen Names, Lvl, Rating, Deck and Income used)",
                 inline: false },
             {   name: "\u200b", 
-                value: "Not every computer is the same but generally you can find your replay files under\nC:/user/xxxxxx/",
+                value: "If the game has been submitted via a channel that also allows rating, the match will be rated by the BOT and updates to the player ratings added to the player database.",
+                inline: false },
+            {   name: "-------------------------------------------------------------", 
+                value: "\u200b",
+                inline: false },
+            {   name: "Replay Location On Your PC", 
+                value: "First thing is to navigate in-game to Profile/Replays and ensure the check box \"Cloud\" is unchecked on the replay, this will ensure a copy of the game has been saved to your local device.",
+                inline: false },
+            {   name: "\u200b", 
+                value: "Not every computer is the same but generally you can find your locally saved replay files under -\nC:/user/xxxxxx/SavedGames/EugenSystems/SteelDivision 2/",
                 inline: false }
         ])
         message.author.send(embed);

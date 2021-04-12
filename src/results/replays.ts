@@ -73,13 +73,15 @@ export class Replays {
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
-                    embed = embed.addField("-------------------------------------------------", "\u200B")
+                
+                    embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, true)
                         .addField("Level", player.level, true)
-                        .addField('\u200b', '\u200b', true)
+                        .addField('Rating', 'TBD', true)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
+                        .setColor("#347C17")
                 }
             message.channel.send(embed)
             if (g.players.length >= 4) {
@@ -102,12 +104,12 @@ export class Replays {
                         playerid += " (id:" + player.id + ")";
                     }
                     embed = embed.addField("-------------------------------------------------", "\u200B")
-                    .addField("Player", playerid, true)
-                    .addField("Level", player.level, true)
-                    .addField('\u200b', '\u200b', true)
-                    .addField("Division", player.deck.division, true)
-                    .addField("Income", player.deck.income, true)
-                    .addField("Deck Code", player.deck.raw.code, false)
+                        .addField("Player", playerid, true)
+                        .addField("Level", player.level, true)
+                        .addField('Rating', 'TBD', true)
+                        .addField("Division", player.deck.division, true)
+                        .addField("Income", player.deck.income, true)
+                        .addField("Deck Code", player.deck.raw.code, false)
                     counter++;
                     if (counter == 5) {
                         message.channel.send(embed)
