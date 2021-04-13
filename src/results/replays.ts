@@ -152,15 +152,15 @@ export class Replays {
                 console.log(g.players[1].id)
                 console.log("Victory Condition " + g.result.victory);
                 
-                const ratedGame = await RatingEngine.rateMatch(message, pWinner, pLoser, 1, 0)
-                console.log(ratedGame); 
+                //const ratedGame = await RatingEngine.rateMatch(message, pWinner, pLoser, 1, 0)
+                //console.log(ratedGame); 
                 
-                message.channel.send(`<@${pWinner}> Updated ELO: ||${(ratedGame.newP1Elo.toFixed(2))} (
-                        ${ratedGame.p1EloChange < 0 ? "" : "+"}
-                        ${ratedGame.p1EloChange.toFixed(2)})||<@${pLoser}> Updated ELO: ||
-                        ${ratedGame.NewP2Elo.toFixed(2)} (
-                        ${ratedGame.P2EloChange < 0 ? "" : "+"}
-                        ${ratedGame.P2EloChange.toFixed(2)})||`);
+                //message.channel.send(`<@${pWinner}> Updated ELO: ||${(ratedGame.newP1Elo.toFixed(2))} (
+                //        ${ratedGame.p1EloChange < 0 ? "" : "+"}
+                //        ${ratedGame.p1EloChange.toFixed(2)})||<@${pLoser}> Updated ELO: ||
+                //        ${ratedGame.NewP2Elo.toFixed(2)} (
+                //        ${ratedGame.P2EloChange < 0 ? "" : "+"}
+                //        ${ratedGame.P2EloChange.toFixed(2)})||`);
             }   
         })
         
