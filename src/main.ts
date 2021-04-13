@@ -9,6 +9,7 @@ import * as http from 'http';
 import { Logs } from "./general/logs";
 import { SqlHelper } from "./general/sqlHelper";
 import { HelpCommandHelper } from "./commands/help";
+import { PlayerCommandHelper } from "./commands/player";
 
 
 smp.install();
@@ -21,6 +22,7 @@ DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
 HelpCommandHelper.addCommands(bot);
+PlayerCommandHelper.addCommands(bot);
 bot.login();
 const healthcheck = http.createServer(function (req,res){
     Logs.log(req);
