@@ -69,12 +69,15 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text})
   }
 
+
   static setDiscordUserSql = ""
   static addReplaySql = ""
+  static addPlayerEloSql = ""
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
     SqlHelper.addReplaySql = fs.readFileSync("sql/addReplay.sql").toLocaleString();
+    SqlHelper.addPlayerEloSql = fs.readFileSync("sql/addnewplayer.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.authentication.options.userName = CommonUtil.config("sqluser")
     SqlHelper.connection = new Connection(SqlHelper.config);

@@ -156,10 +156,15 @@ export class MiscCommand {
             (async () => {
                 let user = await SqlHelper.getDiscordUserFromEugenId(Number(input[0]))
                 if(user){
-                    user.id =(message.author.id)
-                    await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"account has been updated")
-                    Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
+                    if(user.id = message.author.id){
+                        MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
+                        Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
+                    }else{
+                        user.id =(message.author.id)
+                        await SqlHelper.setDiscordUser(user);
+                        MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
+                        Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
+                    }
                 }else{
                     console.log(Number(message.author.id))
                     user = {
@@ -169,7 +174,7 @@ export class MiscCommand {
                         globalAdmin: false
                     }
                     await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"has been added to the Player Database")
+                    MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
                     Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
                 }
             })()
