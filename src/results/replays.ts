@@ -154,7 +154,7 @@ export class Replays {
                 console.log(g.players[1].id)
                 console.log("Victory Condition " + g.result.victory);
                 
-                //Need to call the rating engine, not working yet
+                //Need to call the rating engine and then post the results to the channel, not working yet
 
                 //const ratedGame = await RatingEngine.rateMatch(message, pWinner, pLoser, 1, 0)
                 //console.log(ratedGame); 
