@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, ReactionUserManager } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
@@ -9,10 +9,16 @@ import { RatingEngine } from "../results/rating";
 
 export class PlayerCommand {
     static getPlayer(message:Message,input:string[]):void {
-        if(input.length == 0)
+        
+        if(input.length == 0){
             (async () => {
                 const discordUser = await SqlHelper.getDiscordUser(message.author.id)
-                console.log(discordUser.playerId)       
+                console.log(discordUser.playerId)    
+                if(discordUser.playerId == null ){
+                    MsgHelper.reply(message,`The player is not currently registered to the bot, please use $register "EugenId" to register to the bot`)
+                    return
+                }
+
                 const playerdetails = await RatingEngine.getPlayerElo(discordUser.playerId);
                 
                 const embed = new MessageEmbed()
@@ -26,7 +32,34 @@ export class PlayerCommand {
                 ])
                 message.channel.send(embed);
             })()
+            return
+        } else if(input.length == 1){
+            (async () => {
+                console.log(input[0])
+                const discordUser = await SqlHelper.getDiscordUser(input[0])
+                console.log(discordUser.playerId)    
+                if(discordUser.playerId = null ){
+                    MsgHelper.reply(message,`The player is not currently registered to the bot, please use $register "EugenId" to register to the bot`)
+                    return
+                }
 
+                const playerdetails = await RatingEngine.getPlayerElo(discordUser.playerId);
+                
+                const embed = new MessageEmbed()
+                .setTitle("Player Details")
+                .setColor("75D1EA")
+                .addFields([
+                    {name:"Player Name", value: message.author.username,inline:false},
+                    {name:"Eugen Id", value: playerdetails.id,inline:false},
+                    {name:"League Rating", value: playerdetails.elo,inline:true},
+                    {name:"PickBanElo", value: playerdetails.pickBanElo,inline:true},
+                ])
+                message.channel.send(embed);
+            })()
+        } else if (input.length > 1){
+            MsgHelper.reply(message,`This command can only query 1 player at a time`)
+            return
+        }   
     }
 
     static submitRating(message:Message, input:string[]):void{
