@@ -41,7 +41,7 @@ export class PlayerCommand {
                 const discordUser = await SqlHelper.getDiscordUser(p1)
                 console.log(discordUser)    
                 if(discordUser == null ){
-                    MsgHelper.reply(message,`The player is not currently registered to the bot, please use $register "EugenId" to register to the bot`)
+                    MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
                     return
                 }
 
