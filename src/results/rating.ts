@@ -9,11 +9,16 @@ const k_value = 32;
 export class RatingEngine {
     
   static async rateMatch(message: Message, p1uid:number, p2uid:number, p1Score:number, p2Score:number ): Promise<RatedGame> {
-    const p1Elo = await RatingEngine.getPlayerElo(p1uid);
-    const p2Elo = await RatingEngine.getPlayerElo(p2uid);
+    console.log("Have arrived in rateMatch")
+    var p1Elo:PlayerDetails
+    var p2Elo:PlayerDetails
 
-    console.log(p1Elo)
-    console.log(p2Elo)
+
+    p1Elo = await RatingEngine.getPlayerElo(p1uid)
+    p2Elo = await RatingEngine.getPlayerElo(p2uid)
+    
+    console.log(p1Elo.id)
+    console.log(p2Elo.id)
 
     const newP1Elo =
       p1Elo.elo + k_value * (p1Score - RatingEngine.getChanceToWin(p1Elo.elo, p2Elo.elo));
@@ -38,7 +43,22 @@ export class RatingEngine {
 
 
   static async getPlayerElo(eugenId:number): Promise<PlayerDetails> {
-    const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
+    console.log("It gets to getPlayerELO");
+    const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';");
+    console.log("Back from sql")
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      console.log(x.id.value);
+      return {
+        id: String(x.id.value),
+        elo: x.elo.value as number,
+        pickBanElo: x.pickBanElo.value as number,
+      }
+    }
+    // Only here in case we have a user without a entry in the players table
+    console.log("No player found, need to create record")
+    RatingEngine.createPlayerElo(eugenId);
+    const yy = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       console.log(x);
@@ -48,22 +68,8 @@ export class RatingEngine {
         pickBanElo: x.pickBanElo.value as number,
       }
     }
-    else
-        // Only here in case we have a user without a entry in the players table
-      console.log("No player found, need to create record")
-      RatingEngine.createPlayerElo(eugenId);
-      const yy = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
-      if(xx.rows.length > 0){
-        const x = xx.rows[0];
-        console.log(x);
-        return {
-          id: String(x.id.value),
-          elo: x.elo.value as number,
-          pickBanElo: x.pickBanElo.value as number,
-        }
-      }
+    return null
   }
-    
 
   static async createPlayerElo(eugenId: number) {
     const data = {
@@ -72,7 +78,10 @@ export class RatingEngine {
       await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:TYPES.Int})
       return 
   }
+
 }
+
+
 
 export interface PlayerDetails {
   id: string,

@@ -5,6 +5,7 @@ import * as axios from "axios"
 import { SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
 import { RatingEngine } from "./rating";
+import { Console } from "node:console";
 
 const ax = axios.default;
 
@@ -124,7 +125,6 @@ export class Replays {
             message.channel.send("Results Submitted")
             
             //and we need to update ELO (If 2 Players)
-            console.log("This is the number of players" + g.players.length)
             if (g.players.length <= 2){    //And from League Server??
                 let pWinner: number = 0
                 let pLoser: number = 0
@@ -133,18 +133,20 @@ export class Replays {
                     if (g.players[0].alliance == replayPlayer.alliance){
                         pLoser = g.players[0].id
                         pWinner = g.players[1].id
-                    }else
+                    }else{
                         pWinner = g.players[0].id
                         pLoser = g.players[1].id
+                    }
                 }
                 else if (g.result.victory > 3) {
                     //replay creator won
                     if (g.players[0].alliance != replayPlayer.alliance){
                         pLoser = g.players[0].id
                         pWinner = g.players[1].id
-                    }else
+                    }else{
                         pWinner = g.players[0].id
                         pLoser = g.players[1].id
+                    }
                 }
                 console.log("Winner is " +pWinner)
                 console.log("Loser is " +pLoser)
@@ -152,6 +154,8 @@ export class Replays {
                 console.log(g.players[1].id)
                 console.log("Victory Condition " + g.result.victory);
                 
+                //Need to call the rating engine and then post the results to the channel, not working yet
+
                 //const ratedGame = await RatingEngine.rateMatch(message, pWinner, pLoser, 1, 0)
                 //console.log(ratedGame); 
                 
