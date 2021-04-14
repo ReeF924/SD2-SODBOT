@@ -46,12 +46,13 @@ export class PlayerCommand {
                 }
 
                 const playerdetails = await RatingEngine.getPlayerElo(discordUser.playerId);
-                
+                const playername = await DiscordBot.bot.users.fetch(String(p1))
+
                 const embed = new MessageEmbed()
                 .setTitle("Player Details")
                 .setColor("75D1EA")
                 .addFields([
-                    {name:"Player Name", value: message.author.username,inline:false},
+                    {name:"Player Name", value: playername,inline:false},
                     {name:"Eugen Id", value: playerdetails.id,inline:false},
                     {name:"League Rating", value: playerdetails.elo,inline:true},
                     {name:"PickBanElo", value: playerdetails.pickBanElo,inline:true},
