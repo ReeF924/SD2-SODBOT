@@ -36,7 +36,7 @@ export class PlayerCommand {
         } else if(input.length == 1){
             (async () => {
                 console.log(input[0])
-                const p1 = input[0].slice(3)
+                const p1 = input[0].slice(3,-1)
                 console.log(p1) 
                 const discordUser = await SqlHelper.getDiscordUser(p1)
                 console.log(discordUser)    
