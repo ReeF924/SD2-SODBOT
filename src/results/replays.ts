@@ -20,24 +20,21 @@ export class Replays {
             let winners = ""
             let loosers = ""
             if (g.result.victory < 3) {
-                //replay creator lost
-                for (const player of g.players) {
-                    const playerid = player.name;
-                    if (player.alliance == replayPlayer.alliance)
+                 for (const player of g.players) {
+                    const playerid = player.name
+                    if (g.ingamePlayerId == player.alliance)
                         loosers += playerid + "\n"
-                    else
+                        else
                         winners += playerid + "\n"
-                }
+                    }  
             } else if (g.result.victory > 3) {
-                //replay creator won
                 for (const player of g.players) {
-                    const playerid = player.name;
-                    if (player.alliance != replayPlayer.alliance)
+                    const playerid = player.name
+                    if (g.ingamePlayerId != player.alliance)
                         loosers += playerid + "\n"
-                    else
+                        else
                         winners += playerid + "\n"
-                }
-
+                    }  
             } else {
                 winners = "noone"
                 loosers = "everyone"
@@ -130,7 +127,7 @@ export class Replays {
                 let pLoser: number = 0
                 if (g.result.victory < 3) {
                     //replay creator lost
-                    if (g.players[0].alliance == replayPlayer.alliance){
+                    if (g.players[0].alliance == g.ingamePlayerId){
                         pLoser = g.players[0].id
                         pWinner = g.players[1].id
                     }else{
@@ -140,7 +137,7 @@ export class Replays {
                 }
                 else if (g.result.victory > 3) {
                     //replay creator won
-                    if (g.players[0].alliance != replayPlayer.alliance){
+                    if (g.players[0].alliance != g.ingamePlayerId){
                         pLoser = g.players[0].id
                         pWinner = g.players[1].id
                     }else{
