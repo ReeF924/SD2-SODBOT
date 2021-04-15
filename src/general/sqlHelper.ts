@@ -38,10 +38,10 @@ export class SqlHelper {
         globalAdmin: Boolean(x.globalAdmin.value)
       }
     }
-      
     else
       return null;
   }
+
 
   static async getDiscordUserFromEugenId(id: number): Promise<DiscordUser> {
     const xx = await SqlHelper.exec("Select * from discordUsers where playerId =  "+ id + ";")
@@ -58,6 +58,19 @@ export class SqlHelper {
       return null;
   }
 
+  //static async getReplay(id: number): Promise<DBObject> {
+  //  const replay:DBObject = await SqlHelper.exec("Select uploadedAt,JSON_VALUE(replay, '$.players'),JSON_VALUE(replay, '$.ingamePlayerId'),JSON_VALUE(replay, '$.result.victory') from replays where ISJSON(replay) > 0 and JSON_VALUE(replay, '$.players.id') = '" +id+ "' and status = 'Active' order by uploadedAt;")
+  //  if(replay.rows.length > 0){
+  //    return {
+  //      
+  //    }
+  //  }
+  //  else
+  //    return null;
+  //}
+
+
+
   static async setDiscordUser(user: DiscordUser): Promise<DBObject> {
     const data = {
       id: String(user.id),
@@ -73,6 +86,7 @@ export class SqlHelper {
   static setDiscordUserSql = ""
   static addReplaySql = ""
   static addPlayerEloSql = ""
+
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
@@ -123,6 +137,7 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
 
+
   static exec(string: string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {
     const ret = new Promise<DBObject>((resolve) => {
       const request = new Request(string, (err, rowCount, rows) => {
@@ -140,6 +155,7 @@ export class SqlHelper {
     return ret;
   }
 }
+
 
 interface DBObject {
   rows?: Record<string,{value:unknown}>[],

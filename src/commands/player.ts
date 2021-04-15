@@ -15,17 +15,20 @@ export class PlayerCommand {
                 const discordUser = await SqlHelper.getDiscordUser(message.author.id)
                 console.log(discordUser.playerId)    
                 if(discordUser.playerId == null ){
-                    MsgHelper.reply(message,`The player is not currently registered to the bot, please use $register "EugenId" to register to the bot`)
+                    MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
                     return
                 }
 
-                const playerdetails = await RatingEngine.getPlayerElo(discordUser.playerId);
+                const playerdetails = await RatingEngine.getPlayerElo(discordUser.playerId)
+                const playername = await DiscordBot.bot.users.fetch(String(message.author.id))
                 
+                //const gamelist = await SqlHelper.exec("SQL to extract replay data")
+
                 const embed = new MessageEmbed()
                 .setTitle("Player Details")
                 .setColor("75D1EA")
                 .addFields([
-                    {name:"Player Name", value: message.author.username,inline:false},
+                    {name:"Player Name", value: playername,inline:false},
                     {name:"Eugen Id", value: playerdetails.id,inline:false},
                     {name:"League Rating", value: playerdetails.elo,inline:true},
                     {name:"PickBanElo", value: playerdetails.pickBanElo,inline:true},
