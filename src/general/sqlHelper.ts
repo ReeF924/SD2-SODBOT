@@ -29,6 +29,7 @@ export class SqlHelper {
 
   static async getDiscordUser(id: string): Promise<DiscordUser> {
     const xx = await SqlHelper.exec("Select * from discordUsers where id = '" + id + "';")
+
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
@@ -38,10 +39,10 @@ export class SqlHelper {
         globalAdmin: Boolean(x.globalAdmin.value)
       }
     }
-      
     else
       return null;
   }
+
 
   static async getDiscordUserFromEugenId(id: number): Promise<DiscordUser> {
     const xx = await SqlHelper.exec("Select * from discordUsers where playerId =  "+ id + ";")
@@ -58,6 +59,8 @@ export class SqlHelper {
       return null;
   }
 
+
+
   static async setDiscordUser(user: DiscordUser): Promise<DBObject> {
     const data = {
       id: String(user.id),
@@ -69,12 +72,16 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text})
   }
 
+
   static setDiscordUserSql = ""
   static addReplaySql = ""
+  static addPlayerEloSql = ""
+
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
     SqlHelper.addReplaySql = fs.readFileSync("sql/addReplay.sql").toLocaleString();
+    SqlHelper.addPlayerEloSql = fs.readFileSync("sql/addnewplayer.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.authentication.options.userName = CommonUtil.config("sqluser")
     SqlHelper.connection = new Connection(SqlHelper.config);
@@ -120,6 +127,7 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
 
+
   static exec(string: string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {
     const ret = new Promise<DBObject>((resolve) => {
       const request = new Request(string, (err, rowCount, rows) => {
@@ -137,6 +145,7 @@ export class SqlHelper {
     return ret;
   }
 }
+
 
 interface DBObject {
   rows?: Record<string,{value:unknown}>[],
