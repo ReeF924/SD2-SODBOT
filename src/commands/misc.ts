@@ -16,7 +16,15 @@ export class MiscCommand {
         "oh come on, that shot was pathetic... Put your back into it!",
         "ping! Your shot bounced!",
         "you miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
-        "miss! Your shot couldn't hit the broad side of a barn!"
+        "miss! Your shot couldn't hit the broad side of a barn!",
+        "miss! Come on bro, just boogaloo it",
+        "another miss! Your aim is like Gonzo's analysis....lacking",
+        "miss! This piat is rubbish, just use your Sherman",
+        "miss! Just side shot it bro",
+        "miss! I know You will try again, like proto who always came back for another shot",
+        "He's Burning",
+        "hit!, Jerry's in trouble now",
+        "bounce!, you do know that is a King Tiger right?"
       ];
 
 
@@ -58,7 +66,7 @@ export class MiscCommand {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.98){
+        if (i > 0.95){
             MsgHelper.reply(
                 message,
                 MiscCommand.sodbotReplies[Math.floor(Math.random() * MiscCommand.sodbotReplies.length)],
