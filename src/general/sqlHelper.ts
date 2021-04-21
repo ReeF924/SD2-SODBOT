@@ -29,6 +29,7 @@ export class SqlHelper {
 
   static async getDiscordUser(id: string): Promise<DiscordUser> {
     const xx = await SqlHelper.exec("Select * from discordUsers where id = '" + id + "';")
+
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
@@ -57,17 +58,6 @@ export class SqlHelper {
     else
       return null;
   }
-
-  //static async getReplay(id: number): Promise<DBObject> {
-  //  const replay:DBObject = await SqlHelper.exec("Select uploadedAt,JSON_VALUE(replay, '$.players'),JSON_VALUE(replay, '$.ingamePlayerId'),JSON_VALUE(replay, '$.result.victory') from replays where ISJSON(replay) > 0 and JSON_VALUE(replay, '$.players.id') = '" +id+ "' and status = 'Active' order by uploadedAt;")
-  //  if(replay.rows.length > 0){
-  //    return {
-  //      
-  //    }
-  //  }
-  //  else
-  //    return null;
-  //}
 
 
 
