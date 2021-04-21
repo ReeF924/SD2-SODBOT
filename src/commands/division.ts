@@ -2,11 +2,11 @@ import { Message } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
-import { AsciiTable3 } from "ascii-table3/ascii-table3";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
 
+//@todo clean up array mess in this file created by addition of divsion alias names.
 export class DivisionCommand {
     static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
@@ -122,7 +122,7 @@ export class DivisionCommand {
         }
         for(const line of input){
             const divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
-            var target = divs.filter((x)=>{
+            let target = divs.filter((x)=>{
                 return 0 == line.toLocaleLowerCase().localeCompare(x.name.toLocaleLowerCase());
             })
             
