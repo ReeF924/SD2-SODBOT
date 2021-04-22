@@ -17,14 +17,18 @@ export class MiscCommand {
         "ping! Your shot bounced!",
         "you miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
         "miss! Your shot couldn't hit the broad side of a barn!",
-        "miss! Come on bro, just boogaloo it",
+        "miss! Come on bruh, just boogaloo it",
         "another miss! Your aim is like Gonzo's analysis....lacking",
         "miss! This piat is rubbish, just use your Sherman",
         "miss! Just side shot it bro",
-        "miss! I know You will try again, like proto who always came back for another shot",
-        "He's Burning",
+        "miss! I know you will try again, like proto who always came back for another shot",
+        "hit!, He's Burning",
         "hit!, Jerry's in trouble now",
-        "bounce!, you do know that is a King Tiger right?"
+        "bounce!, you do know that is a King Tiger right?",
+        "hit! We're Airborne. We don't start fights, we finish 'em!",
+        "hit! Your name is unknown. Your deed is immortal.",
+        "hit! Up the Ox and Bucks. Up the Ox and Bucks.",
+        "miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
 
