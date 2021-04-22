@@ -21,7 +21,6 @@ export class PlayerCommand {
         if(input.length == 0){
             //Get the message author's id
             const discordUser = await SqlHelper.getDiscordUser(message.author.id)
-            console.log(discordUser.playerId)
             //Check that you received a id back from the DB    
             if(discordUser.playerId == null ){
                 MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
@@ -36,10 +35,8 @@ export class PlayerCommand {
 
         // If there is a argument, then we are getting another player's details
         } else if(input.length == 1){
-            console.log(input[0])
             const p1 = input[0].slice(3,-1)
-            const discordUser = await SqlHelper.getDiscordUser(p1)
-            console.log(discordUser)    
+            const discordUser = await SqlHelper.getDiscordUser(p1) 
             // Check that you received back player discord id    
             if(discordUser == null ){
                 MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
@@ -51,13 +48,11 @@ export class PlayerCommand {
             eugenId = playerDetails.id
             leagueElo = playerDetails.elo
             globalElo = playerDetails.pickBanElo
-
         // If there is more than 1 argument then the command is not valid
         } else if (input.length > 1){
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
             return
         }   
-
         // Create the Embed
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
@@ -69,8 +64,7 @@ export class PlayerCommand {
             {name:"\u200b", value: "\u200b",inline:true}
         ]);
         // Extract recent games
-        const xx = await SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "' ;")
-        console.log(xx.rows.length)
+        const xx = await SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "';")
         let opponent = "";
         let gameMap = "";
         let gameResult = "";
@@ -84,14 +78,14 @@ export class PlayerCommand {
             } 
             for (let i = 0; i < numGames; i++) {        
                 const x = xx.rows[i];
-                console.log("Row Number "+i);
                 try{
                     const replayString = x.replay.value as string;
                     const replayJson = JSON.parse(replayString);
-                    console.log(replayJson)
-                    console.log("Max Players "+replayJson.maxPlayers);
+
+                    console.log(replayJson.players.length)
+
                 //Check that each row is a 1v1 match    
-                if (replayJson.maxPlayers == 2 || replayJson.maxPlayers == null){
+                if (replayJson.players.length == 2){
                     //identify who the opponent was
                     if (replayJson.players[0].id != eugenId){
                         opponent += replayJson.players[0].name + "\n";
@@ -145,6 +139,46 @@ export class PlayerCommand {
 
 
     static async getLadder(message:Message, input:string[]){
+        var numPlayers = 0
+        var pName = ""
+        var pPos = ""
+        var pElo = ""
+        const playerList = await SqlHelper.exec("SELECT * FROM players ORDER BY pickBanElo DESC;")
+        console.log("Number of players's returned "+playerList.rows.length)
+        if (playerList.rows.length < 100){
+            numPlayers = playerList.rows.length
+        }else{
+            numPlayers = 100
+        }
+        // Run through list of players
+        let y = 1
+        for (let i = 0; i < numPlayers; i++){            
+            const x = playerList.rows[i]
+            const p1 = await SqlHelper.exec("SELECT id FROM discordUsers WHERE playerId = '" +x.id.value+ "' ;")
+            if (p1.rows.length == 1){
+                const p1Id = p1.rows[0]
+                const discordUser = await DiscordBot.bot.users.fetch(String(p1Id.id.value))
+    
+                pPos += y + "\n"
+                pName += discordUser.username + "\n";
+                pElo += x.pickBanElo.value + "\n";
+                y += 1
+            }
+        }
+        //Create and send the embed
+        console.log(message.guild.id)
+        console.log(message.guild.name)
+       
+        const embed = new MessageEmbed();
+        embed.setTitle("Player Ranking")
+        embed.setColor("75D1EA")
+        embed.addFields([
+            {name:"Pos", value: pPos,inline:true},
+            {name:"Player Name", value: pName,inline:true},
+            {name:"ELO", value: pElo,inline:true}
+        ])
+        //Send Final Embed
+        message.channel.send(embed);
 
     }
 

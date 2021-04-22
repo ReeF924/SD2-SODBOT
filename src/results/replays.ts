@@ -115,8 +115,13 @@ export class Replays {
                         counter = 0;
                     }
                 }
+                // Check the game is 1v1 and warn that results will not be rated
+                if (g.players.length > 2){
+                    message.reply("This reply is not a 1v1 player game, outcome will not be used in ELO")
+                } 
                 message.channel.send(embed)
             }      
+
             //and we need to commit this to DB....
             SqlHelper.setReplay(message,g);
             message.channel.send("Results Submitted")

@@ -90,6 +90,7 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text})
   }
 
+<<<<<<< HEAD
   static async getPlayerElo(eugenId:number): Promise<PlayerDetails> {
     console.log("It gets to getPlayerELO");
     const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';");
@@ -127,14 +128,29 @@ export class SqlHelper {
       return 
   }
 
+=======
+  static async setPlayer(id, elo, globalElo): Promise<DBObject> {
+    const data = {
+      id: id,
+      elo: elo,
+      pickBanElo: globalElo
+    }
+    console.log(data)
+    return await SqlHelper.exec(SqlHelper.updatePlayerSql,data,{id:TYPES.Int,elo:TYPES.Int,pickBanElo:TYPES.Int})
+  }
+
+
+>>>>>>> e69bd4605a7de9eb4e447e69304a184ba8ab6605
 
   static setDiscordUserSql = ""
   static addReplaySql = ""
   static addPlayerEloSql = ""
+  static updatePlayerSql = ""
 
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
+    SqlHelper.updatePlayerSql = fs.readFileSync("sql/updatePlayer.sql").toLocaleString();
     SqlHelper.addReplaySql = fs.readFileSync("sql/addReplay.sql").toLocaleString();
     SqlHelper.addPlayerEloSql = fs.readFileSync("sql/addnewplayer.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
@@ -211,6 +227,7 @@ export interface DiscordUser {
   id: string,
   playerId: number,
   serverAdmin: number[],
+<<<<<<< HEAD
   globalAdmin: boolean,
   impliedName: string
 }
@@ -224,6 +241,13 @@ export interface EloLadderElement {
 
 export interface PlayerDetails {
   id: string,
+=======
+  globalAdmin: boolean
+}
+
+export interface Player {
+  id: number,
+>>>>>>> e69bd4605a7de9eb4e447e69304a184ba8ab6605
   elo: number,
   pickBanElo: number
 }
