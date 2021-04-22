@@ -9,21 +9,30 @@ CREATE TABLE players
 (
     id INT NOT NULL PRIMARY KEY, -- Primary Key column / eugen id
     impliedName text null,
-    pickBanElo float NOT NULL
+    pickBanElo float NOT NULL DEFAULT(1500),
+    elo float NOT NULL DEFAULT(1500), 
+    lastPlayed datetime null
 );
 
 CREATE TABLE elo
 (
     resourceId varchar(30) NOT NULL, -- resource ID. Typically a snowflake for a channel or server.
     playerId INT NOT NULL, -- player ID. a player's eugen id.
-    elo float NOT NULL,
+    elo float NOT NULL DEFAULT(1500),
 )
 
 CREATE TABLE eloRef
 (
-    id varchar(30) NOT NULL PRIMARY KEY,
-    serverName text NOT NULL,
+    id varchar(30) NOT NULL PRIMARY KEY, -- resource id
+    serverName text NULL,
     channelName text null,
+)
+
+CREATE TABLE divisionElo
+(
+    id varchar(30) NOT NULL PRIMARY,
+    divName text NOT NULL,
+    elo float NOT NULL
 )
 
 CREATE TABLE channelBlacklist

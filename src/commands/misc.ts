@@ -179,7 +179,8 @@ export class MiscCommand {
                         id: (message.author.id),
                         playerId: Number(input[0]),
                         serverAdmin: [],
-                        globalAdmin: false
+                        globalAdmin: false,
+                        impliedName: message.author.username
                     }
                     await SqlHelper.setDiscordUser(user);
                     MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
