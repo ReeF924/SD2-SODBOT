@@ -3,6 +3,7 @@ import { Message, MessageEmbed } from "discord.js"
 import * as axios from "axios"
 import { SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
+import { Logs } from '../general/logs';
 
 const k_value = 32;
 
@@ -42,51 +43,51 @@ export class RatingEngine {
   }
 
 
-  static async getPlayerElo(eugenId:number): Promise<PlayerDetails> {
-    console.log("It gets to getPlayerELO");
-    const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';");
-    console.log("Back from sql")
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
-      console.log(x.id.value);
-      return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
-      }
+  static createLadder():[EloLadderElement]{
+    const ladder = [];
+    var numPlayers = 0
+    var pName = ""
+    var pId = ""
+    var pElo = ""
+    const playerList = await SqlHelper.exec()
+    Logs.log("Number of players's returned "+playerList.rows.length)
+    if (playerList.rows.length < 100){
+        numPlayers = playerList.rows.length
+    }else{
+        numPlayers = 100
     }
-    // Only here in case we have a user without a entry in the players table
-    console.log("No player found, need to create record")
-    RatingEngine.createPlayerElo(eugenId);
-    const yy = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
-      console.log(x);
-      return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
-      }
+    // Run through list of players
+    for (let i = 0; i < numPlayers; i++){
+        
+        const x = playerList.rows[i]
+        Logs.log(x.id.value)
+        const p1 = await SqlHelper.exec("SELECT id FROM discordUsers WHERE playerId = '" +x.id.value+ "' ;")
+        Logs.log("How many rows returned "+p1.rows.length)
+        if (p1.rows.length == 1){
+            const p1Id = p1.rows[0]
+            Logs.log(p1Id.id.value)
+            const discordUser = await DiscordBot.bot.users.fetch(String(p1Id.id.value))
+            Logs.log("Get the DiscordUser name "+discordUser.username)
+            Logs.log("Discord User ID "+discordUser.id)
+
+            pName += discordUser.username + "\n";
+            pId += x.id.value + "\n";
+            pElo += x.elo.value + "\n";
+        }
     }
-    return null
+    //Create and send the embed
+    const embed = new MessageEmbed();
+    embed.setTitle("Player Ranking")
+    embed.setColor("75D1EA")
+    embed.addFields([
+        {name:"Player Name", value: pName,inline:true},
+        {name:"Eugen Id", value: pId,inline:true},
+        {name:"SDL Rating", value: pElo,inline:true}
+    ])
+    return ladder
+
   }
-
-  static async createPlayerElo(eugenId: number) {
-    const data = {
-      playerId: eugenId
-    }
-      await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:TYPES.Int})
-      return 
-  }
-
-}
-
-
-
-export interface PlayerDetails {
-  id: string,
-  elo: number,
-  pickBanElo: number
+  
 }
 
 export interface RatedGame {

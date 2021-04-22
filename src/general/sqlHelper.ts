@@ -4,7 +4,6 @@ import { Logs } from "./logs";
 import * as fs from 'fs'
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
-import { types } from 'node:util';
 
 export class SqlHelper {
 
@@ -36,11 +35,30 @@ export class SqlHelper {
         id: String(x.id.value),
         playerId: x.playerId.value as number,
         serverAdmin: JSON.parse(x.serverAdmin.value as string),
-        globalAdmin: Boolean(x.globalAdmin.value)
+        globalAdmin: Boolean(x.globalAdmin.value),
+        impliedName: String(x.impliedName.value)
       }
     }
     else
       return null;
+  }
+
+  static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
+    const sql = "SELECT players.id as eugenid, pickBanElo, discordUsers.id, impliedName as discordId FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.pickBanElo DESC"
+    const xx = await SqlHelper.exec(sql);
+    const ret = new Array<EloLadderElement>();
+    let r = 1;
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      ret.push({
+        rank: r,
+        elo: Number(x.elo.value),
+        discordId: String(x.discordId.value),
+        name: String(x.impliedName.value)
+      })
+      r++;
+    }
+    return ret;
   }
 
 
@@ -52,13 +70,13 @@ export class SqlHelper {
         id: String(x.id.value),
         playerId: x.playerId.value as number,
         serverAdmin: JSON.parse(x.serverAdmin.value as string),
-        globalAdmin: Boolean(x.globalAdmin.value)
+        globalAdmin: Boolean(x.globalAdmin.value),
+        impliedName: String(x.impliedName.value)
       }
     }
     else
       return null;
   }
-
 
 
   static async setDiscordUser(user: DiscordUser): Promise<DBObject> {
@@ -70,6 +88,43 @@ export class SqlHelper {
     }
     console.log(data)
     return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text})
+  }
+
+  static async getPlayerElo(eugenId:number): Promise<PlayerDetails> {
+    console.log("It gets to getPlayerELO");
+    const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';");
+    console.log("Back from sql")
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      console.log(x.id.value);
+      return {
+        id: String(x.id.value),
+        elo: x.elo.value as number,
+        pickBanElo: x.pickBanElo.value as number,
+      }
+    }
+    // Only here in case we have a user without a entry in the players table
+    console.log("No player found, need to create record")
+    RatingEngine.createPlayerElo(eugenId);
+    const yy = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      console.log(x);
+      return {
+        id: String(x.id.value),
+        elo: x.elo.value as number,
+        pickBanElo: x.pickBanElo.value as number,
+      }
+    }
+    return null
+  }
+
+  static async createPlayerElo(eugenId: number) {
+    const data = {
+      playerId: eugenId
+    }
+      await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:TYPES.Int})
+      return 
   }
 
 
@@ -156,5 +211,19 @@ export interface DiscordUser {
   id: string,
   playerId: number,
   serverAdmin: number[],
-  globalAdmin: boolean
+  globalAdmin: boolean,
+  impliedName: string
+}
+
+export interface EloLadderElement {
+  rank:number,
+  elo:number,
+  discordId:string,
+  name:string
+}
+
+export interface PlayerDetails {
+  id: string,
+  elo: number,
+  pickBanElo: number
 }

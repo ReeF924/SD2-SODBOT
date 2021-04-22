@@ -145,47 +145,6 @@ export class PlayerCommand {
 
 
     static async getLadder(message:Message, input:string[]){
-        var numPlayers = 0
-        var pName = ""
-        var pId = ""
-        var pElo = ""
-        const playerList = await SqlHelper.exec("SELECT * FROM players ORDER BY pickBanElo DESC;")
-        console.log("Number of players's returned "+playerList.rows.length)
-        if (playerList.rows.length < 100){
-            numPlayers = playerList.rows.length
-        }else{
-            numPlayers = 100
-        }
-        // Run through list of players
-        for (let i = 0; i < numPlayers; i++){
-            
-            const x = playerList.rows[i]
-            console.log(x.id.value)
-            const p1 = await SqlHelper.exec("SELECT id FROM discordUsers WHERE playerId = '" +x.id.value+ "' ;")
-            console.log("How many rows returned "+p1.rows.length)
-            if (p1.rows.length == 1){
-                const p1Id = p1.rows[0]
-                console.log(p1Id.id.value)
-                const discordUser = await DiscordBot.bot.users.fetch(String(p1Id.id.value))
-                console.log("Get the DiscordUser name "+discordUser.username)
-                console.log("Discord User ID "+discordUser.id)
-    
-                pName += discordUser.username + "\n";
-                pId += x.id.value + "\n";
-                pElo += x.elo.value + "\n";
-            }
-        }
-        //Create and send the embed
-        const embed = new MessageEmbed();
-        embed.setTitle("Player Ranking")
-        embed.setColor("75D1EA")
-        embed.addFields([
-            {name:"Player Name", value: pName,inline:true},
-            {name:"Eugen Id", value: pId,inline:true},
-            {name:"SDL Rating", value: pElo,inline:true}
-        ])
-        //Send Final Embed
-        message.channel.send(embed);
 
     }
 
@@ -203,6 +162,6 @@ export class PlayerCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("player",PlayerCommand.getPlayer);
         bot.registerCommand("ladder",PlayerCommand.getLadder);
-        bot.registerCommand("rating",PlayerCommand.submitRating);
+        bot.registerCommand("rating",PlayerCommand.submitRating); // purge this / secure this BEFORE we release.
     }
 }
