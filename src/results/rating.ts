@@ -1,32 +1,29 @@
 import { Connection, Request, TediousType, TYPES } from 'tedious'
 import { Message, MessageEmbed } from "discord.js"
 import * as axios from "axios"
-import { SqlHelper } from "../general/sqlHelper";
+import { Elos, Player, SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
+import { Logs } from '../general/logs';
 
 const k_value = 32;
 
 export class RatingEngine {
     
-  static async rateMatch(message: Message, p1uid:number, p2uid:number, p1Score:number, p2Score:number ): Promise<RatedGame> {
+  static async rateMatch(message: Message, p1uid:string, p2uid:string, p1Score:number, p2Score:number ): Promise<RatedGame> {
     console.log("Have arrived in rateMatch")
-    var p1Elo:PlayerDetails
-    var p2Elo:PlayerDetails
 
 
-    p1Elo = await RatingEngine.getPlayerElo(p1uid)
-    p2Elo = await RatingEngine.getPlayerElo(p2uid)
+    const p1Elo = await RatingEngine.getPlayerElo(p1uid,message)
+    const p2Elo = await RatingEngine.getPlayerElo(p2uid,message)
     
-    console.log(p1Elo.id)
-    console.log(p2Elo.id)
 
     const newP1Elo =
-      p1Elo.elo + k_value * (p1Score - RatingEngine.getChanceToWin(p1Elo.elo, p2Elo.elo));
+      p1Elo.globalElo + k_value * (p1Score - RatingEngine.getChanceToWin(p1Elo.globalElo, p2Elo.globalElo));
     const newP2Elo =
-      p2Elo.elo + k_value * (p2Score - RatingEngine.getChanceToWin(p2Elo.elo, p1Elo.elo));
+      p2Elo.globalElo + k_value * (p2Score - RatingEngine.getChanceToWin(p2Elo.globalElo, p1Elo.globalElo));
     
-    const p1EloChange = newP1Elo - p1Elo.elo;
-    const p2EloChange = newP2Elo - p2Elo.elo;
+    const p1EloChange = newP1Elo - p1Elo.globalElo;
+    const p2EloChange = newP2Elo - p2Elo.globalElo;
 
     return {
       newP1Elo: newP1Elo as number,
@@ -36,57 +33,47 @@ export class RatingEngine {
     }
   }
 
+
+
   static getChanceToWin(a:number, b:number): number {
     const c = (1 / (1 + Math.pow(10, (b - a) / 400)));
     return c;    
   }
 
-
-  static async getPlayerElo(eugenId:number): Promise<PlayerDetails> {
-    console.log("It gets to getPlayerELO");
-    const xx = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';");
-    console.log("Back from sql")
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
-      console.log(x.id.value);
-      return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
-      }
-    }
-    // Only here in case we have a user without a entry in the players table
-    console.log("No player found, need to create record")
-    RatingEngine.createPlayerElo(eugenId);
-    const yy = await SqlHelper.exec("Select * from players where id = '" + eugenId + "';")
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
-      console.log(x);
-      return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
-      }
-    }
-    return null
+  static async getPlayerElo(discordId:string,message:Message):Promise<Elos>{
+    return SqlHelper.getElos(discordId,message.channel.id,message.guild.id)
   }
 
-  static async createPlayerElo(eugenId: number) {
-    const data = {
-      playerId: eugenId
+  static async createLadder(){
+    const ladder = [];
+    var numPlayers = 0
+    var pName = ""
+    var pId = ""
+    var pElo = ""
+    const playerList = await SqlHelper.getGlobalLadder();
+    Logs.log("Number of players's returned "+playerList.length)
+    if (playerList.length < 100){
+        numPlayers = playerList.length
+    }else{
+        numPlayers = 100
     }
-      await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:TYPES.Int})
-      return 
+    // Run through list of players
+    for (let i = 0; i < numPlayers; i++){
+        
+        const x = playerList[i]
+      
+    }
+    //Create and send the embed
+    const embed = new MessageEmbed();
+    embed.setTitle("Player Ranking")
+    embed.setColor("75D1EA")
+    embed.addFields([
+        {name:"Player Name", value: pName,inline:true},
+        {name:"Eugen Id", value: pId,inline:true},
+        {name:"SDL Rating", value: pElo,inline:true}
+    ])
   }
-
-}
-
-
-
-export interface PlayerDetails {
-  id: string,
-  elo: number,
-  pickBanElo: number
+  
 }
 
 export interface RatedGame {
@@ -94,4 +81,11 @@ export interface RatedGame {
   NewP2Elo: number,
   p1EloChange: number,
   P2EloChange: number
+}
+
+export interface EloLadderElement {
+  name:string,
+  pos: number,
+  elo: number,
+  lastActive: Date
 }

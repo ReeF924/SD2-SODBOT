@@ -27,11 +27,11 @@ export class PlayerCommand {
                 return
             }
             //Get the player's details
-            const playerDetails = await RatingEngine.getPlayerElo(discordUser.playerId)
+            const playerDetails = await RatingEngine.getPlayerElo(discordUser.id,message)
             playerName = await DiscordBot.bot.users.fetch(String(message.author.id))
-            eugenId = playerDetails.id
-            leagueElo = playerDetails.elo
-            globalElo = playerDetails.pickBanElo
+            eugenId = playerDetails.eugenId
+            leagueElo = playerDetails.globalElo
+            globalElo = playerDetails.pickBanGlobalElo
 
         // If there is a argument, then we are getting another player's details
         } else if(input.length == 1){
@@ -43,11 +43,11 @@ export class PlayerCommand {
                 return
             }
             // Get player details from DB
-            const playerDetails = await RatingEngine.getPlayerElo(discordUser.playerId)
+            const playerDetails = await RatingEngine.getPlayerElo(discordUser.id,message)
             playerName = await DiscordBot.bot.users.fetch(String(p1))
-            eugenId = playerDetails.id
-            leagueElo = playerDetails.elo
-            globalElo = playerDetails.pickBanElo
+            eugenId = playerDetails.eugenId
+            leagueElo = playerDetails.globalElo
+            globalElo = playerDetails.pickBanGlobalElo
         // If there is more than 1 argument then the command is not valid
         } else if (input.length > 1){
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
@@ -185,7 +185,7 @@ export class PlayerCommand {
 
     static submitRating(message:Message, input:string[]):void{
         (async () => {
-            const newGameRating = await RatingEngine.rateMatch(message, 1471338, 1442542, 1, 0)
+            const newGameRating = await RatingEngine.rateMatch(message, "1471338", "1442542", 1, 0)
             console.log(newGameRating) 
         })()
     }
@@ -196,6 +196,6 @@ export class PlayerCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("player",PlayerCommand.getPlayer);
         bot.registerCommand("ladder",PlayerCommand.getLadder);
-        bot.registerCommand("rating",PlayerCommand.submitRating);
+        bot.registerCommand("rating",PlayerCommand.submitRating); // purge this / secure this BEFORE we release.
     }
 }

@@ -65,7 +65,7 @@ export class AdminCommand {
                 let eugenId = input[0]
                 let newLeagueElo = input[1]
                 let newGlobalElo = input[2]
-                await SqlHelper.setPlayer(eugenId, newLeagueElo, newGlobalElo);
+                //await SqlHelper.setPlayer(eugenId, newLeagueElo, newGlobalElo);
                 message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
                 return
             }
