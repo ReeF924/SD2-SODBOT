@@ -72,14 +72,27 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text})
   }
 
+  static async setPlayer(id, elo, globalElo): Promise<DBObject> {
+    const data = {
+      id: id,
+      elo: elo,
+      pickBanElo: globalElo
+    }
+    console.log(data)
+    return await SqlHelper.exec(SqlHelper.updatePlayerSql,data,{id:TYPES.Int,elo:TYPES.Int,pickBanElo:TYPES.Int})
+  }
+
+
 
   static setDiscordUserSql = ""
   static addReplaySql = ""
   static addPlayerEloSql = ""
+  static updatePlayerSql = ""
 
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
+    SqlHelper.updatePlayerSql = fs.readFileSync("sql/updatePlayer.sql").toLocaleString();
     SqlHelper.addReplaySql = fs.readFileSync("sql/addReplay.sql").toLocaleString();
     SqlHelper.addPlayerEloSql = fs.readFileSync("sql/addnewplayer.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
@@ -157,4 +170,10 @@ export interface DiscordUser {
   playerId: number,
   serverAdmin: number[],
   globalAdmin: boolean
+}
+
+export interface Player {
+  id: number,
+  elo: number,
+  pickBanElo: number
 }
