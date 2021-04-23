@@ -131,15 +131,15 @@ export class PlayerCommand {
         while(x < 20 && x < ladder.length){
             if(ladder[x].discordId != "null"){
                 //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
-                playerDetails += ladder[x].rank + ":    " + PlayerCommand.pad(ladder[x].elo) + "   <@!" + ladder[x].discordId + "> \n"
+                playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
 
             }else{
                 //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
-                playerDetails += ladder[x].rank + ":    " + PlayerCommand.pad(ladder[x].elo) + "    " + ladder[x].name + "\n"
+                playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
             }
             x++;
         }
-        embed.addField("Pos   Elo        Name", playerDetails, true)
+        embed.addField("Pos      Elo           Name", playerDetails, true)
         //Send Final Embed
         embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
         MsgHelper.say(message,embed,false)
