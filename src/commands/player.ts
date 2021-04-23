@@ -130,11 +130,9 @@ export class PlayerCommand {
         let x = 0;
         while(x < 20 && x < ladder.length){
             if(ladder[x].discordId != "null"){
-                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
-                playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+                playerDetails += ladder[x].rank + ":    \u0003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
 
             }else{
-                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
                 playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
             }
             x++;
@@ -145,6 +143,8 @@ export class PlayerCommand {
         MsgHelper.say(message,embed,false)
     }
 
+
+    
         //Register a player to the bot
         static register(message:Message, input:string[]):void{
             if(input.length == 1 && Number(input[0])){
