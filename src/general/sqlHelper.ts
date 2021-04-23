@@ -214,17 +214,17 @@ export class SqlHelper {
 
 
   static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
-    const sql = "SELECT players.id as eugenid, pickBanElo, discordUsers.id, impliedName as discordId FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.pickBanElo DESC"
+    const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
     const xx = await SqlHelper.exec(sql);
     const ret = new Array<EloLadderElement>();
     let r = 1;
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
+    while(xx.rows.length > r-1){
+      const x = xx.rows[r-1];
       ret.push({
         rank: r,
         elo: Number(x.elo.value),
         discordId: String(x.discordId.value),
-        name: String(x.impliedName.value)
+        name: String(x.eugenName.value)
       })
       r++;
     }

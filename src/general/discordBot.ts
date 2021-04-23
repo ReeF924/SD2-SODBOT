@@ -96,18 +96,22 @@ export class MsgHelper{
     
     static reply (message:Message, content:APIMessageContentResolvable|MessageEmbed, mentions=true):void{
         const opts = {};
-        if(!mentions){
-            opts["allowed_mentions"] = true;
-        }
-        message.reply(content, opts);
+        //if(!mentions){
+        //    opts["allowed_mentions"] = true;
+        //}
+        message.reply(content);
     }
 
     static say (message:Message, content:APIMessageContentResolvable|MessageEmbed,  mentions=true):void{
         const opts = {};
         if(!mentions){
-            opts["allowed_mentions"] = true;
+            opts["allowed_mentions"] = "{parse:[]}";
         }
-        message.channel.send(content, opts);
+        if(typeof content as any  != String){
+            opts["embed"] = "rich";
+        }
+        Logs.log(content);
+        message.channel.send(content);
     }
 
     static dmUser(message:Message, content:APIMessageContentResolvable|MessageEmbed):void{

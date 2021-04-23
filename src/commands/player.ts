@@ -35,13 +35,14 @@ export class PlayerCommand {
         embed.addFields([
             {name:"Player Name", value: "<@!"+player+">",inline:false},
             //{name:"Eugen Id", value: eugenId,inline:false}, --we don't really want people messing with this/registering as others. Yes I know you can find it via replays.
-            {name:"Server Rating", value: Elos.serverElo,inline:true},
-            {name:"Channel Rating", value: Elos.channelElo,inline:true},
-            {name:"Global Elo", value: Elos.globalElo,inline:true},
+            {name:"Server Rating", value: Math.round(Elos.serverElo),inline:true},
+            {name:"Channel Rating", value: Math.round(Elos.channelElo),inline:true},
+            {name:"Global Elo", value: Math.round(Elos.globalElo),inline:true},
             {name:"\u200b", value: "\u200b",inline:true}
         ]);
         // Extract recent games
         //thou shall not use exec.
+        /*
         const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
         let opponent = "";
         let gameMap = "";
@@ -111,11 +112,12 @@ export class PlayerCommand {
             console.log("No Games found")
         }
         //Send Final Embed
+        */
        MsgHelper.say(message,embed,false)
     }
 
     private static pad(num:number):string {
-        return String(Math.fround(num)).padEnd(7);
+        return String(Math.round(num*10)/10).padEnd(7);
     }
 
     static async getLadder(message:Message, input:string[]){
@@ -126,10 +128,11 @@ export class PlayerCommand {
         embed.setColor("75D1EA")
         let x = 0;
         while(x < 10 && x < ladder.length){
-            if(ladder[x].discordId)
+            if(ladder[x].discordId != "null")
                 embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
             else
                 embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
+            x++;
         }
         //Send Final Embed
         embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
