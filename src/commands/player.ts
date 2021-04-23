@@ -1,70 +1,48 @@
-import { Message, ReactionUserManager, User } from "discord.js";
+import { Message } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
-import * as Data from "sd2-data"
-import { CommonUtil } from "../general/common";
-import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
 import { SqlHelper } from "../general/sqlHelper";
 import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
-import { Console } from "node:console";
+import { Logs } from "../general/logs";
 
 export class PlayerCommand {
     
     static async getPlayer(message:Message,input:string[]){
         const embed = new MessageEmbed();
-        var playerName:User
-        var eugenId
-        var leagueElo
-        var globalElo
-        //Check that no arguments are present
+        var player:string;
+        //Determine the target player
         if(input.length == 0){
-            //Get the message author's id
-            const discordUser = await SqlHelper.getDiscordUser(message.author.id)
-            //Check that you received a id back from the DB    
-            if(discordUser.playerId == null ){
-                MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
-                return
-            }
-            //Get the player's details
-            const playerDetails = await RatingEngine.getPlayerElo(discordUser.id,message)
-            playerName = await DiscordBot.bot.users.fetch(String(message.author.id))
-            eugenId = playerDetails.eugenId
-            leagueElo = playerDetails.globalElo
-            globalElo = playerDetails.pickBanGlobalElo
-
-        // If there is a argument, then we are getting another player's details
-        } else if(input.length == 1){
-            const p1 = input[0].slice(3,-1)
-            const discordUser = await SqlHelper.getDiscordUser(p1) 
-            // Check that you received back player discord id    
-            if(discordUser == null ){
-                MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
-                return
-            }
-            // Get player details from DB
-            const playerDetails = await RatingEngine.getPlayerElo(discordUser.id,message)
-            playerName = await DiscordBot.bot.users.fetch(String(p1))
-            eugenId = playerDetails.eugenId
-            leagueElo = playerDetails.globalElo
-            globalElo = playerDetails.pickBanGlobalElo
-        // If there is more than 1 argument then the command is not valid
-        } else if (input.length > 1){
+            player = message.author.id
+        }else if(input.length == 1){
+            player = input[0].slice(3,-1) //this is magic.
+        }else{
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
+            return;
+        }
+        const Elos = await SqlHelper.getDiscordElos(player,message.channel.id,message.guild.id);
+             
+        if(Elos == null ){
+            if(input.length == 0)
+                MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
+            else
+                MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
             return
-        }   
-        // Create the Embed
+        }
+        
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
         embed.addFields([
-            {name:"Player Name", value: playerName,inline:false},
-            {name:"Eugen Id", value: eugenId,inline:false},
-            {name:"SDL Rating", value: leagueElo,inline:true},
-            {name:"Global Elo", value: globalElo,inline:true},
+            {name:"Player Name", value: "<@!"+player+">",inline:false},
+            //{name:"Eugen Id", value: eugenId,inline:false}, --we don't really want people messing with this/registering as others. Yes I know you can find it via replays.
+            {name:"Server Rating", value: Elos.serverElo,inline:true},
+            {name:"Channel Rating", value: Elos.channelElo,inline:true},
+            {name:"Global Elo", value: Elos.globalElo,inline:true},
             {name:"\u200b", value: "\u200b",inline:true}
         ]);
         // Extract recent games
-        const xx = await SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "';")
+        //thou shall not use exec.
+        const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
         let opponent = "";
         let gameMap = "";
         let gameResult = "";
@@ -87,7 +65,7 @@ export class PlayerCommand {
                 //Check that each row is a 1v1 match    
                 if (replayJson.players.length == 2){
                     //identify who the opponent was
-                    if (replayJson.players[0].id != eugenId){
+                    if (replayJson.players[0].id != Elos.eugenId){
                         opponent += replayJson.players[0].name + "\n";
                     }else{
                         opponent += replayJson.players[1].name + "\n";
@@ -98,7 +76,7 @@ export class PlayerCommand {
                     if (replayJson.result.victory > 3) {
                         for (const player of replayJson.players) {
                             if (replayJson.ingamePlayerId = player.alliance)
-                                if (player.name = eugenId)
+                                if (player.name = Elos.eugenId)
                                     gameResult += "Victory" + "\n"
                                     else
                                     gameResult += "Defeat" + "\n" 
@@ -106,7 +84,7 @@ export class PlayerCommand {
                     } else if (replayJson.result.victory < 3) {
                         for (const player of replayJson.players) {
                             if (replayJson.ingamePlayerId = player.alliance)
-                                if (player.name = eugenId)
+                                if (player.name = Elos.eugenId)
                                     gameResult += "Defeat" + "\n"
                                     else
                                     gameResult += "Victory" + "\n"
@@ -133,69 +111,68 @@ export class PlayerCommand {
             console.log("No Games found")
         }
         //Send Final Embed
-        message.channel.send(embed);
+       MsgHelper.say(message,embed,false)
     }
 
-
+    private static pad(num:number):string {
+        return String(Math.fround(num)).padEnd(7);
+    }
 
     static async getLadder(message:Message, input:string[]){
-        var numPlayers = 0
-        var pName = ""
-        var pPos = ""
-        var pElo = ""
-        const playerList = await SqlHelper.exec("SELECT * FROM players ORDER BY pickBanElo DESC;")
-        console.log("Number of players's returned "+playerList.rows.length)
-        if (playerList.rows.length < 100){
-            numPlayers = playerList.rows.length
-        }else{
-            numPlayers = 100
-        }
-        // Run through list of players
-        let y = 1
-        for (let i = 0; i < numPlayers; i++){            
-            const x = playerList.rows[i]
-            const p1 = await SqlHelper.exec("SELECT id FROM discordUsers WHERE playerId = '" +x.id.value+ "' ;")
-            if (p1.rows.length == 1){
-                const p1Id = p1.rows[0]
-                const discordUser = await DiscordBot.bot.users.fetch(String(p1Id.id.value))
-    
-                pPos += y + "\n"
-                pName += discordUser.username + "\n";
-                pElo += x.pickBanElo.value + "\n";
-                y += 1
-            }
-        }
-        //Create and send the embed
-        console.log(message.guild.id)
-        console.log(message.guild.name)
+        const ladder = await SqlHelper.getGlobalLadder();
        
         const embed = new MessageEmbed();
-        embed.setTitle("Player Ranking")
+        embed.setTitle("Top 10 Players")
         embed.setColor("75D1EA")
-        embed.addFields([
-            {name:"Pos", value: pPos,inline:true},
-            {name:"Player Name", value: pName,inline:true},
-            {name:"ELO", value: pElo,inline:true}
-        ])
+        let x = 0;
+        while(x < 10 && x < ladder.length){
+            if(ladder[x].discordId)
+                embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
+            else
+                embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
+        }
         //Send Final Embed
-        message.channel.send(embed);
-
+        embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
+        MsgHelper.say(message,embed,false)
     }
 
-
-    static submitRating(message:Message, input:string[]):void{
-        (async () => {
-            const newGameRating = await RatingEngine.rateMatch(message, "1471338", "1442542", 1, 0)
-            console.log(newGameRating) 
-        })()
-    }
-
+        //Register a player to the bot
+        static register(message:Message, input:string[]):void{
+            if(input.length == 1 && Number(input[0])){
+                (async () => {
+                    let user = await SqlHelper.getDiscordUserFromEugenId(Number(input[0]))
+                    if(user){
+                        if(user.id = message.author.id){
+                            MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
+                            Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
+                        }else{
+                            user.id =(message.author.id)
+                            await SqlHelper.setDiscordUser(user);
+                            MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
+                            Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
+                        }
+                    }else{
+                        console.log(Number(message.author.id))
+                        user = {
+                            id: (message.author.id),
+                            playerId: Number(input[0]),
+                            serverAdmin: [],
+                            globalAdmin: false,
+                            impliedName: message.author.username
+                        }
+                        await SqlHelper.setDiscordUser(user);
+                        MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
+                        Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
+                    }
+                })()
+            }
+        }
 }
 
 export class PlayerCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("player",PlayerCommand.getPlayer);
         bot.registerCommand("ladder",PlayerCommand.getLadder);
-        bot.registerCommand("rating",PlayerCommand.submitRating); // purge this / secure this BEFORE we release.
+        bot.registerCommand("register",PlayerCommand.register)
     }
 }

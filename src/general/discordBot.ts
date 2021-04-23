@@ -1,7 +1,7 @@
 `use strict`
 
 import { CommonUtil } from "./common";
-import {APIMessageContentResolvable, Client, Message} from "discord.js";
+import {APIMessageContentResolvable, Client, Message, MessageEmbed} from "discord.js";
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 
@@ -94,23 +94,23 @@ export class DiscordBot {
 
 export class MsgHelper{
     
-    static reply (message:Message, content:APIMessageContentResolvable, tts?:unknown):void{
+    static reply (message:Message, content:APIMessageContentResolvable|MessageEmbed, mentions=true):void{
         const opts = {};
-        if(CommonUtil.configBoolean("tts_enabled_global")){
-            opts["tts"] = tts;
+        if(!mentions){
+            opts["allowed_mentions"] = true;
         }
         message.reply(content, opts);
     }
 
-    static say (message:Message, content:APIMessageContentResolvable, tts?:unknown):void{
+    static say (message:Message, content:APIMessageContentResolvable|MessageEmbed,  mentions=true):void{
         const opts = {};
-        if(CommonUtil.configBoolean("tts_enabled_global")){
-            opts["tts"] = tts;
+        if(!mentions){
+            opts["allowed_mentions"] = true;
         }
         message.channel.send(content, opts);
     }
 
-    static dmUser(message:Message, content:APIMessageContentResolvable):void{
+    static dmUser(message:Message, content:APIMessageContentResolvable|MessageEmbed):void{
         message.author.send(content);
     }
 

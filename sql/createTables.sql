@@ -18,19 +18,19 @@ CREATE TABLE elo
 (
     resourceId varchar(30) NOT NULL, -- resource ID. Typically a snowflake for a channel or server.
     playerId INT NOT NULL, -- player ID. a player's eugen id.
-    elo float NOT NULL DEFAULT(1500),
+    elo float NOT NULL DEFAULT(1500)
 )
 
 CREATE TABLE eloRef
 (
     id varchar(30) NOT NULL PRIMARY KEY, -- resource id
     serverName text NULL,
-    channelName text null,
+    channelName text null
 )
 
 CREATE TABLE divisionElo
 (
-    id varchar(30) NOT NULL PRIMARY,
+    id varchar(30) NOT NULL PRIMARY KEY,
     divName text NOT NULL,
     elo float NOT NULL
 )
@@ -39,9 +39,9 @@ CREATE TABLE channelBlacklist
 (
     id varchar(30) NOT NULL PRIMARY KEY,
     channelName text null,
-    blockElo boolean DEFAULT(false),
-    blockCommands boolean DEFAULT(false),
-    blockReplay boolean DEFAULT(false)
+    blockElo bit DEFAULT 0,
+    blockCommands bit DEFAULT 0,
+    blockReplay bit DEFAULT 0
 )
 
 CREATE TABLE discordUsers

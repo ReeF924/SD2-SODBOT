@@ -81,8 +81,8 @@ export class SqlHelper {
   
   //elos
 
-  static async getElos(discordId:string, channel:string, server:string):Promise<Elos>{
-    const xx = await SqlHelper.exec(SqlHelper.getElosSql,{discordId:discordId,channelId:channel,serverId:server},{eugenId:TYPES.VarChar,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
+  static async getElos(eugenId:number, channel:string, server:string):Promise<Elos>{
+    const xx = await SqlHelper.exec(SqlHelper.getElosSql,{playerId:eugenId,channelId:channel,serverId:server},{playerId:TYPES.Int,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
@@ -100,9 +100,28 @@ export class SqlHelper {
       return null;
   }
 
-  static async setElos(elos:Elos):Promise<DBObject>{
-    return await SqlHelper.exec(SqlHelper.updateElosSql,(elos as unknown as Record<string,unknown>),
-    {eugenId: TYPES.Int, serverId: TYPES.VarChar,channelId: TYPES.VarChar,channelElo: TYPES.Float,serverElo: TYPES.Float,globalElo: TYPES.Float,pickBanGlobalElo: TYPES.Float,playerName: TYPES.Text})
+  static async getDiscordElos(discordId:string, channel:string, server:string):Promise<Elos>{
+    const xx = await SqlHelper.exec(SqlHelper.getElosDiscordSql,{playerId:discordId,channelId:channel,serverId:server},{playerId:TYPES.VarChar,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      return {
+        eugenId: Number(x.eugenId.value),
+        serverId: String(x.serverId.value),
+        channelId: String(x.channelId.value),
+        channelElo: x.channelElo ? Number(x.channelElo.value) : 1500,
+        serverElo: x.serverElo ? Number(x.serverElo.value) : 1500,
+        globalElo: Number(x.globalElo.value),
+        pickBanGlobalElo: Number(x.pickBanGlobalElo.value),
+        playerName: String(x.playerName.value)
+      }
+    }
+    else
+      return null;
+  }
+
+  static async setElos(elos:Elos,info:EloInfo):Promise<DBObject>{
+    return await SqlHelper.exec(SqlHelper.updateElosSql,({...elos, ...info} as unknown as Record<string,unknown>),
+    {impliedName: TYPES.VarChar, serverName:TYPES.VarChar, channelName: TYPES.VarChar, eugenId: TYPES.Int, serverId: TYPES.VarChar,channelId: TYPES.VarChar,channelElo: TYPES.Float,serverElo: TYPES.Float,globalElo: TYPES.Float,pickBanGlobalElo: TYPES.Float,playerName: TYPES.Text})
   }
 
   static async setDivisionElo(elo:DivElo): Promise<DBObject>{
@@ -247,6 +266,7 @@ export class SqlHelper {
   static updateDivEloSql = ""
   static updateElosSql = ""
   static getElosSql = ""
+  static getElosDiscordSql = ""
 
 
   static init(): void {
@@ -257,6 +277,7 @@ export class SqlHelper {
     SqlHelper.addPlayerEloSql = fs.readFileSync("sql/updateDivElo.sql").toLocaleString();
     SqlHelper.getElosSql = fs.readFileSync("sql/getElos.sql").toLocaleString();
     SqlHelper.updateElosSql = fs.readFileSync("sql/updateElos.sql").toLocaleString();
+    SqlHelper.getElosDiscordSql = fs.readFileSync("sql/getElosDiscord.sql").toLocaleString();
     SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.authentication.options.userName = CommonUtil.config("sqluser")
     SqlHelper.connection = new Connection(SqlHelper.config);
@@ -302,8 +323,15 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
 
+  //This is expensive. And an unprepared statement. and it returns *....
+  //it needs work. @todo
+  static async getReplaysByEugenId(eugenId:number):Promise<DBObject>{
+    return SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "';")
+  }
+  
 
-  static exec(string: string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {
+
+  private static exec(string:string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {
     const ret = new Promise<DBObject>((resolve) => {
       const request = new Request(string, (err, rowCount, rows) => {
         Logs.error(err);
@@ -342,6 +370,12 @@ export interface EloLadderElement {
   name:string
 }
 
+export interface EloInfo{
+  impliedName:string,
+  serverName:string,
+  channelName:string
+}
+
 export interface Player {
   id: number,
   elo: number,
@@ -358,7 +392,14 @@ export interface Elos {
   serverElo: number,
   globalElo: number,
   pickBanGlobalElo: number,
-  playerName: string
+  playerName: string,
+}
+
+export interface ElosDelta extends Elos {
+  serverDelta: number,
+  channelDelta: number,
+  globalDelta: number,
+  pickBanDelta: number
 }
 
 export interface ChannelPermissionSet{

@@ -1,6 +1,7 @@
 import {Application} from 'express'
 import * as express from 'express'
 import { Logs } from '../general/logs'
+import { SqlHelper } from '../general/sqlHelper'
 
 class API {
     
@@ -11,11 +12,7 @@ class API {
     start():void{
 
         this.express.get('/', (req,res)=>{res.send(200)})
-        this.express.get('/leaderboard', (req,res)=>{
-            
-        });
-
-
+        this.express.get('/leaderboard', async (req,res)=>{res.send(await JSON.stringify(SqlHelper.getGlobalLadder()))})
         this.express.listen(this.port, ()=>{
             Logs.log("HTTP server started on " + this.port);
         })

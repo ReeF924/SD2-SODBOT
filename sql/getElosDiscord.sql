@@ -7,7 +7,8 @@ select (
     @serverId as serverId,
     serverElo.elo as serverElo,
     channelElo.elo as channelElo
-    ) from players where players.id = @playerId
+    ) from discordUsers where discordUsers.id = @playerId
+left join players on players.id = discordUsers.playerId
 left join elo serverElo on resourceId = @serverId and players.id = serverElo.playerId
 left join elo channelElo on resourceId = @channelId and players.id = channelElo.playerId
 

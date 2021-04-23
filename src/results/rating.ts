@@ -1,36 +1,48 @@
 import { Connection, Request, TediousType, TYPES } from 'tedious'
 import { Message, MessageEmbed } from "discord.js"
 import * as axios from "axios"
-import { Elos, Player, SqlHelper } from "../general/sqlHelper";
+import { Elos, ElosDelta, Player, SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
 import { Logs } from '../general/logs';
 
-const k_value = 32;
+
 
 export class RatingEngine {
+
+  static k_value = 32;
     
-  static async rateMatch(message: Message, p1uid:string, p2uid:string, p1Score:number, p2Score:number ): Promise<RatedGame> {
+  static rateMatch(p1:Elos, p2:Elos, victor:number ): {p1:ElosDelta,p2:ElosDelta} {
     console.log("Have arrived in rateMatch")
+    const global = RatingEngine.generateElo(p1.globalElo,p2.globalElo,victor)
+    const server = RatingEngine.generateElo(p1.serverElo,p2.serverElo,victor)
+    const channel = RatingEngine.generateElo(p1.channelElo,p2.channelElo,victor)
+    const p1x = p1 as ElosDelta;
+    const p2x = p2 as ElosDelta;
+    p1x.globalElo = global.p1Elo
+    p1x.globalDelta = global.p1EloDelta
+    p2x.globalElo = global.p2Elo
+    p2x.globalDelta = global.p2EloDelta
+    p1x.serverElo = server.p1Elo
+    p1x.serverDelta = server.p1EloDelta
+    p2x.serverElo = server.p2Elo
+    p2x.serverDelta = server.p2EloDelta
+    p1x.channelElo = channel.p1Elo
+    p1x.channelDelta = channel.p1EloDelta
+    p2x.channelElo = channel.p2Elo
+    p2x.channelDelta = channel.p2EloDelta
+    return {p1:p1x, p2:p2x}
 
+  }
 
-    const p1Elo = await RatingEngine.getPlayerElo(p1uid,message)
-    const p2Elo = await RatingEngine.getPlayerElo(p2uid,message)
-    
-
+  /**
+  /@param gameState: 0 for p1 loss, 1 for p1 win, .5 for draw...
+  **/
+  static generateElo(p1Elo:number, p2Elo:number,gameState:number):{p1Elo:number,p1EloDelta:number,p2Elo:number,p2EloDelta:number}{
     const newP1Elo =
-      p1Elo.globalElo + k_value * (p1Score - RatingEngine.getChanceToWin(p1Elo.globalElo, p2Elo.globalElo));
+       RatingEngine.k_value * (gameState - RatingEngine.getChanceToWin(p1Elo, p2Elo));
     const newP2Elo =
-      p2Elo.globalElo + k_value * (p2Score - RatingEngine.getChanceToWin(p2Elo.globalElo, p1Elo.globalElo));
-    
-    const p1EloChange = newP1Elo - p1Elo.globalElo;
-    const p2EloChange = newP2Elo - p2Elo.globalElo;
-
-    return {
-      newP1Elo: newP1Elo as number,
-      NewP2Elo: newP2Elo as number,
-      p1EloChange: p1EloChange as number,
-      P2EloChange: p2EloChange as number
-    }
+       RatingEngine.k_value * ((1-gameState) - RatingEngine.getChanceToWin(p2Elo, p1Elo));
+    return {p1Elo:(p1Elo + newP1Elo), p1EloDelta: newP1Elo,p2Elo:(p2Elo + newP2Elo), p2EloDelta:newP2Elo}
   }
 
 
@@ -41,39 +53,12 @@ export class RatingEngine {
   }
 
   static async getPlayerElo(discordId:string,message:Message):Promise<Elos>{
-    return SqlHelper.getElos(discordId,message.channel.id,message.guild.id)
+    return SqlHelper.getDiscordElos(discordId,message.channel.id,message.guild.id)
   }
 
   static async createLadder(){
-    const ladder = [];
-    var numPlayers = 0
-    var pName = ""
-    var pId = ""
-    var pElo = ""
-    const playerList = await SqlHelper.getGlobalLadder();
-    Logs.log("Number of players's returned "+playerList.length)
-    if (playerList.length < 100){
-        numPlayers = playerList.length
-    }else{
-        numPlayers = 100
-    }
-    // Run through list of players
-    for (let i = 0; i < numPlayers; i++){
-        
-        const x = playerList[i]
-      
-    }
-    //Create and send the embed
-    const embed = new MessageEmbed();
-    embed.setTitle("Player Ranking")
-    embed.setColor("75D1EA")
-    embed.addFields([
-        {name:"Player Name", value: pName,inline:true},
-        {name:"Eugen Id", value: pId,inline:true},
-        {name:"SDL Rating", value: pElo,inline:true}
-    ])
+    return await SqlHelper.getGlobalLadder();
   }
-  
 }
 
 export interface RatedGame {

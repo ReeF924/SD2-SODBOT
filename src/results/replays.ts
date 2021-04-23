@@ -1,8 +1,8 @@
-import { Message, MessageEmbed } from "discord.js"
+import { ChannelData, Message, MessageEmbed } from "discord.js"
 import { GameParser } from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
-import { SqlHelper } from "../general/sqlHelper";
+import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
 import { RatingEngine } from "./rating";
 import { Console } from "node:console";
@@ -17,27 +17,63 @@ export class Replays {
             const g = GameParser.parseRaw(res.data)
             //discover winning team
             const replayPlayer = g.players[g.ingamePlayerId];
+            
+            //and we need to commit this to DB....
+            SqlHelper.setReplay(message,g);
+            message.channel.send("Results Submitted")
             let winners = ""
             let loosers = ""
+            let winnerList = []
+            let looserList = []
+            let ratings:{p1:ElosDelta,p2:ElosDelta}
+            const channel = await DiscordBot.bot.channels.fetch(message.channel.id) as ChannelData
             if (g.result.victory < 3) {
                  for (const player of g.players) {
                     const playerid = player.name
-                    if (g.ingamePlayerId == player.alliance)
+                    if (g.ingamePlayerId == player.alliance){
                         loosers += playerid + "\n"
-                        else
+                        looserList.push(player)
+                    }else{
                         winners += playerid + "\n"
-                    }  
+                        winnerList.push(player)
+                    }    
+                }
+                if(g.players.length == 2){
+                    const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
+                    ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
+                    
+                    await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                }  
             } else if (g.result.victory > 3) {
                 for (const player of g.players) {
                     const playerid = player.name
-                    if (g.ingamePlayerId != player.alliance)
+                    if (g.ingamePlayerId != player.alliance){
                         loosers += playerid + "\n"
-                        else
+                        looserList.push(player)
+                    }else{
                         winners += playerid + "\n"
-                    }  
+                        winnerList.push(player)
+                    }
+                }
+                if(g.players.length == 2){
+                    const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
+                    ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
+                    await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                }
             } else {
-                winners = "noone"
+                winners = "no one"
                 loosers = "everyone"
+                if(g.players.length == 2){
+                    const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
+                    ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
+                    await SqlHelper.setElos(ratings.p1,{impliedName:g.players[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await SqlHelper.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
+                }
             }
 
             let embed = new MessageEmbed()
@@ -59,22 +95,32 @@ export class Replays {
                 for (const player of g.players) {
                     let playerid = player.name;
                     let discordId = ""
+                    let elo = ""
                     const discordUser = await SqlHelper.getDiscordUserFromEugenId(player.id);
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
                         const user = await DiscordBot.bot.users.fetch(String(discordId))
                         if(!user)
-                            playerid =  "BORKED! Please yell at <@271792666910392325>"
+                            playerid =  "BORKED! Please yell at <@!271792666910392325>"
                         else
-                            playerid += " *<@" + user.id +">*"
+                            playerid += " *<@!" + user.id +">*"
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
-                
+                    if(g.players.length == 2){
+                        if(ratings.p1.eugenId == player.id){
+                            elo += `Global: ${ratings.p1.globalElo}(${ratings.p1.globalDelta})\nServer: ${ratings.p1.serverElo}(${ratings.p1.serverDelta})\nChannel: ${ratings.p1.channelElo}(${ratings.p1.channelDelta})`
+                        }else if(ratings.p2.eugenId == player.id){
+                            elo += `Global: ${ratings.p2.globalElo}(${ratings.p2.globalDelta})\nServer: ${ratings.p2.serverElo}(${ratings.p2.serverDelta})\nChannel: ${ratings.p2.channelElo}(${ratings.p2.channelDelta})`
+                        }
+                    }else{
+                        const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
+                        elo += `Global: ${elox.globalElo}\nServer: ${elox.serverElo}\nChannel: ${elox.channelElo}`
+                    }
                     embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, false)
-                        .addField("Level", player.level, false)
+                        .addField("Elo", elo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
@@ -95,9 +141,9 @@ export class Replays {
                     if (discordId != "") {
                         const user = await DiscordBot.bot.users.fetch(String(discordId))
                         if(!user)
-                        playerid =  "BORKED! Please yell at <@271792666910392325>"
+                        playerid =  "BORKED! Please yell at <@!271792666910392325>"
                     else
-                        playerid += "*<@" + user.id +">*"
+                        playerid += "*<@!" + user.id +">*"
                     } else {
                         playerid += " (id:" + player.id + ")";
                     }
@@ -120,54 +166,7 @@ export class Replays {
                     message.reply("This reply is not a 1v1 player game, outcome will not be used in ELO")
                 } 
                 message.channel.send(embed)
-            }      
-
-            //and we need to commit this to DB....
-            SqlHelper.setReplay(message,g);
-            message.channel.send("Results Submitted")
-            
-            //and we need to update ELO (If 2 Players)
-            if (g.players.length <= 2){    //And from League Server??
-                let pWinner: number = 0
-                let pLoser: number = 0
-                if (g.result.victory < 3) {
-                    //replay creator lost
-                    if (g.players[0].alliance == g.ingamePlayerId){
-                        pLoser = g.players[0].id
-                        pWinner = g.players[1].id
-                    }else{
-                        pWinner = g.players[0].id
-                        pLoser = g.players[1].id
-                    }
-                }
-                else if (g.result.victory > 3) {
-                    //replay creator won
-                    if (g.players[0].alliance != g.ingamePlayerId){
-                        pLoser = g.players[0].id
-                        pWinner = g.players[1].id
-                    }else{
-                        pWinner = g.players[0].id
-                        pLoser = g.players[1].id
-                    }
-                }
-                console.log("Winner is " +pWinner)
-                console.log("Loser is " +pLoser)
-                console.log(g.players[0].id)
-                console.log(g.players[1].id)
-                console.log("Victory Condition " + g.result.victory);
-                
-                //Need to call the rating engine and then post the results to the channel, not working yet
-
-                //const ratedGame = await RatingEngine.rateMatch(message, pWinner, pLoser, 1, 0)
-                //console.log(ratedGame); 
-                
-                //message.channel.send(`<@${pWinner}> Updated ELO: ||${(ratedGame.newP1Elo.toFixed(2))} (
-                //        ${ratedGame.p1EloChange < 0 ? "" : "+"}
-                //        ${ratedGame.p1EloChange.toFixed(2)})||<@${pLoser}> Updated ELO: ||
-                //        ${ratedGame.NewP2Elo.toFixed(2)} (
-                //        ${ratedGame.P2EloChange < 0 ? "" : "+"}
-                //        ${ratedGame.P2EloChange.toFixed(2)})||`);
-            }   
+            }     
         })
         
     }

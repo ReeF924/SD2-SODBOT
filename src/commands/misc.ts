@@ -158,37 +158,7 @@ export class MiscCommand {
         }
     }
 
-    //Register a player to the bot
-    static register(message:Message, input:string[]):void{
-        if(input.length == 1 && Number(input[0])){
-            (async () => {
-                let user = await SqlHelper.getDiscordUserFromEugenId(Number(input[0]))
-                if(user){
-                    if(user.id = message.author.id){
-                        MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
-                        Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
-                    }else{
-                        user.id =(message.author.id)
-                        await SqlHelper.setDiscordUser(user);
-                        MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
-                        Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
-                    }
-                }else{
-                    console.log(Number(message.author.id))
-                    user = {
-                        id: (message.author.id),
-                        playerId: Number(input[0]),
-                        serverAdmin: [],
-                        globalAdmin: false,
-                        impliedName: message.author.username
-                    }
-                    await SqlHelper.setDiscordUser(user);
-                    MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
-                    Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
-                }
-            })()
-        }
-    }
+
 }
 
 export class MiscCommandHelper {
@@ -198,6 +168,5 @@ export class MiscCommandHelper {
         bot.registerCommand("help", MiscCommand.help);
         bot.registerCommand("piat",MiscCommand.piat);
         bot.registerCommand("deck",MiscCommand.deck);
-        bot.registerCommand("register",MiscCommand.register)
     }
 }
