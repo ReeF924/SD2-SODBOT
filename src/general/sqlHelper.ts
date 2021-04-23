@@ -214,7 +214,7 @@ export class SqlHelper {
 
 
   static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
-    const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
+    const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
     const xx = await SqlHelper.exec(sql);
     const ret = new Array<EloLadderElement>();
     let r = 1;
@@ -224,7 +224,8 @@ export class SqlHelper {
         rank: r,
         elo: Number(x.elo.value),
         discordId: String(x.discordId.value),
-        name: String(x.eugenName.value)
+        name: String(x.eugenName.value),
+        lastActive: new Date(x.lastActive.value as number)
       })
       r++;
     }
@@ -379,7 +380,8 @@ export interface EloLadderElement {
   rank:number,
   elo:number,
   discordId:string,
-  name:string
+  name:string,
+  lastActive: Date
 }
 
 export interface EloInfo{
