@@ -1,13 +1,14 @@
-select (
-    players.id as euegenId, 
+select 
+    players.id as eugenId, 
     players.impliedName as playerName, 
-    elo as globalElo, 
-    pickBanElo as golbalPickBanElo, 
+    players.elo as globalElo, 
+    players.pickBanElo as pickBanGlobalElo, 
     @channelId as channelId,
     @serverId as serverId,
     serverElo.elo as serverElo,
     channelElo.elo as channelElo
-    ) from players where players.id = @playerId
-left join elo serverElo on resourceId = @serverId and players.id = serverElo.playerId
-left join elo channelElo on resourceId = @channelId and players.id = channelElo.playerId
+     from players 
+        left join elo as serverElo on players.id = serverElo.playerId and serverElo.resourceId = @channelId
+        left join elo as channelElo on players.id = channelElo.playerId and channelElo.resourceId = @serverId
+        where players.id = @playerId --and serverElo.resourceId = @serverId and serverresourceId = @channelId
 

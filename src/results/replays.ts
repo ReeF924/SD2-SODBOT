@@ -3,7 +3,7 @@ import { GameParser } from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
 import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelper";
-import { DiscordBot } from "../general/discordBot";
+import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { RatingEngine } from "./rating";
 import { Console } from "node:console";
 
@@ -19,8 +19,9 @@ export class Replays {
             const replayPlayer = g.players[g.ingamePlayerId];
             
             //and we need to commit this to DB....
-            SqlHelper.setReplay(message,g);
+            let uuid = await SqlHelper.setReplay(message,g);
             message.channel.send("Results Submitted")
+            console.log(uuid.rows)
             let winners = ""
             let loosers = ""
             let winnerList = []
@@ -38,7 +39,7 @@ export class Replays {
                         winnerList.push(player)
                     }    
                 }
-                if(g.players.length == 2){
+                if(g.players.length == 2 && uuid.rows.length == 0){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -57,7 +58,7 @@ export class Replays {
                         winnerList.push(player)
                     }
                 }
-                if(g.players.length == 2){
+                if(g.players.length == 2 && uuid.rows.length == 0){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -67,7 +68,7 @@ export class Replays {
             } else {
                 winners = "no one"
                 loosers = "everyone"
-                if(g.players.length == 2){
+                if(g.players.length == 2 && uuid.rows.length == 0){
                     const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
@@ -108,15 +109,15 @@ export class Replays {
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
-                    if(g.players.length == 2){
+                    if(g.players.length == 2 && uuid.rows.length == 0){
                         if(ratings.p1.eugenId == player.id){
-                            elo += `Global: ${ratings.p1.globalElo}(${ratings.p1.globalDelta})\nServer: ${ratings.p1.serverElo}(${ratings.p1.serverDelta})\nChannel: ${ratings.p1.channelElo}(${ratings.p1.channelDelta})`
+                            elo += `Global: ${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})\nServer: ${Math.round(ratings.p1.serverElo)}   (${ratings.p1.serverDelta})\nChannel: ${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})`
                         }else if(ratings.p2.eugenId == player.id){
-                            elo += `Global: ${ratings.p2.globalElo}(${ratings.p2.globalDelta})\nServer: ${ratings.p2.serverElo}(${ratings.p2.serverDelta})\nChannel: ${ratings.p2.channelElo}(${ratings.p2.channelDelta})`
+                            elo += `Global: ${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})\nServer: ${Math.round(ratings.p2.serverElo)}   (${ratings.p2.serverDelta})\nChannel: ${Math.round(ratings.p2.channelElo)} (${Math.round(ratings.p2.channelDelta)})`
                         }
                     }else{
                         const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
-                        elo += `Global: ${elox.globalElo}\nServer: ${elox.serverElo}\nChannel: ${elox.channelElo}`
+                        elo += `Global:   ${Math.round(elox.globalElo)}\nServer:   ${Math.round(elox.serverElo)}\nChannel: ${Math.round(elox.channelElo)}`
                     }
                     embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, false)
@@ -162,11 +163,14 @@ export class Replays {
                     }
                 }
                 // Check the game is 1v1 and warn that results will not be rated
-                if (g.players.length > 2){
-                    message.reply("This reply is not a 1v1 player game, outcome will not be used in ELO")
-                } 
                 message.channel.send(embed)
-            }     
+            }    
+            if (g.players.length > 2){
+                MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
+            } 
+            if(uuid.rows.length == 1){
+                MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
+            } 
         })
         
     }

@@ -5,6 +5,7 @@ import * as fs from 'fs'
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { types } from 'node:util';
+import { Server } from 'node:http';
 
 export class SqlHelper {
 
@@ -85,6 +86,7 @@ export class SqlHelper {
     const xx = await SqlHelper.exec(SqlHelper.getElosSql,{playerId:eugenId,channelId:channel,serverId:server},{playerId:TYPES.Int,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
     if(xx.rows.length > 0){
       const x = xx.rows[0];
+      Logs.log("getElos Fetched: " + JSON.stringify(x))
       return {
         eugenId: Number(x.eugenId.value),
         serverId: String(x.serverId.value),
@@ -97,7 +99,17 @@ export class SqlHelper {
       }
     }
     else
-      return null;
+    Logs.log("getElos User Not Found: " + eugenId)
+    return {
+      eugenId: eugenId,
+      serverId: server,
+      channelId: channel,
+      channelElo:  1500,
+      serverElo:  1500,
+      globalElo: 1500,
+      pickBanGlobalElo: 1500,
+      playerName: ""
+    }
   }
 
   static async getDiscordElos(discordId:string, channel:string, server:string):Promise<Elos>{
@@ -120,8 +132,11 @@ export class SqlHelper {
   }
 
   static async setElos(elos:Elos,info:EloInfo):Promise<DBObject>{
-    return await SqlHelper.exec(SqlHelper.updateElosSql,({...elos, ...info} as unknown as Record<string,unknown>),
-    {impliedName: TYPES.VarChar, serverName:TYPES.VarChar, channelName: TYPES.VarChar, eugenId: TYPES.Int, serverId: TYPES.VarChar,channelId: TYPES.VarChar,channelElo: TYPES.Float,serverElo: TYPES.Float,globalElo: TYPES.Float,pickBanGlobalElo: TYPES.Float,playerName: TYPES.Text})
+    const elosData = {playerId:elos.eugenId, serverId:elos.serverId, channelId:elos.channelId, channelElo:elos.channelElo, serverElo:elos.serverElo, globalElo:elos.globalElo, pickBanGlobalElo: elos.pickBanGlobalElo, ...info}
+    Logs.log("saving elos: "+ JSON.stringify(elosData))
+    return await SqlHelper.exec(SqlHelper.updateElosSql,
+      ( elosData as unknown as Record<string,unknown>),
+    {playerId:TYPES.Int, impliedName: TYPES.VarChar, serverName:TYPES.VarChar, channelName: TYPES.VarChar, eugenId: TYPES.Int, serverId: TYPES.VarChar,channelId: TYPES.VarChar,channelElo: TYPES.Float,serverElo: TYPES.Float,globalElo: TYPES.Float,pickBanGlobalElo: TYPES.Float,playerName: TYPES.Text})
   }
 
   static async setDivisionElo(elo:DivElo): Promise<DBObject>{
@@ -316,9 +331,6 @@ export class SqlHelper {
       replay: TYPES.Text,
       uuid: TYPES.VarChar
     }
-    console.log(dbRow)
-    console.log(dbRow.replay.length)
-    console.log(SqlHelper.addReplaySql)
     Logs.log("Committing replay: " + dbRow.uuid)
     return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
