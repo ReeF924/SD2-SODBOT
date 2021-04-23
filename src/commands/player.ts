@@ -124,16 +124,30 @@ export class PlayerCommand {
         const ladder = await SqlHelper.getGlobalLadder();
        
         const embed = new MessageEmbed();
-        embed.setTitle("Top 10 Players")
+        embed.setTitle("Top 25 Players")
         embed.setColor("75D1EA")
+        var playerElo = ""
+        var playerName = ""
+        var playerPos = ""
         let x = 0;
-        while(x < 10 && x < ladder.length){
-            if(ladder[x].discordId != "null")
-                embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
-            else
-                embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
+        while(x < 20 && x < ladder.length){
+            if(ladder[x].discordId != "null"){
+                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
+                playerElo += PlayerCommand.pad(ladder[x].elo) + "\n"
+                playerName += "<@!" + ladder[x].discordId + "> \n"
+                playerPos += ladder[x].rank + "\n"
+
+            }else{
+                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
+                playerElo += PlayerCommand.pad(ladder[x].elo) + "\n"
+                playerName +=  ladder[x].name + "\n"
+                playerPos += ladder[x].rank + "\n"
+            }
             x++;
         }
+        embed.addField("Pos", playerPos, true)
+        embed.addField("Name", playerName, true)
+        embed.addField("Elo", playerElo, true)
         //Send Final Embed
         embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
         MsgHelper.say(message,embed,false)
