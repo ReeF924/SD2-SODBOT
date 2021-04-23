@@ -12,6 +12,7 @@ import * as smp from 'source-map-support';
 import * as http from 'http';
 import { Logs } from "./general/logs";
 import { SqlHelper } from "./general/sqlHelper";
+import { API } from "./api/api";
 
 smp.install();
 
@@ -32,4 +33,6 @@ const healthcheck = http.createServer(function (req,res){
     res.end();
 });
 Logs.log("Starting healthcheck server on 8080")
-healthcheck.listen(8080);
+//healthcheck.listen(8080);
+const api = new API()
+api.start();
