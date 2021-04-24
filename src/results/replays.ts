@@ -15,13 +15,23 @@ export class Replays {
         const url = message.attachments.first().url
         ax.get(url).then(async (res) => {
             const g = GameParser.parseRaw(res.data)
-            //discover winning team
+            //discover winning team alliance....Not sure we need this now?
             const replayPlayer = g.players[g.ingamePlayerId];
             
-            //and we need to commit this to DB....
+            //we need to commit the replay to the DB....
             let uuid = await SqlHelper.setReplay(message,g);
             message.channel.send("Results Submitted")
             console.log(uuid.rows)
+
+            // and check the game is 1v1, if it isn't warn that results will not be rated
+            if (g.players.length > 2){
+                MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
+            }
+            // and check if the game already existed in DB 
+            if(uuid.rows.length == 1){
+                MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
+            } 
+            //determine who won and lost, calculate ELO
             let winners = ""
             let loosers = ""
             let winnerList = []
@@ -76,7 +86,7 @@ export class Replays {
                     await SqlHelper.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
                 }
             }
-
+            // Create embed header
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
                 .setColor("#0099ff")
@@ -92,7 +102,8 @@ export class Replays {
                 .addField('Starting Points', g.initMoney + " pts", true)
                 .addField('Map', misc.map[g.map_raw], true) 
 
-            if (g.players.length < 4)
+            // If embed is less than 4 we can send in single embed
+            if (g.players.length < 4){
                 for (const player of g.players) {
                     let playerid = player.name;
                     let discordId = ""
@@ -109,30 +120,61 @@ export class Replays {
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
+                   //
+                   // This needs to be replaced once we have the blacklist tables in place
+                   // Allocates what ELO is shown in the players details of the embed
+                   //
                     if(g.players.length == 2 && uuid.rows.length == 0){
                         if(ratings.p1.eugenId == player.id){
-                            elo += `Global: ${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})\nServer: ${Math.round(ratings.p1.serverElo)}   (${ratings.p1.serverDelta})\nChannel: ${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})`
+                            let blackListServer = "false"
+                            let blackListChannel = "false"   
+                            if (blackListChannel == "true"){            
+                                elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})||`
+                            } else if (blackListServer == "true"){
+                                elo += `League ELO: ||${Math.round(ratings.p1.serverElo)}   (${ratings.p1.serverDelta})||`
+                            } else {
+                                elo += `Global ELO: ||${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})||`
+                            }
                         }else if(ratings.p2.eugenId == player.id){
-                            elo += `Global: ${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})\nServer: ${Math.round(ratings.p2.serverElo)}   (${ratings.p2.serverDelta})\nChannel: ${Math.round(ratings.p2.channelElo)} (${Math.round(ratings.p2.channelDelta)})`
+                            let blackListServer = "false"
+                            let blackListChannel = "false"   
+                            if (blackListChannel == "true"){            
+                                elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${Math.round(ratings.p2.channelDelta)})||`
+                            } else if (blackListServer == "true"){
+                                elo += `League ELO: ||${Math.round(ratings.p2.serverElo)}   (${ratings.p2.serverDelta})||`
+                            } else {
+                                elo += `Global ELO: ||${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})||`
+                            }
                         }
                     }else{
                         const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
-                        elo += `Global:   ${Math.round(elox.globalElo)}\nServer:   ${Math.round(elox.serverElo)}\nChannel: ${Math.round(elox.channelElo)}`
+                        let blackListServer = "false"
+                            let blackListChannel = "false"   
+                            if (blackListChannel == "true"){            
+                                elo += `Channel ELO: ${Math.round(ratings.p2.channelElo)}`
+                            } else if (blackListServer == "true"){
+                                elo += `League ELO: ${Math.round(ratings.p2.serverElo)}`
+                            } else {
+                                elo += `Global ELO: ${Math.round(elox.globalElo)}`
+                            }
                     }
+                    // Add the player details to the embed
                     embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, false)
                         .addField("Elo", elo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
+                        
                 }
+            }
             message.channel.send(embed)
-            
 
+            // But if the number so players are equal to or greater than 4 we need to break it over several embeds 
             if (g.players.length >= 4) {
-                embed = new MessageEmbed()
-                    .setColor("#0099ff")
                 let counter = 0;
+                embed = new MessageEmbed()
+                            .setColor("#0099ff")
                 for (const player of g.players) {
                     let playerid = player.name;
                     let discordId = ""
@@ -162,15 +204,9 @@ export class Replays {
                         counter = 0;
                     }
                 }
-                // Check the game is 1v1 and warn that results will not be rated
                 message.channel.send(embed)
-            }    
-            if (g.players.length > 2){
-                MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
-            } 
-            if(uuid.rows.length == 1){
-                MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
-            } 
+            }  
+            
         })
         
     }

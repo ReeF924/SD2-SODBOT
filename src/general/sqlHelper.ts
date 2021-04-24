@@ -336,6 +336,7 @@ export class SqlHelper {
     return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
   }
 
+  
   //This is expensive. And an unprepared statement. and it returns *....
   //it needs work. @todo
   static async getReplaysByEugenId(eugenId:number):Promise<DBObject>{
