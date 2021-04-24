@@ -32,14 +32,23 @@ export class PlayerCommand {
         
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
-        embed.addFields([
-            {name:"Player Name", value: "<@!"+player+">",inline:false},
-            //{name:"Eugen Id", value: eugenId,inline:false}, --we don't really want people messing with this/registering as others. Yes I know you can find it via replays.
-            {name:"Server Rating", value: Math.round(Elos.serverElo),inline:true},
-            {name:"Channel Rating", value: Math.round(Elos.channelElo),inline:true},
-            {name:"Global Elo", value: Math.round(Elos.globalElo),inline:true},
-            {name:"\u200b", value: "\u200b",inline:true}
-        ]);
+        embed.addField("Player Name", "<@!"+player+">",false)
+          
+        let blackListServer = "false"
+        let blackListChannel = "false"   
+        if (blackListChannel == "true"){            
+            embed.addField("Elo Rating", Math.round(Elos.channelElo),true)
+            console.log("Channel Elo " + Elos.channelElo)
+        } else if (blackListServer == "true"){
+            embed.addField("Elo Rating", Math.round(Elos.serverElo),true)
+            console.log("Server Elo " + Elos.serverElo)
+        } else {
+            embed.addField("Elo Rating", Math.round(Elos.globalElo),true)
+            console.log("Global Elo " + Elos.globalElo)
+            embed.addField("\u200b", "\u200b",true)
+        }
+        
+        
         // Extract recent games
         //thou shall not use exec.
         /*
