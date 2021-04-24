@@ -1,21 +1,26 @@
-import { Message } from "discord.js";
+import { Message, User } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { MessageEmbed } from "discord.js";
 import { SqlHelper } from "../general/sqlHelper";
 import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
 import { Logs } from "../general/logs";
+import e = require("express");
 
 export class PlayerCommand {
     
     static async getPlayer(message:Message,input:string[]){
         const embed = new MessageEmbed();
         var player:string;
+        var icon:string
         //Determine the target player
         if(input.length == 0){
             player = message.author.id
+            icon = message.author.displayAvatarURL()
         }else if(input.length == 1){
             player = input[0].slice(3,-1) //this is magic.
+            let usr = message.mentions.users.first();
+            icon = usr.displayAvatarURL()
         }else{
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
             return;
@@ -33,18 +38,23 @@ export class PlayerCommand {
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
         embed.addField("Player Name", "<@!"+player+">",false)
+        embed.setThumbnail(icon)
           
+        // 
+        //This code needs to be re-written once we have the blacklist tables up and working 
+        //
         let blackListServer = "false"
         let blackListChannel = "false"   
         if (blackListChannel == "true"){            
             embed.addField("Elo Rating", Math.round(Elos.channelElo),true)
-            console.log("Channel Elo " + Elos.channelElo)
+            embed.setFooter("Note: This Elo rating is specific for this channel")
         } else if (blackListServer == "true"){
             embed.addField("Elo Rating", Math.round(Elos.serverElo),true)
-            console.log("Server Elo " + Elos.serverElo)
+            embed.setFooter("Note: This Elo rating is specific for the " + message.guild.name + " server")
         } else {
             embed.addField("Elo Rating", Math.round(Elos.globalElo),true)
-            console.log("Global Elo " + Elos.globalElo)
+            embed.setFooter("Note: This Elo rating is a global rating and takes into account all approved uploaded matches")
+
             embed.addField("\u200b", "\u200b",true)
         }
         
