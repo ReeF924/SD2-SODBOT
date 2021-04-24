@@ -117,34 +117,41 @@ export class PlayerCommand {
     }
 
     private static pad(num:number):string {
-        return String(Math.round(num*10)/10).padEnd(7);
+        var rounded = Math.round(num*10)/10
+        var fixed = rounded.toFixed(1)
+        return fixed.padEnd(7);
     }
 
     static async getLadder(message:Message, input:string[]){
         const ladder = await SqlHelper.getGlobalLadder();
        
         const embed = new MessageEmbed();
-        embed.setTitle("Top 25 Players")
+        embed.setTitle("Top 50 Players")
         embed.setColor("75D1EA")
         var playerDetails = ""
+        var yearAgoTime = new Date()
+        yearAgoTime.setFullYear(yearAgoTime.getFullYear()-1)
         let x = 0;
-        while(x < 20 && x < ladder.length){
-            if(ladder[x].discordId != "null"){
-                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": <@!" + ladder[x].discordId + ">",false)
-                playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+        while(x < 50 && x < ladder.length){
+            if (yearAgoTime < ladder[x].lastActive){
+                if(ladder[x].discordId != "null"){
+                    playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
 
-            }else{
-                //embed.addField("\u200b", PlayerCommand.pad(ladder[x].elo) + ": " + ladder[x].name,false)
-                playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
+                }else{
+                    playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
+                }
             }
             x++;
         }
         embed.addField("Pos      Elo           Name", playerDetails, true)
         //Send Final Embed
         embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
+        embed.setFooter("Only those players who have been involved in a submitted match in the last year will appear in the ladder")
         MsgHelper.say(message,embed,false)
     }
 
+
+    
         //Register a player to the bot
         static register(message:Message, input:string[]):void{
             if(input.length == 1 && Number(input[0])){

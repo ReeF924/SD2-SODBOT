@@ -79,7 +79,7 @@ export class Replays {
 
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
-                .setColor("#347C17")
+                .setColor("#0099ff")
                 .addField("Winner", `||${winners}||`, true)
                 .addField("Loser", `||${loosers}||`, true)
                 .addField("victoryState", `||${misc.victory[g.result.victory]}||`, true)

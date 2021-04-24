@@ -45,9 +45,7 @@ export class DivisionCommand {
     static allDivs(message:Message,input:string[]):void {        
         let embed = new MessageEmbed().setTitle("-- All Divisions --")
         let allieddivs = "";
-        let allieddivsalias = "";
         let axisdivs = "";
-        let axisdivsalias = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
             let allied = "";
             let alliedalias = "";
@@ -59,17 +57,13 @@ export class DivisionCommand {
             if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
 
 
-            allieddivs += allied + "\n";
-            allieddivsalias += alliedalias + "\n";
-            axisdivs += axis + "\n";
-            axisdivsalias += axisalias + "\n";
+            allieddivs += allied + " (" + alliedalias + ") \n";
+            axisdivs += axis + " (" + axisalias + ") \n";
         }
         embed = embed.addFields(
-            {name:"Allied Divisions", value: allieddivs,inline:true},
-            {name:"Allied (Alias)", value: allieddivsalias,inline:true},
+            {name:"Allied Divisions   (Alias)", value: allieddivs,inline:true},
             {name:'\u200b', value:'\u200b',inline:false},
-            {name:"Axis Divisions", value: axisdivs,inline:true},
-            {name:"Axis (Alias)", value: axisdivsalias,inline:true}
+            {name:"Axis Divisions   (Alias)", value: axisdivs,inline:true},
             )
         message.channel.send(embed);
 
