@@ -17,20 +17,25 @@ export class Replays {
             const g = GameParser.parseRaw(res.data)
             //discover winning team alliance....Not sure we need this now?
             const replayPlayer = g.players[g.ingamePlayerId];
-            
-            //we need to commit the replay to the DB....
+
+            //we need to commit the replay to the DB
             let uuid = await SqlHelper.setReplay(message,g);
             message.channel.send("Results Submitted")
             console.log(uuid.rows)
-
+        
+            // and check if game has been uploaded in a non-ELO channel
+            if (message.channel.id == "766325209891340358" || message.channel.id == "714730729631776819"){
+                MsgHelper.say(message,"This channel does not support ELO calculation, game summary will still be posted however for interest purposes")
+            }
             // and check the game is 1v1, if it isn't warn that results will not be rated
-            if (g.players.length > 2){
+            else if (g.players.length > 2){
                 MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
             }
             // and check if the game already existed in DB 
-            if(uuid.rows.length == 1){
+            else if(uuid.rows.length == 1){
                 MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
-            } 
+            }  
+
             //determine who won and lost, calculate ELO
             let winners = ""
             let loosers = ""
@@ -39,7 +44,7 @@ export class Replays {
             let ratings:{p1:ElosDelta,p2:ElosDelta}
             const channel = await DiscordBot.bot.channels.fetch(message.channel.id) as ChannelData
             if (g.result.victory < 3) {
-                 for (const player of g.players) {
+                for (const player of g.players) {
                     const playerid = player.name
                     if (g.ingamePlayerId == player.alliance){
                         loosers += playerid + "\n"
@@ -49,11 +54,10 @@ export class Replays {
                         winnerList.push(player)
                     }    
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0){
+                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
-                    
                     await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
                     await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
                 }  
@@ -68,7 +72,7 @@ export class Replays {
                         winnerList.push(player)
                     }
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0){
+                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -78,7 +82,7 @@ export class Replays {
             } else {
                 winners = "no one"
                 loosers = "everyone"
-                if(g.players.length == 2 && uuid.rows.length == 0){
+                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
                     const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
@@ -86,6 +90,20 @@ export class Replays {
                     await SqlHelper.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
                 }
             }
+            //Test remove later
+            console.log("Winners "+winners)
+            console.log("Losers "+loosers)
+            console.log("VictoryState "+misc.victory[g.result.victory])
+            console.log("Duration "+Replays.duration(g.result.duration))
+            console.log("Game Version "+g.version)
+            console.log("ScoreLimit "+g.scoreLimit)
+            console.log("Timelimit "+g.timeLimit)
+            console.log("IncomeRate "+misc.incomeLevel[g.incomeRate])
+            console.log("Game Mode "+misc.mode[g.gameMode])
+            console.log("StartingPoints "+g.initMoney)
+            console.log("Map "+ misc.map[g.map_raw])
+
+
             // Create embed header
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
@@ -123,8 +141,9 @@ export class Replays {
                    //
                    // This needs to be replaced once we have the blacklist tables in place
                    // Allocates what ELO is shown in the players details of the embed
+                   // Currently defaults to Global ELO
                    //
-                    if(g.players.length == 2 && uuid.rows.length == 0){
+                    if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
                         if(ratings.p1.eugenId == player.id){
                             let blackListServer = "false"
                             let blackListChannel = "false"   
@@ -135,7 +154,7 @@ export class Replays {
                             } else {
                                 elo += `Global ELO: ||${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})||`
                             }
-                        }else if(ratings.p2.eugenId == player.id){
+                        } else if(ratings.p2.eugenId == player.id){
                             let blackListServer = "false"
                             let blackListChannel = "false"   
                             if (blackListChannel == "true"){            
@@ -146,18 +165,28 @@ export class Replays {
                                 elo += `Global ELO: ||${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})||`
                             }
                         }
-                    }else{
-                        const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
-                        let blackListServer = "false"
+                    } 
+                    else {
+                            const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
+                            let blackListServer = "false"
                             let blackListChannel = "false"   
                             if (blackListChannel == "true"){            
-                                elo += `Channel ELO: ${Math.round(ratings.p2.channelElo)}`
+                                elo += `Channel ELO: ${Math.round(elox.channelElo)}`
                             } else if (blackListServer == "true"){
-                                elo += `League ELO: ${Math.round(ratings.p2.serverElo)}`
+                                elo += `League ELO: ${Math.round(elox.serverElo)}`
                             } else {
                                 elo += `Global ELO: ${Math.round(elox.globalElo)}`
                             }
                     }
+
+                    //Testing  remove later
+                    console.log("Player : "+playerid)
+                    console.log("ELO "+elo)
+                    console.log("Divi "+player.deck.division)
+                    console.log("Income "+player.deck.income)
+                    console.log("DeckCode : "+player.deck.raw.code)
+
+
                     // Add the player details to the embed
                     embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, false)
