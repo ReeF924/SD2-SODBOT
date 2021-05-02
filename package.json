@@ -32,7 +32,6 @@
     "sd2-data": "^0.5.2",
     "sd2-utilities": "^0.1.8",
     "tedious": "^11.0.6",
-    "tedious-connection-pool2": "2.0.0",
     "winston": "3.3.3",
     "winston-azure-transport": "3.0.5"
   },

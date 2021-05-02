@@ -390,7 +390,9 @@ export class SqlHelper {
       }
       const result = (await request.query(string))
       console.log(result)
-      return {rowCount:result.recordset.length, rows:result.recordset}
+      let len = 0
+      if(result.recordset) len = result.recordset.length;
+      return {rowCount:len, rows:result.recordset}
   }
 }
 
