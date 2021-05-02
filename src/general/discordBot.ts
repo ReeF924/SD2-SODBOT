@@ -4,9 +4,10 @@ import { CommonUtil } from "./common";
 import {APIMessageContentResolvable, Client, Message, MessageEmbed} from "discord.js";
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
+import { Permissions, PermissionsSet } from "./permissions"
 
 
-export type BotCommand = (message:Message,input:string[])=>void;
+export type BotCommand = (message:Message,input:string[],perm?:PermissionsSet)=>void;
 
 export class DiscordBot {
 
@@ -40,7 +41,7 @@ export class DiscordBot {
         Logs.error(message)
     }
 
-    private runCommand(message:Message,command:string){
+    private runCommand(message:Message,command:string,perms:PermissionsSet){
         let input:string[] = [];
         const ii = message.content.indexOf(" ");
         if(ii>0){
@@ -54,14 +55,18 @@ export class DiscordBot {
             }
         }
         if(this.commands[command]){
-            this.commands[command](message,input);
+            this.commands[command](message,input,perms);
         }else{
             MsgHelper.reply(message, "Unknown Command. Did you mean " +CommonUtil.config("prefix") + CommonUtil.lexicalGuesser(command,Object.keys(this.commands)))
         }
     }
 
     private async onMessage(message:Message){
-        if (message.content.startsWith(CommonUtil.config("prefix"))) {
+        let channel, guild
+        if(message.channel) channel = message.channel.id;
+        if(message.guild) guild = message.guild.id;
+        const perms = Permissions.getPermissions(channel,guild)
+        if (!(await perms).areCommandsBlocked && message.content.startsWith(CommonUtil.config("prefix"))) {
             const inputList = message.content
             .substr(1, message.content.length)
             .toLowerCase()
@@ -72,13 +77,13 @@ export class DiscordBot {
             if (message.channel.type === "dm") {
                 return;
             }
-            this.runCommand(message, command);
+            this.runCommand(message, command,(await perms));
         }
     
-        if (message.attachments.first()) {
+        if (!(await perms).areReplaysBlocked && message.attachments.first()) {
             if (message.attachments.first().url.endsWith(".rpl3")) {
             if (message.channel.type !== "dm") {
-                Replays.extractReplayInfo(message);
+                Replays.extractReplayInfo(message,(await perms));
             }
             }
         }
