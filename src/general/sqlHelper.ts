@@ -1,25 +1,25 @@
-import { Connection, Request, TediousType, TYPES } from 'tedious'
+import { Connection, Request, TediousType, } from 'tedious'
 import { CommonUtil } from './common';
 import { Logs } from "./logs";
 import * as fs from 'fs'
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
-import { types } from 'node:util';
-import { Server } from 'node:http';
+import * as sql from 'mssql'
+
 
 export class SqlHelper {
 
   static config = {
-    authentication: {
-      options: {
-        userName: "",
-        password: ""
-      },
-      type: "default"
-    },
+    user: "",
+    password: "",
     server: "sodbotdb.database.windows.net",
+    database: "sodbot",
+    pool: {
+      max: 10,
+      min: 0,
+      idleTimeoutMillis: 30000
+    },
     options: {
-      database: "sodbot",
       encrypt: true,
       rowCollectionOnRequestCompletion: true,
       useColumnNames: true
@@ -27,6 +27,7 @@ export class SqlHelper {
   }
 
   static connection: Connection
+  static connectionPool: sql.ConnectionPool
 
 
   //Functions by Table (matching createTables.sql)
@@ -40,9 +41,8 @@ export class SqlHelper {
       pickBanElo: player.pickBanElo,
       impliedName: player.impliedName,
       lastPlayed: player.lastPlayed
-      
     }
-    return await SqlHelper.exec(SqlHelper.updatePlayerSql,data,{id:TYPES.Int,elo:TYPES.Float,pickBanElo:TYPES.Float,lastPlayed:TYPES.DateTime})
+    return await SqlHelper.exec(SqlHelper.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
   }
 
   static async getPlayer(eugenId:number): Promise<Player> {
@@ -50,28 +50,11 @@ export class SqlHelper {
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        id: Number(x.id.value),
-        elo: Number(x.elo.value),
-        pickBanElo: Number(x.pickBanElo.value),
-        impliedName:  x.impliedName != null ? x.impliedName.value as string : null,
-        lastPlayed: x.lastPlayed != null ? new Date(x.lastPlayed.value as Date) : null
-      }
-    }
-    else
-      return null;
-  }
-
-  //channel admin
-  static async getChannelPermissions(channelId:number): Promise<ChannelPermissionSet>{
-    const xx = await SqlHelper.exec("Select * from channelBlacklist where id = '" + channelId + "';")
-    if(xx.rows.length > 0){
-      const x = xx.rows[0];
-      return {
-        id : String(x.id.value),
-        channelName : String(x.channelName.value),
-        blockElo : Boolean(x.blockElo.value),
-        blockCommands : Boolean (x.blockCommands.value),
-        blockReplay : Boolean (x.blockReplay.value)
+        id: Number(x.id),
+        elo: Number(x.elo),
+        pickBanElo: Number(x.pickBanElo),
+        impliedName:  x.impliedName != null ? String(x.impliedName) : null,
+        lastPlayed: x.lastPlayed != null ? new Date(x.lastPlayed as Date) : null
       }
     }
     else
@@ -83,19 +66,19 @@ export class SqlHelper {
   //elos
 
   static async getElos(eugenId:number, channel:string, server:string):Promise<Elos>{
-    const xx = await SqlHelper.exec(SqlHelper.getElosSql,{playerId:eugenId,channelId:channel,serverId:server},{playerId:TYPES.Int,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
+    const xx = await SqlHelper.exec(SqlHelper.getElosSql,{playerId:eugenId,channelId:channel,serverId:server},{playerId:sql.Int,channelId:sql.VarChar,serverId:sql.VarChar})
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       Logs.log("getElos Fetched: " + JSON.stringify(x))
       return {
-        eugenId: Number(x.eugenId.value),
-        serverId: String(x.serverId.value),
-        channelId: String(x.channelId.value),
-        channelElo: x.channelElo ? Number(x.channelElo.value) : 1500,
-        serverElo: x.serverElo ? Number(x.serverElo.value) : 1500,
-        globalElo: Number(x.globalElo.value),
-        pickBanGlobalElo: Number(x.pickBanGlobalElo.value),
-        playerName: String(x.playerName.value)
+        eugenId: Number(x.eugenId),
+        serverId: String(x.serverId),
+        channelId: String(x.channelId),
+        channelElo: x.channelElo ? Number(x.channelElo) : 1500,
+        serverElo: x.serverElo ? Number(x.serverElo) : 1500,
+        globalElo: Number(x.globalElo),
+        pickBanGlobalElo: Number(x.pickBanGlobalElo),
+        playerName: String(x.playerName)
       }
     }
     else
@@ -113,18 +96,18 @@ export class SqlHelper {
   }
 
   static async getDiscordElos(discordId:string, channel:string, server:string):Promise<Elos>{
-    const xx = await SqlHelper.exec(SqlHelper.getElosDiscordSql,{playerId:discordId,channelId:channel,serverId:server},{playerId:TYPES.VarChar,channelId:TYPES.VarChar,serverId:TYPES.VarChar})
+    const xx = await SqlHelper.exec(SqlHelper.getElosDiscordSql,{playerId:discordId,channelId:channel,serverId:server},{playerId:sql.VarChar,channelId:sql.VarChar,serverId:sql.VarChar})
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        eugenId: Number(x.eugenId.value),
-        serverId: String(x.serverId.value),
-        channelId: String(x.channelId.value),
-        channelElo: x.channelElo ? Number(x.channelElo.value) : 1500,
-        serverElo: x.serverElo ? Number(x.serverElo.value) : 1500,
-        globalElo: Number(x.globalElo.value),
-        pickBanGlobalElo: Number(x.pickBanGlobalElo.value),
-        playerName: String(x.playerName.value)
+        eugenId: Number(x.eugenId),
+        serverId: String(x.serverId),
+        channelId: String(x.channelId),
+        channelElo: x.channelElo ? Number(x.channelElo) : 1500,
+        serverElo: x.serverElo ? Number(x.serverElo) : 1500,
+        globalElo: Number(x.globalElo),
+        pickBanGlobalElo: Number(x.pickBanGlobalElo),
+        playerName: String(x.playerName)
       }
     }
     else
@@ -136,7 +119,7 @@ export class SqlHelper {
     Logs.log("saving elos: "+ JSON.stringify(elosData))
     return await SqlHelper.exec(SqlHelper.updateElosSql,
       ( elosData as unknown as Record<string,unknown>),
-    {playerId:TYPES.Int, impliedName: TYPES.VarChar, serverName:TYPES.VarChar, channelName: TYPES.VarChar, eugenId: TYPES.Int, serverId: TYPES.VarChar,channelId: TYPES.VarChar,channelElo: TYPES.Float,serverElo: TYPES.Float,globalElo: TYPES.Float,pickBanGlobalElo: TYPES.Float,playerName: TYPES.Text})
+    {playerId:sql.Int, impliedName: sql.VarChar, serverName:sql.VarChar, channelName: sql.VarChar, eugenId: sql.Int, serverId: sql.VarChar,channelId: sql.VarChar,channelElo: sql.Float,serverElo: sql.Float,globalElo: sql.Float,pickBanGlobalElo: sql.Float,playerName: sql.Text})
   }
 
   static async setDivisionElo(elo:DivElo): Promise<DBObject>{
@@ -146,7 +129,7 @@ export class SqlHelper {
       divName: elo.divName
       
     }
-    return await SqlHelper.exec(SqlHelper.updateDivEloSql,data,{id:TYPES.VarChar,elo:TYPES.Float,pickBanElo:TYPES.Float})
+    return await SqlHelper.exec(SqlHelper.updateDivEloSql,data,{id:sql.VarChar,elo:sql.Float,pickBanElo:sql.Float})
   }
 
   static async getDivisionElo(id:string):Promise<DivElo>{
@@ -154,14 +137,55 @@ export class SqlHelper {
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        id : String(x.id.value),
-        divName : String(x.divName.value),
-        elo : Number(x.elo.value),
+        id : String(x.id),
+        divName : String(x.divName),
+        elo : Number(x.elo),
       }
     }
     else
       return null;
   }
+  //permissions
+
+  static async getServerPermissions(serverId: string): Promise<Blacklist>{
+    const xx = await SqlHelper.exec("Select * from serverBlackList where id = '" + serverId + "';")
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      return {
+        id: String(x.id),
+        name: String(x.serverName),
+        blockElo: Number(x.blockElo),
+        blockCommands: Number(x.blockCommands),
+        blockReplay: Number(x.blockReplay),
+        blockChannelElo: Number(x.blockChannelElo),
+        blockServerElo: Number(x.blockServerElo),
+        blockGlobalElo: Number(x.blockGlobalElo)
+      }
+    }else{
+      return null;
+    }
+  }
+
+  static async getChannelPermissions(serverId: string): Promise<Blacklist>{
+    const xx = await SqlHelper.exec("Select * from serverBlackList where id = '" + serverId + "';")
+    if(xx.rows.length > 0){
+      const x = xx.rows[0];
+      return {
+        id: String(x.id),
+        name: String(x.channelName),
+        blockElo: Number(x.blockElo),
+        blockCommands: Number(x.blockCommands),
+        blockReplay: Number(x.blockReplay),
+        blockChannelElo: Number(x.blockChannelElo),
+        blockServerElo: Number(x.blockServerElo),
+        blockGlobalElo: Number(x.blockGlobalElo)
+      }
+    }else{
+      return null;
+    }
+  }
+
+
   //discordUser
 
   static async getDiscordUser(discordId: string): Promise<DiscordUser> {
@@ -170,11 +194,11 @@ export class SqlHelper {
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        id: String(x.id.value),
-        playerId: x.playerId.value as number,
-        serverAdmin: JSON.parse(x.serverAdmin.value as string),
-        globalAdmin: Boolean(x.globalAdmin.value),
-        impliedName: String(x.impliedName.value)
+        id: String(x.id),
+        playerId: x.playerId as number,
+        serverAdmin: JSON.parse(x.serverAdmin as string),
+        globalAdmin: Boolean(x.globalAdmin),
+        impliedName: String(x.impliedName)
       }
     }
     else
@@ -186,11 +210,11 @@ export class SqlHelper {
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        id: String(x.id.value),
-        playerId: x.playerId.value as number,
-        serverAdmin: JSON.parse(x.serverAdmin.value as string),
-        globalAdmin: Boolean(x.globalAdmin.value),
-        impliedName: String(x.impliedName.value)
+        id: String(x.id),
+        playerId: x.playerId as number,
+        serverAdmin: JSON.parse(x.serverAdmin as string),
+        globalAdmin: Boolean(x.globalAdmin),
+        impliedName: String(x.impliedName)
       }
     }
     else
@@ -206,7 +230,7 @@ export class SqlHelper {
       impliedName: user.impliedName
     }
     console.log(data)
-    return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:TYPES.VarChar,playerId:TYPES.Int,globalAdmin:TYPES.Bit,serverAdmin:TYPES.Text,impliedName:TYPES.Text})
+    return await SqlHelper.exec(SqlHelper.setDiscordUserSql,data,{id:sql.VarChar,playerId:sql.Int,globalAdmin:sql.Bit,serverAdmin:sql.Text,impliedName:sql.Text})
   }
 
 
@@ -222,10 +246,10 @@ export class SqlHelper {
       const x = xx.rows[r-1];
       ret.push({
         rank: r,
-        elo: Number(x.elo.value),
-        discordId: String(x.discordId.value),
-        name: String(x.eugenName.value),
-        lastActive: new Date(x.lastActive.value as number)
+        elo: Number(x.elo),
+        discordId: String(x.discordId),
+        name: String(x.eugenName),
+        lastActive: new Date(x.lastActive as number)
       })
       r++;
     }
@@ -239,11 +263,11 @@ export class SqlHelper {
     console.log("Back from sql")
     if(xx.rows.length > 0){
       const x = xx.rows[0];
-      console.log(x.id.value);
+      console.log(x.id);
       return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
+        id: String(x.id),
+        elo: x.elo as number,
+        pickBanElo: x.pickBanElo as number,
       }
     }
     // Only here in case we have a user without a entry in the players table
@@ -254,9 +278,9 @@ export class SqlHelper {
       const x = xx.rows[0];
       console.log(x);
       return {
-        id: String(x.id.value),
-        elo: x.elo.value as number,
-        pickBanElo: x.pickBanElo.value as number,
+        id: String(x.id),
+        elo: x.elo as number,
+        pickBanElo: x.pickBanElo as number,
       }
     }
     return null
@@ -266,7 +290,7 @@ export class SqlHelper {
     const data = {
       playerId: eugenId
     }
-      await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:TYPES.Int})
+      await SqlHelper.exec(SqlHelper.addPlayerEloSql,data,{playerId:sql.Int})
       return 
   }
   */
@@ -284,6 +308,7 @@ export class SqlHelper {
   static getElosSql = ""
   static getElosDiscordSql = ""
 
+  static connectionPoolConnect:Promise<sql.ConnectionPool>
 
   static init(): void {
     SqlHelper.setDiscordUserSql = fs.readFileSync("sql/updateDiscordUser.sql").toLocaleString();
@@ -294,26 +319,32 @@ export class SqlHelper {
     SqlHelper.getElosSql = fs.readFileSync("sql/getElos.sql").toLocaleString();
     SqlHelper.updateElosSql = fs.readFileSync("sql/updateElos.sql").toLocaleString();
     SqlHelper.getElosDiscordSql = fs.readFileSync("sql/getElosDiscord.sql").toLocaleString();
-    SqlHelper.config.authentication.options.password = CommonUtil.config("sqlpassword");
-    SqlHelper.config.authentication.options.userName = CommonUtil.config("sqluser")
+    SqlHelper.config.password = CommonUtil.config("sqlpassword");
+    SqlHelper.config.user = CommonUtil.config("sqluser");
+    SqlHelper.config.database = CommonUtil.config("database","sodbot")
+    SqlHelper.connectionPool = new sql.ConnectionPool(SqlHelper.config)
+    SqlHelper.connectionPoolConnect = SqlHelper.connectionPool.connect();
+    SqlHelper.connectionPool.on('error', Logs.error )
+
     SqlHelper.connection = new Connection(SqlHelper.config);
-    SqlHelper.connection.on('connect', function (err) {
-      Logs.log("Connected to SQL @ " + SqlHelper.config.server);
-      if (err) Logs.error(JSON.stringify(err));
-      //check to see if DB needs seeding and seed DB if needed.
-      const req = new Request("SELECT vers FROM vers", (err) => {
+    (async ()=>{
+      await SqlHelper.connectionPoolConnect
+      try{
+        const request = SqlHelper.connectionPool.request();
+        const result = await request.query("SELECT vers FROM vers")
+      }catch (err){
         if (err && err.message == "Invalid object name 'vers'.") {
           Logs.log("making new tables")
-          const sql = fs.readFileSync("sql/createTables.sql").toLocaleString()
-          const req2 = new Request(sql, Logs.error)
-          SqlHelper.connection.execSql(req2)
-        } else if (err) Logs.error(err)
-      })
-      SqlHelper.connection.execSql(req)
-    })
-    SqlHelper.connection.connect();
-
+            const sql = fs.readFileSync("sql/createTables.sql").toLocaleString()
+            await SqlHelper.exec(sql)
+        }
+        else
+        Logs.error(err)
+      }
+    })();  
   }
+
+  
 
   static async setReplay(message:Message, replay:RawGameData): Promise<DBObject>{
     //( @discordId, @serverId, @channelId, @replay, @gameId, @uuid )
@@ -325,17 +356,16 @@ export class SqlHelper {
       uuid: replay.uniqueSessionId
     }
 
-    const types = {
-      discordId: TYPES.VarChar,
-      serverId: TYPES.VarChar,
-      channelId: TYPES.VarChar,
-      replay: TYPES.Text,
-      uuid: TYPES.VarChar
+    const type = {
+      discordId: sql.VarChar,
+      serverId: sql.VarChar,
+      channelId: sql.VarChar,
+      replay: sql.Text,
+      uuid: sql.VarChar
     }
     Logs.log("Committing replay: " + dbRow.uuid)
-    return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,types)
+    return await SqlHelper.exec(SqlHelper.addReplaySql,dbRow,type)
   }
-
   
   //This is expensive. And an unprepared statement. and it returns *....
   //it needs work. @todo
@@ -345,27 +375,28 @@ export class SqlHelper {
   
 
 
-  private static exec(string:string, params?:Record<string,unknown>, types?:Record<string,TediousType>): Promise<DBObject> {
-    const ret = new Promise<DBObject>((resolve) => {
-      const request = new Request(string, (err, rowCount, rows) => {
-        Logs.error(err);
-        const obj = { rows: rows, rowCount: rowCount };
-        resolve(obj);
-      });
-      if(params && types){
+  private static async exec(string:string, params?:Record<string,unknown>, sql?:Record<string,sql.ISqlTypeFactory>): Promise<DBObject> {
+      let request = SqlHelper.connectionPool.request()
+      //const request = new Request(string, (err, rowCount, rows) => {
+      //  Logs.error(err);
+      //  const obj = { rows: rows, rowCount: rowCount };
+      // resolve(obj);
+      //});
+      if(params && sql){
        for(const key of Object.keys(params)) {
-         request.addParameter(key,types[key],params[key])
+         request.input(key,{type:sql[key]},params[key])
+         //request.addParameter(key,sql[key],params[key])
        }
       }
-      SqlHelper.connection.execSql(request);
-    });
-    return ret;
+      const result = (await request.query(string))
+      console.log(result)
+      return {rowCount:result.recordset.length, rows:result.recordset}
   }
 }
 
 
 interface DBObject {
-  rows?: Record<string,{value:unknown}>[],
+  rows?: Record<string,unknown>[],
   rowCount: number
 }
 
@@ -416,17 +447,18 @@ export interface ElosDelta extends Elos {
   globalDelta: number,
   pickBanDelta: number
 }
-
-export interface ChannelPermissionSet{
-  id: string,
-  channelName: string,
-  blockElo: boolean,
-  blockCommands: boolean,
-  blockReplay: boolean
-}
-
 export interface DivElo{
   id: string,
   divName: string,
   elo: number
 } 
+export interface Blacklist{
+    id: string,
+    name: string,
+    blockElo: number,
+    blockCommands: number,
+    blockReplay: number,
+    blockChannelElo: number,
+    blockServerElo: number,
+    blockGlobalElo: number
+}

@@ -6,10 +6,11 @@ import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
 import { Logs } from "../general/logs";
 import e = require("express");
+import { PermissionsSet } from "../general/permissions";
 
 export class PlayerCommand {
     
-    static async getPlayer(message:Message,input:string[]){
+    static async getPlayer(message:Message,input:string[],perms:PermissionsSet){
         const embed = new MessageEmbed();
         var player:string;
         var icon:string
@@ -26,7 +27,7 @@ export class PlayerCommand {
             return;
         }
         const Elos = await SqlHelper.getDiscordElos(player,message.channel.id,message.guild.id);
-             
+        console.log(Elos)
         if(Elos == null ){
             if(input.length == 0)
                 MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
@@ -43,17 +44,18 @@ export class PlayerCommand {
         // 
         //This code needs to be re-written once we have the blacklist tables up and working 
         //
-        let blackListServer = "false"
-        let blackListChannel = "false"   
-        if (blackListChannel == "true"){            
-            embed.addField("Elo Rating", Math.round(Elos.channelElo),true)
-            embed.setFooter("Note: This Elo rating is specific for this channel")
-        } else if (blackListServer == "true"){
-            embed.addField("Elo Rating", Math.round(Elos.serverElo),true)
-            embed.setFooter("Note: This Elo rating is specific for the " + message.guild.name + " server")
-        } else {
-            embed.addField("Elo Rating", Math.round(Elos.globalElo),true)
-            embed.setFooter("Note: This Elo rating is a global rating and takes into account all approved uploaded matches")
+  
+        if (perms.isChannelEloShown){            
+            embed.addField("Channel Rating", Math.round(Elos.channelElo),true)
+            //embed.setFooter("Note: This Elo rating is specific for this channel")
+        }
+        if(perms.isServerEloShown){
+            embed.addField("Server Rating", Math.round(Elos.serverElo),true)
+            //embed.setFooter("Note: This Elo rating is specific for the " + message.guild.name + " server")
+        } 
+        if(perms.isGlobalEloShown){
+            embed.addField("Global Rating", Math.round(Elos.globalElo),true)
+            //embed.setFooter("Note: G Elo rating is a global rating and takes into account all approved uploaded matches")
 
             embed.addField("\u200b", "\u200b",true)
         }

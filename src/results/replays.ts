@@ -6,12 +6,13 @@ import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelp
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { RatingEngine } from "./rating";
 import { Console } from "node:console";
+import { PermissionsSet } from "../general/permissions";
 
 const ax = axios.default;
 
 
 export class Replays {
-    static extractReplayInfo(message: Message): void {
+    static extractReplayInfo(message: Message, perms:PermissionsSet): void {
         const url = message.attachments.first().url
         ax.get(url).then(async (res) => {
             const g = GameParser.parseRaw(res.data)
@@ -24,8 +25,8 @@ export class Replays {
             console.log(uuid.rows)
         
             // and check if game has been uploaded in a non-ELO channel
-            if (message.channel.id == "766325209891340358" || message.channel.id == "714730729631776819"){
-                MsgHelper.say(message,"This channel does not support ELO calculation, game summary will still be posted however for interest purposes")
+            if (!perms.isEloComputed){
+                MsgHelper.say(message,"This game is unranked")
             }
             // and check the game is 1v1, if it isn't warn that results will not be rated
             else if (g.players.length > 2){
@@ -54,7 +55,7 @@ export class Replays {
                         winnerList.push(player)
                     }    
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -72,7 +73,7 @@ export class Replays {
                         winnerList.push(player)
                     }
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -82,7 +83,7 @@ export class Replays {
             } else {
                 winners = "no one"
                 loosers = "everyone"
-                if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
                     const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
@@ -138,54 +139,42 @@ export class Replays {
                     } else {
                         playerid += "(id:" + player.id + ")";
                     }
-                   //
-                   // This needs to be replaced once we have the blacklist tables in place
-                   // Allocates what ELO is shown in the players details of the embed
-                   // Currently defaults to Global ELO
-                   //
-                    if(g.players.length == 2 && uuid.rows.length == 0 && channel != "766325209891340358" && channel != "714730729631776819"){
+
+                    if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
                         if(ratings.p1.eugenId == player.id){
-                            let blackListServer = "false"
-                            let blackListChannel = "false"   
-                            if (blackListChannel == "true"){            
+                            if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})||`
-                            } else if (blackListServer == "true"){
-                                elo += `League ELO: ||${Math.round(ratings.p1.serverElo)}   (${ratings.p1.serverDelta})||`
-                            } else {
-                                elo += `Global ELO: ||${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})||`
+                            }
+                            if (perms.isServerEloShown){
+                                elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${Math.round(ratings.p1.serverDelta)})||`
+                            }
+                            if (perms.isGlobalEloShown){
+                                elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})||`
                             }
                         } else if(ratings.p2.eugenId == player.id){
-                            let blackListServer = "false"
-                            let blackListChannel = "false"   
-                            if (blackListChannel == "true"){            
+                            if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${Math.round(ratings.p2.channelDelta)})||`
-                            } else if (blackListServer == "true"){
-                                elo += `League ELO: ||${Math.round(ratings.p2.serverElo)}   (${ratings.p2.serverDelta})||`
-                            } else {
-                                elo += `Global ELO: ||${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})||`
+                            }
+                            if (perms.isServerEloShown){
+                                elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${Math.round(ratings.p2.serverDelta)})||`
+                            }
+                            if (perms.isGlobalEloShown){
+                                elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})||`
                             }
                         }
                     } 
                     else {
                             const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
-                            let blackListServer = "false"
-                            let blackListChannel = "false"   
-                            if (blackListChannel == "true"){            
+                            if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-                            } else if (blackListServer == "true"){
-                                elo += `League ELO: ${Math.round(elox.serverElo)}`
-                            } else {
-                                elo += `Global ELO: ${Math.round(elox.globalElo)}`
+                            }
+                            if (perms.isServerEloShown){
+                                elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                            }
+                            if (perms.isGlobalEloShown){
+                                elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
                             }
                     }
-
-                    //Testing  remove later
-                    console.log("Player : "+playerid)
-                    console.log("ELO "+elo)
-                    console.log("Divi "+player.deck.division)
-                    console.log("Income "+player.deck.income)
-                    console.log("DeckCode : "+player.deck.raw.code)
-
 
                     // Add the player details to the embed
                     embed = embed.addField("\u200b", "-------------------------------------------------")
