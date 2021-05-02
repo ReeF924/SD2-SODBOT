@@ -10,25 +10,25 @@ import { Logs } from "../general/logs";
 export class MiscCommand {
 
     static sodbotReplies = [
-        "hit! Target destroyed!",
-        "miss! Mission failed. We'll get em next time!",
-        "miss! Are you even trying to hit anymore?",
-        "oh come on, that shot was pathetic... Put your back into it!",
-        "ping! Your shot bounced!",
-        "you miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
-        "miss! Your shot couldn't hit the broad side of a barn!",
-        "miss! Come on bruh, just boogaloo it",
-        "another miss! Your aim is like Gonzo's analysis....lacking",
-        "miss! This piat is rubbish, just use your Sherman",
-        "miss! Just side shot it bro",
-        "miss! I know you will try again, like proto who always came back for another shot",
-        "hit!, He's Burning",
-        "hit!, Jerry's in trouble now",
-        "bounce!, you do know that is a King Tiger right?",
-        "hit! We're Airborne. We don't start fights, we finish 'em!",
-        "hit! Your name is unknown. Your deed is immortal.",
-        "hit! Up the Ox and Bucks. Up the Ox and Bucks.",
-        "miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
+        "Hit! Target destroyed!",
+        "Miss! Mission failed. We'll get em next time!",
+        "Miss! Are you even trying to hit anymore?",
+        "Oh come on, that shot was pathetic... Put your back into it!",
+        "Ping! Your shot bounced!",
+        "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
+        "Miss! Your shot couldn't hit the broad side of a barn!",
+        "Miss! Come on bruh, just boogaloo it",
+        "Another miss! Your aim is like Gonzo's analysis....lacking",
+        "Miss! This piat is rubbish, just use your Sherman",
+        "Miss! Just side shot it bro",
+        "Miss! I know you will try again, like proto who always came back for another shot",
+        "Hit! He's Burning",
+        "Hit! Jerry's in trouble now",
+        "Bounce! You do know that is a King Tiger right?",
+        "Hit! We're Airborne. We don't start fights, we finish 'em!",
+        "Hit! Your name is unknown. Your deed is immortal.",
+        "Hit! Up the Ox and Bucks. Up the Ox and Bucks.",
+        "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
 
@@ -70,7 +70,7 @@ export class MiscCommand {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.95){
+        if (i > 0.92){
             MsgHelper.reply(
                 message,
                 MiscCommand.sodbotReplies[Math.floor(Math.random() * MiscCommand.sodbotReplies.length)],
