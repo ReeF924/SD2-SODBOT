@@ -5,7 +5,6 @@ name: Azure App Service - SodBot-Prod(Production), Build and deploy NodeJS app
 
 on:
   workflow_dispatch:
-  release:
 
 jobs:
   build-and-deploy:
@@ -38,6 +37,17 @@ jobs:
         sqluser: kurios
         sqlpassword: ${{ secrets.SQLPASSWORD }}
         database: sodbot-prod
+        
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: sodbot-prod
+        path: .
+    
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v2
+      with:
+        name: sodbot-prod
 
     - name: Run Azure webapp deploy action using publish profile credentials
       uses: azure/webapps-deploy@v2
