@@ -35,8 +35,11 @@ export class Replays {
             // and check if the game already existed in DB 
             else if(uuid.rows.length == 1){
                 MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
-            }  
-
+            }
+            // and check if the game already existed in DB 
+            else if(g.version < 51345){
+                MsgHelper.say(message,"This replay is from a older version of the game and won't be used in ELO Calcs")
+            }
             //determine who won and lost, calculate ELO
             let winners = ""
             let loosers = ""
@@ -55,7 +58,7 @@ export class Replays {
                         winnerList.push(player)
                     }    
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -73,7 +76,7 @@ export class Replays {
                         winnerList.push(player)
                     }
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
@@ -83,7 +86,7 @@ export class Replays {
             } else {
                 winners = "no one"
                 loosers = "everyone"
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
+                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                     const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
                     const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
@@ -140,7 +143,7 @@ export class Replays {
                         playerid += "(id:" + player.id + ")";
                     }
 
-                    if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed){
+                    if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                         if(ratings.p1.eugenId == player.id){
                             if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})||`
