@@ -70,7 +70,7 @@ export class MiscCommand {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.92){
+        if (i > 0.9){
             MsgHelper.reply(
                 message,
                 MiscCommand.sodbotReplies[Math.floor(Math.random() * MiscCommand.sodbotReplies.length)],
