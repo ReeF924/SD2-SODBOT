@@ -1,7 +1,7 @@
 import { Message, User } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { MessageEmbed } from "discord.js";
-import { SqlHelper } from "../general/sqlHelper";
+import { EloLadderElement, SqlHelper } from "../general/sqlHelper";
 import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
 import { Logs } from "../general/logs";
@@ -143,30 +143,48 @@ export class PlayerCommand {
         return fixed.padEnd(7);
     }
 
-    static async getLadder(message:Message, input:string[]){
-        const ladder = await SqlHelper.getGlobalLadder();
-       
+    static async getLadder(message:Message, input:string[], perms:PermissionsSet){
+        let ladder:EloLadderElement[]
+        if(perms.isGlobalEloShown)
+            ladder = await SqlHelper.getGlobalLadder();
+        else
+            ladder = await SqlHelper.getServerLadder(message.guild.id);
+
+
         const embed = new MessageEmbed();
-        embed.setTitle("Top 50 Players")
+        embed.setTitle("Top 25 Players")
         embed.setColor("75D1EA")
         var playerDetails = ""
         var yearAgoTime = new Date()
         yearAgoTime.setFullYear(yearAgoTime.getFullYear()-1)
         let x = 0;
-        while(x < 50 && x < ladder.length){
-            if (yearAgoTime < ladder[x].lastActive){
-                if(ladder[x].discordId != "null"){
-                    playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
-
+        let playerFound = false;
+        while(x < ladder.length ||  (playerFound && x >= 25)){
+            if (yearAgoTime < ladder[x].lastActive ){
+                if( x < 25){
+                    if(ladder[x].discordId != "null"){
+                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+                        if(ladder[x].discordId == message.author.id) playerFound = true;
+                    }else{
+                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
+                    }
                 }else{
-                    playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
+                    if(ladder[x].discordId != "null" && ladder[x].discordId == message.author.id){
+                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+
+                    }
                 }
             }
             x++;
         }
+        
+        if(ladder.length == 0 || playerDetails.length == 0){
+            MsgHelper.reply(message,"Noone uploaded a ranked Replay within a year. The ladder is empty.")
+            return;
+        }
         embed.addField("Pos      Elo           Name", playerDetails, true)
         //Send Final Embed
-        embed.setDescription("For full global leaderboard please goto http://eugenplz.com")
+        //embed.setDescription("For full global leaderboard please goto http://eugenplz.com") --site isn't ready
         embed.setFooter("Only those players who have been involved in a submitted match in the last year will appear in the ladder")
         MsgHelper.say(message,embed,false)
     }

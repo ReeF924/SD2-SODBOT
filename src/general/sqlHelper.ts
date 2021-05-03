@@ -1,4 +1,4 @@
-import { Connection, Request, TediousType, } from 'tedious'
+import { Connection, Request, TediousType, TYPES, } from 'tedious'
 import { CommonUtil } from './common';
 import { Logs } from "./logs";
 import * as fs from 'fs'
@@ -240,6 +240,26 @@ export class SqlHelper {
   static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
     const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
     const xx = await SqlHelper.exec(sql);
+    const ret = new Array<EloLadderElement>();
+    let r = 1;
+    while(xx.rows.length > r-1){
+      const x = xx.rows[r-1];
+      ret.push({
+        rank: r,
+        elo: Number(x.elo),
+        discordId: String(x.discordId),
+        name: String(x.eugenName),
+        lastActive: new Date(x.lastActive as number)
+      })
+      r++;
+    }
+    return ret;
+  }
+
+
+  static async getServerLadder(serverId:string): Promise<Array<EloLadderElement>> {
+    const sqlstr = "SELECT players.id as eugenid, pickBanElo, elo.elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id LEFT JOIN elo ON resourceId = @serverId AND elo.playerId = players.id ORDER BY elo.elo DESC"
+    const xx = await SqlHelper.exec(sqlstr,{serverId:serverId},{serverId:sql.VarChar});
     const ret = new Array<EloLadderElement>();
     let r = 1;
     while(xx.rows.length > r-1){

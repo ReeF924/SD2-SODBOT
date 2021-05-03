@@ -65,26 +65,31 @@ export class DiscordBot {
         let channel, guild
         if(message.channel) channel = message.channel.id;
         if(message.guild) guild = message.guild.id;
-        const perms = Permissions.getPermissions(channel,guild)
-        if (!(await perms).areCommandsBlocked && message.content.startsWith(CommonUtil.config("prefix"))) {
-            const inputList = message.content
-            .substr(1, message.content.length)
-            .toLowerCase()
-            .replace(/\n/g, " ")
-            .split(" ");
-            const command = inputList[0];
-    
-            if (message.channel.type === "dm") {
-                return;
+        if (message.content.startsWith(CommonUtil.config("prefix"))) {
+            const perms = Permissions.getPermissions(channel,guild)
+            if(!(await perms).areCommandsBlocked){
+                const inputList = message.content
+                .substr(1, message.content.length)
+                .toLowerCase()
+                .replace(/\n/g, " ")
+                .split(" ");
+                const command = inputList[0];
+        
+                if (message.channel.type === "dm") {
+                    return;
+                }
+                this.runCommand(message, command,(await perms));
             }
-            this.runCommand(message, command,(await perms));
         }
     
-        if (!(await perms).areReplaysBlocked && message.attachments.first()) {
-            if (message.attachments.first().url.endsWith(".rpl3")) {
-            if (message.channel.type !== "dm") {
-                Replays.extractReplayInfo(message,(await perms));
-            }
+        if (message.attachments.first()) {
+            const perms = Permissions.getPermissions(channel,guild)
+            if(!(await perms).areReplaysBlocked){
+                if (message.attachments.first().url.endsWith(".rpl3")) {
+                    if (message.channel.type !== "dm") {
+                        Replays.extractReplayInfo(message,(await perms));
+                    }
+                }
             }
         }
     }
