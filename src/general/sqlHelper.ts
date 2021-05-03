@@ -166,8 +166,8 @@ export class SqlHelper {
     }
   }
 
-  static async getChannelPermissions(serverId: string): Promise<Blacklist>{
-    const xx = await SqlHelper.exec("Select * from serverBlackList where id = '" + serverId + "';")
+  static async getChannelPermissions(channelId: string): Promise<Blacklist>{
+    const xx = await SqlHelper.exec("Select * from channelBlackList where id = '" + channelId + "';")
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
