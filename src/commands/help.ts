@@ -129,8 +129,8 @@ export class HelpCommand {
         const embed = new MessageEmbed()
         .setTitle("Help - Misc Commands")
         .addFields([
-            {   name: "$piat", 
-                value: "FIRE the Piat.   Can you get a Hit?",
+            {   name: "$piat or $ptrd", 
+                value: "FIRE the Piat or PTRD.   Can you get a Hit?",
              inline: false },
             {   name: "$info", 
                 value: "Shows info about the bot.",
