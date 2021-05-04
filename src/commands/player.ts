@@ -152,7 +152,7 @@ export class PlayerCommand {
 
 
         const embed = new MessageEmbed();
-        embed.setTitle("Top 25 Players")
+        embed.setTitle("Top Players")
         embed.setColor("75D1EA")
         var playerDetails = ""
         var yearAgoTime = new Date()
@@ -160,7 +160,7 @@ export class PlayerCommand {
         let x = 0;
         let playerFound = false;
         while(x < ladder.length ||  (playerFound && x >= 25)){
-            //if (yearAgoTime < ladder[x].lastActive ){
+            if (yearAgoTime < ladder[x].lastActive ){
                 if( x < 15){
                     if(ladder[x].discordId != "null"){
                         playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
@@ -174,7 +174,7 @@ export class PlayerCommand {
 
                     }
                 }
-            //}
+            }
             x++;
         }
         
