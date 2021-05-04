@@ -11,8 +11,13 @@ export class API {
 
     start():void{
         this.express.get('/leaderboard', async (req,res)=>{
-            const results = await SqlHelper.getGlobalLadder()
-            res.send(results);
+            if(req.query.server){
+                const results = await SqlHelper.getServerLadder(req.query.server as string)
+                res.send(results);
+            }else{
+                const results = await SqlHelper.getGlobalLadder()
+                res.send(results);
+            }
         })
         this.express.get('/', (req,res)=>{res.send(200)})
         this.express.listen(this.port, ()=>{

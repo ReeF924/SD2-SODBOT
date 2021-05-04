@@ -4,16 +4,19 @@ import { Blacklist, SqlHelper } from "./sqlHelper";
 export class Permissions {
 
 
-    public static getPermissions(channel:Channel,server:Guild):PermissionsSet{
+    public static async getPermissions(channel:string,server:string):Promise<PermissionsSet>{
         const perms = new PermissionsSet();
-        let channelPerms 
-        if(channel) channelPerms = SqlHelper.getChannelPermissions(channel.id);
         let serverPerms
-        if(server) serverPerms = SqlHelper.getServerPermissions(server.id);
-        if(serverPerms)
-            perms.apply(serverPerms)
-        if(channelPerms)
-            perms.apply( channelPerms)
+        console.log(server)
+        if(server) serverPerms = SqlHelper.getServerPermissions(server);
+        let channelPerms 
+        console.log(channel)
+        if(channel) channelPerms = SqlHelper.getChannelPermissions(channel);
+        if(await serverPerms)
+            perms.apply(await serverPerms)
+        if(await channelPerms)
+            perms.apply(await channelPerms)
+        console.log(perms)
         return perms;
     }
     
@@ -29,6 +32,7 @@ export class PermissionsSet {
     isChannelEloShown = false;
 
     async apply(perms:Blacklist){
+        console.log(" apply " + perms)
         if(perms.blockReplay > 0) this.areReplaysBlocked = true
         if(perms.blockReplay < 0) this.areReplaysBlocked = false
         if(perms.blockCommands > 0) this.areCommandsBlocked = true

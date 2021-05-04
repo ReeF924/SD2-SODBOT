@@ -39,24 +39,24 @@ CREATE TABLE channelBlacklist
 (
     id varchar(30) NOT NULL PRIMARY KEY,
     channelName text null,
-    blockElo  tinyint DEFAULT 0,
-    blockCommands tinyint DEFAULT 0,
-    blockReplay tinyint DEFAULT 0,
-    blockChannelElo tinyint DEFAULT 0,
-    blockServerElo tinyint DEFAULT 0,
-    blockGlobalElo tinyint DEFAULT 0
+    blockElo  smallint DEFAULT 0,
+    blockCommands smallint DEFAULT 0,
+    blockReplay smallint DEFAULT 0,
+    blockChannelElo smallint DEFAULT 0,
+    blockServerElo smallint DEFAULT 0,
+    blockGlobalElo smallint DEFAULT 0
 )
 
 CREATE TABLE serverBlacklist
 (
     id varchar(30) NOT NULL PRIMARY KEY,
     serverName text null,
-    blockElo  tinyint DEFAULT 0,
-    blockCommands tinyint DEFAULT 0,
-    blockReplay tinyint DEFAULT 0,
-    blockChannelElo tinyint DEFAULT 0,
-    blockServerElo tinyint DEFAULT 0,
-    blockGlobalElo tinyint DEFAULT 0
+    blockElo  smallint DEFAULT 0,
+    blockCommands smallint DEFAULT 0,
+    blockReplay smallint DEFAULT 0,
+    blockChannelElo smallint DEFAULT 0,
+    blockServerElo smallint DEFAULT 0,
+    blockGlobalElo smallint DEFAULT 0
 )
 
 CREATE TABLE discordUsers

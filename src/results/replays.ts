@@ -5,7 +5,6 @@ import * as axios from "axios"
 import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelper";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { RatingEngine } from "./rating";
-import { Console } from "node:console";
 import { PermissionsSet } from "../general/permissions";
 
 const ax = axios.default;
