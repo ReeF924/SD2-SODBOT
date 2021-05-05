@@ -122,22 +122,25 @@ export class SqlHelper {
     {playerId:sql.Int, impliedName: sql.VarChar, serverName:sql.VarChar, channelName: sql.VarChar, eugenId: sql.Int, serverId: sql.VarChar,channelId: sql.VarChar,channelElo: sql.Float,serverElo: sql.Float,globalElo: sql.Float,pickBanGlobalElo: sql.Float,playerName: sql.Text})
   }
 
-  static async setDivisionElo(elo:DivElo): Promise<DBObject>{
+  static async setDivisionElo(elo:DivElo): Promise<number>{
+    console.log(elo)
     const data = {
       id: elo.id,
       elo: elo.elo,
       divName: elo.divName
       
     }
-    return await SqlHelper.exec(SqlHelper.updateDivEloSql,data,{id:sql.VarChar,elo:sql.Float,pickBanElo:sql.Float})
+    const i = await (await SqlHelper.exec(SqlHelper.updateDivEloSql,data,{id:sql.Int,elo:sql.Float,divName:sql.VarChar})).rowCount
+    console.log(i)
+    return i
   }
 
-  static async getDivisionElo(id:string):Promise<DivElo>{
+  static async getDivisionElo(id:number):Promise<DivElo>{
     const xx = await SqlHelper.exec("Select * from divisionElo where id = '" + id + "';")
     if(xx.rows.length > 0){
       const x = xx.rows[0];
       return {
-        id : String(x.id),
+        id : Number(x.id),
         divName : String(x.divName),
         elo : Number(x.elo),
       }
@@ -339,6 +342,7 @@ export class SqlHelper {
     SqlHelper.getElosSql = fs.readFileSync("sql/getElos.sql").toLocaleString();
     SqlHelper.updateElosSql = fs.readFileSync("sql/updateElos.sql").toLocaleString();
     SqlHelper.getElosDiscordSql = fs.readFileSync("sql/getElosDiscord.sql").toLocaleString();
+    SqlHelper.updateDivEloSql = fs.readFileSync("sql/updateDivElo.sql").toLocaleString();
     SqlHelper.config.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.user = CommonUtil.config("sqluser");
     SqlHelper.config.database = CommonUtil.config("database","sodbot")
@@ -408,6 +412,7 @@ export class SqlHelper {
          //request.addParameter(key,sql[key],params[key])
        }
       }
+      request.addListener('err',Logs.error)
       const result = (await request.query(string))
       console.log(result)
       let len = 0
@@ -470,7 +475,7 @@ export interface ElosDelta extends Elos {
   pickBanDelta: number
 }
 export interface DivElo{
-  id: string,
+  id: number,
   divName: string,
   elo: number
 } 
