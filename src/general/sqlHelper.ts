@@ -409,7 +409,7 @@ export class SqlHelper {
   //This is expensive. And an unprepared statement. and it returns *....
   //it needs work. @todo
   static async getReplaysByEugenId(eugenId:number):Promise<DBObject>{
-    return SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "';")
+    return SqlHelper.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" +eugenId+ "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" +eugenId+ "' ORDER BY uploadedAt DESC;")
   }
   
 

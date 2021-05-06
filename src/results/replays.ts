@@ -96,20 +96,6 @@ export class Replays {
                     RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,3)
                 }
             }
-            //Test remove later
-            console.log("Winners "+winners)
-            console.log("Losers "+loosers)
-            console.log("VictoryState "+misc.victory[g.result.victory])
-            console.log("Duration "+Replays.duration(g.result.duration))
-            console.log("Game Version "+g.version)
-            console.log("ScoreLimit "+g.scoreLimit)
-            console.log("Timelimit "+g.timeLimit)
-            console.log("IncomeRate "+misc.incomeLevel[g.incomeRate])
-            console.log("Game Mode "+misc.mode[g.gameMode])
-            console.log("StartingPoints "+g.initMoney)
-            console.log("Map "+ misc.map[g.map_raw])
-
-
             // Create embed header
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
