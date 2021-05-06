@@ -148,8 +148,8 @@ export class SqlHelper {
     else
       return null;
   }
+  
   //permissions
-
   static async getServerPermissions(serverId: string): Promise<Blacklist>{
     const xx = await SqlHelper.exec("Select * from serverBlackList where id = '" + serverId + "';")
     if(xx.rows.length > 0){
@@ -186,6 +186,21 @@ export class SqlHelper {
     }else{
       return null;
     }
+  }
+
+  static async setChannelPermissions(channelId: string, blockPrem: string): Promise<Blacklist>{
+
+    return {
+      id: String(),
+      name: String(),
+      blockElo: Number(),
+      blockCommands: Number(),
+      blockReplay: Number(),
+      blockChannelElo: Number(),
+      blockServerElo: Number(),
+      blockGlobalElo: Number()
+    }
+    
   }
 
 
