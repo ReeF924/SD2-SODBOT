@@ -48,9 +48,6 @@ export class AdminCommand {
     }
 
 
-
-
-
     static async adjustElo(message:Message,input:string[]){
         let user = await SqlHelper.getDiscordUser(message.author.id)
         //Check if requestor has admin access
@@ -66,18 +63,81 @@ export class AdminCommand {
                 let newLeagueElo = input[1]
                 let newGlobalElo = input[2]
                 //await SqlHelper.setPlayer(eugenId, newLeagueElo, newGlobalElo);
-                message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
+                //message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
                 return
             }
             else{
                 message.reply("This command is not correctly formatted, it requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
-
             }
         }
         else{
             message.reply("You do not have the admin access to use this command")
 
         }
+    }
+
+
+    static async setPrem(message:Message,input:string[]){
+        let user = await SqlHelper.getDiscordUser(message.author.id)
+        //Check if requestor has admin access
+        if (user.globalAdmin == true){
+            // Check if formatted correctly
+            if (input.length == 1){
+                message.reply("This command requires a channel id and one or more premission commands to be correctly formatted")
+                return
+            }
+            else if (input.length > 1){
+                let channel = input[0]
+                let x = 1
+                for (const command of  input) {
+                    switch (command) {
+                        case "blockElo":
+                            
+                            break;
+            
+                        case "blockCommands":
+                            
+                            break;
+
+                        case "blockReplay":
+                            
+                            break;
+                        
+                        case "blockChannelElo":
+                            
+                            break;
+
+                        case "blockServerElo":
+                            
+                            break;
+
+                        case "blockGlobalElo":
+                            
+                            break;
+
+                        case "blockall":
+
+                            break;
+
+                        default:
+                            message.reply("Sorry that is not a valid command")
+                    }
+
+
+
+                }
+            }
+            else {
+                message.reply("This command is not correctly formatted, it requires one channel as a argument");
+                return
+            }
+
+        }
+        else{
+            message.reply("You do not have the admin access to use this command")
+            return
+        }
+
     }
 
 }
@@ -88,5 +148,6 @@ export class AdminCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("adjustelo",AdminCommand.adjustElo);
         bot.registerCommand("setadmin",AdminCommand.setAdmin);
+        bot.registerCommand("setchannel",AdminCommand.setPrem);
     }
 }
