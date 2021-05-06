@@ -1,5 +1,5 @@
 import { ChannelData, Message, MessageEmbed } from "discord.js"
-import { GameParser } from "sd2-utilities/lib/parser/gameParser"
+import { GameParser, RawPlayer } from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
 import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelper";
@@ -42,8 +42,8 @@ export class Replays {
             //determine who won and lost, calculate ELO
             let winners = ""
             let loosers = ""
-            let winnerList = []
-            let looserList = []
+            let winnerList:RawPlayer[] = []
+            let looserList:RawPlayer[] = []
             let ratings:{p1:ElosDelta,p2:ElosDelta}
             const channel = await DiscordBot.bot.channels.fetch(message.channel.id) as ChannelData
             if (g.result.victory < 3) {
@@ -63,6 +63,7 @@ export class Replays {
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
                     await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
                     await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,5)
                 }  
             } else if (g.result.victory > 3) {
                 for (const player of g.players) {
@@ -81,6 +82,7 @@ export class Replays {
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
                     await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
                     await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,5)
                 }
             } else {
                 winners = "no one"
@@ -91,6 +93,7 @@ export class Replays {
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
                     await SqlHelper.setElos(ratings.p1,{impliedName:g.players[0].name,serverName:message.guild.name,channelName:channel.name})
                     await SqlHelper.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
+                    RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,3)
                 }
             }
             //Test remove later

@@ -4,6 +4,8 @@ import * as axios from "axios"
 import { Elos, ElosDelta, Player, SqlHelper } from "../general/sqlHelper";
 import { DiscordBot } from "../general/discordBot";
 import { Logs } from '../general/logs';
+import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
+import { DeckData } from 'sd2-utilities/lib/parser/deckParser';
 
 
 
@@ -43,6 +45,25 @@ export class RatingEngine {
     const newP2Elo =
        RatingEngine.k_value * ((1-gameState) - RatingEngine.getChanceToWin(p2Elo, p1Elo));
     return {p1Elo:(p1Elo + newP1Elo), p1EloDelta: newP1Elo,p2Elo:(p2Elo + newP2Elo), p2EloDelta:newP2Elo}
+  }
+
+  static async doDivisionElo(deck1:DeckData,deck2:DeckData,victoryState:number){
+      let div1 = SqlHelper.getDivisionElo(Number(deck1.raw.division));
+      let div2 = SqlHelper.getDivisionElo(Number(deck2.raw.division));
+      let elo, e1, e2;
+      if(!(await div1)) e1 = 1500; else e1 = (await div1).elo;
+      if(!(await div2)) e2 = 1500; else e2 = (await div1).elo;
+      if(victoryState > 3){
+        elo = this.generateElo(e1,e2,1)
+      }else if(victoryState == 3){
+        elo = this.generateElo(e1,e2,.5)
+      }else if(victoryState < 3){
+        elo = this.generateElo(e2,e1,1)
+      }
+      console.log(`div 1: ${deck1.division} div2: ${deck2.division}`)
+      console.log(elo)
+      await SqlHelper.setDivisionElo({id:Number(deck1.raw.division),divName:deck1.division,elo:elo.p1Elo})
+      await SqlHelper.setDivisionElo({id:Number(deck2.raw.division),divName:deck2.division,elo:elo.p2Elo})
   }
 
 

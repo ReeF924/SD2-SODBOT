@@ -30,7 +30,7 @@ CREATE TABLE eloRef
 
 CREATE TABLE divisionElo
 (
-    id varchar(30) NOT NULL PRIMARY KEY,
+    id int NOT NULL PRIMARY KEY,
     divName text NOT NULL,
     elo float NOT NULL
 )
