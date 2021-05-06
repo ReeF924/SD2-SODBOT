@@ -1,13 +1,7 @@
-import { Message, ReactionUserManager, User } from "discord.js";
+import { Message } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
-import * as Data from "sd2-data"
-import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
-import { MessageEmbed } from "discord.js";
 import { SqlHelper } from "../general/sqlHelper";
-import { RatingEngine } from "../results/rating";
-import { misc } from "sd2-data";
-import { Console } from "node:console";
 
 export class AdminCommand {
 
