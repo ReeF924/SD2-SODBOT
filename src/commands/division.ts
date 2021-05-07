@@ -47,11 +47,9 @@ export class DivisionCommand {
         let allieddivs = "";
         let axisdivs = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
-            let allied = "";
-            let axis = "";
-            if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name + `[ ${divisions.divisionsAllies[i].alias[0]} ]\n`;
+            if(divisions.divisionsAllies[i]) allieddivs  += divisions.divisionsAllies[i].name + ` [ ${divisions.divisionsAllies[i].alias[0]} ]\n`;
             //if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
-            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name + `[ ${divisions.divisionsAxis[i].alias[0]} ]\n`;
+            if(divisions.divisionsAxis[i]) axisdivs += divisions.divisionsAxis[i].name + ` [ ${divisions.divisionsAxis[i].alias[0]} ]\n`;
             //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
         }
         embed = embed.addFields(
@@ -83,7 +81,7 @@ export class DivisionCommand {
             if(target.length == 0){
                 const target = divs.filter((x)=>{
                     for(const i of x.alias){
-                        if(i.toLocaleLowerCase == line.toLocaleLowerCase) return true;
+                        if(0 == i.toLocaleLowerCase().localeCompare(line.toLocaleLowerCase())) return true;
                     }
                     return false
                 })
@@ -124,7 +122,7 @@ export class DivisionCommand {
             if(target.length == 0){
                 target = divs.filter((x)=>{
                     for(const i of x.alias){
-                        if(i.toLocaleLowerCase == line.toLocaleLowerCase) return true;
+                        if(0 == i.toLocaleLowerCase().localeCompare(line.toLocaleLowerCase())) return true;
                     }
                     return false
                 })
