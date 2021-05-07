@@ -1,6 +1,6 @@
 {
   "name": "sodbot_2",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "src/main.ts",
   "scripts": {
@@ -29,7 +29,7 @@
     "lodash": "^4.17.21",
     "mssql": "^6.3.1",
     "node": "^14.16.0",
-    "sd2-data": "^0.5.3",
+    "sd2-data": "^0.5.5",
     "sd2-utilities": "^0.1.9",
     "tedious": "^11.0.6",
     "winston": "3.3.3",

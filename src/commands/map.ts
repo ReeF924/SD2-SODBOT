@@ -8,6 +8,21 @@ import { MessageEmbed } from "discord.js";
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
 
+    static burningBalticsMaps = [
+"Bobr",
+"Haroshaje",
+"Krupa",
+"Orsha East",
+"Orsha North",
+"Shchedrin",
+"Sianno",
+"Siedlce",
+"Slutsk",
+"Slutsk east",
+"Slutsk west",
+"Tali Ihantala",
+"Tsel",
+    ]
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message:Message,input:string[]):void {
         
@@ -23,6 +38,7 @@ export class MapCommand {
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
+                case "bb": maplist = MapCommand.burningBalticsMaps; break;
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                 return
             }
@@ -51,13 +67,14 @@ export class MapCommand {
         const importedMapData = Data.maps;
         console.log(JSON.stringify(importedMapData));
         const bannedMaps = MapCommand.bans[message.author.id];
+        const legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
         let embed = new MessageEmbed().setTitle(message.author.username + '\'s Maps')
         let text1v1 = "";
         let text2v2 = "";
         let text3v3 = "";
         let text4v4 = "";
-        for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) {
+        for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) { //this needs to be rewritten into 4 loops.
             let maps1 = importedMapData.mapData.byPlayerSize[2][i];
             let maps2 = importedMapData.mapData.byPlayerSize[4][i];
             let maps3 = importedMapData.mapData.byPlayerSize[6][i];
@@ -67,6 +84,8 @@ export class MapCommand {
               maps1 = "";
             }else if(bannedMaps && bannedMaps[maps1]){
                 maps1 = '~~'+maps1+'~~';
+            }else if(maps1 && !legaueMaps.includes(maps1)){
+                maps1 += " *"
             }
             if (!maps2) {
               maps2 = "";
@@ -94,7 +113,7 @@ export class MapCommand {
             {name:"3v3", value: text3v3,inline:true},
             {name:"4v4", value: text4v4,inline:true}
         )
-        embed = embed.setFooter("Maps are stike-through'd when banned")
+        embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
         message.channel.send(embed);
     }
 

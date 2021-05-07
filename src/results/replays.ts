@@ -199,14 +199,25 @@ export class Replays {
                     } else {
                         playerid += " (id:" + player.id + ")";
                     }
+                    let elo = ""
+                    const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
+                            if (perms.isChannelEloShown){            
+                                elo += `Channel ELO: ${Math.round(elox.channelElo)}`
+                            }
+                            if (perms.isServerEloShown){
+                                elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                            }
+                            if (perms.isGlobalEloShown){
+                                elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
+                            }
                     embed = embed.addField("-------------------------------------------------", "\u200B")
                         .addField("Player", playerid, false)
-                        .addField("Level", player.level, false)
+                        .addField("Elo", elo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
                     counter++;
-                    if (counter == 5) {
+                    if (counter == 4) {
                         message.channel.send(embed)
                         embed = new MessageEmbed()
                             .setColor("#0099ff")
