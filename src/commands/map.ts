@@ -12,15 +12,15 @@ export class MapCommand {
 "Bobr",
 "Haroshaje",
 "Krupa",
-"Orsha east",
-"Orsha north",
+"Orsha East",
+"Orsha North",
 "Shchedrin",
 "Sianno",
 "Siedlce",
 "Slutsk",
 "Slutsk east",
 "Slutsk west",
-"Thali Ihantala",
+"Tali Ihantala",
 "Tsel",
     ]
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
