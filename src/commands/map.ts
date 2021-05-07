@@ -38,7 +38,7 @@ export class MapCommand {
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
-                case "bb": maplist = this.burningBalticsMaps; break;
+                case "bb": maplist = MapCommand.burningBalticsMaps; break;
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                 return
             }
@@ -84,8 +84,8 @@ export class MapCommand {
               maps1 = "";
             }else if(bannedMaps && bannedMaps[maps1]){
                 maps1 = '~~'+maps1+'~~';
-            }else if(maps1 && legaueMaps.includes(maps1)){
-                maps1 += "*"
+            }else if(maps1 && !legaueMaps.includes(maps1)){
+                maps1 += " *"
             }
             if (!maps2) {
               maps2 = "";
@@ -113,7 +113,7 @@ export class MapCommand {
             {name:"3v3", value: text3v3,inline:true},
             {name:"4v4", value: text4v4,inline:true}
         )
-        embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are in league pool (rmap without specifying 1v1)")
+        embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
         message.channel.send(embed);
     }
 

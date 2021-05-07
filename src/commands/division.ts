@@ -48,22 +48,16 @@ export class DivisionCommand {
         let axisdivs = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
             let allied = "";
-            let alliedalias = "";
             let axis = "";
-            let axisalias = "";
-            if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name;
-            if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
-            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name;
-            if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
-
-
-            allieddivs += allied + " (" + alliedalias + ") \n";
-            axisdivs += axis + " (" + axisalias + ") \n";
+            if(divisions.divisionsAllies[i]) allied = divisions.divisionsAllies[i].name + `[ ${divisions.divisionsAllies[i].alias[0]} ]\n`;
+            //if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
+            if(divisions.divisionsAxis[i]) axis = divisions.divisionsAxis[i].name + `[ ${divisions.divisionsAxis[i].alias[0]} ]\n`;
+            //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
         }
         embed = embed.addFields(
-            {name:"Allied Divisions   (Alias)", value: allieddivs,inline:true},
+            {name:"Allied Divisions   [Alias]", value: allieddivs,inline:true},
             {name:'\u200b', value:'\u200b',inline:false},
-            {name:"Axis Divisions   (Alias)", value: axisdivs,inline:true},
+            {name:"Axis Divisions   [Alias]", value: axisdivs,inline:true},
             )
         message.channel.send(embed);
 
@@ -88,7 +82,10 @@ export class DivisionCommand {
             })
             if(target.length == 0){
                 const target = divs.filter((x)=>{
-                    return 0 == line.toLocaleLowerCase().localeCompare(x.alias.toLocaleLowerCase());
+                    for(const i of x.alias){
+                        if(i.toLocaleLowerCase == line.toLocaleLowerCase) return true;
+                    }
+                    return false
                 })
             }
             if(target.length == 0){
@@ -126,7 +123,10 @@ export class DivisionCommand {
             
             if(target.length == 0){
                 target = divs.filter((x)=>{
-                    return 0 == line.toLocaleLowerCase().localeCompare(x.alias.toLocaleLowerCase());
+                    for(const i of x.alias){
+                        if(i.toLocaleLowerCase == line.toLocaleLowerCase) return true;
+                    }
+                    return false
                 })
             }
 
