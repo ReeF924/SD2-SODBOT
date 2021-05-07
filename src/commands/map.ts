@@ -4,6 +4,7 @@ import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
+import { map } from "mssql";
 
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
@@ -60,7 +61,9 @@ export class MapCommand {
                 break;
             }
             else{
-                const pick = maplist[Math.floor(Math.random()*maplist.length)]
+                const pickIndex = Math.floor(Math.random()*maplist.length)
+                const pick = maplist[pickIndex]
+                maplist = maplist.filter((x,index)=>{return pickIndex != index;})
                 Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
                 message.reply(pick, { files: ["./src/general/images/"+pick+".png"] });
             
