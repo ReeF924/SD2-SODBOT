@@ -156,6 +156,29 @@ export class AdminCommand {
             return
         }
     }
+
+    static async resetChannelPrems(message:Message, input:string[]){
+        let channel = DiscordBot.bot.channels.cache.get(input[0]) 
+        if (input.length == 1){
+            let prem = {
+                id: input[0],
+                name:(channel as GuildChannel).name,
+                blockElo: 0,
+                blockCommands: 0,
+                blockReplay: 0,
+                blockChannelElo: 0,
+                blockServerElo: 0,
+                blockGlobalElo: 0
+            }
+            await SqlHelper.setChannelPermissions(prem);
+            MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been reset back to default settings.")
+        }
+        else {
+            MsgHelper.reply(message,"Command not formatted corrctly, this command just takes a channel id only as its argument")
+        }
+    }
+
+
 }
 
 
@@ -165,5 +188,6 @@ export class AdminCommandHelper {
         bot.registerCommand("adjustelo",AdminCommand.adjustElo);
         bot.registerCommand("setadmin",AdminCommand.setAdmin);
         bot.registerCommand("setchannel",AdminCommand.setChannelPrems);
+        bot.registerCommand("resetchannel",AdminCommand.resetChannelPrems);
     }
 }
