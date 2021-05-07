@@ -188,18 +188,19 @@ export class SqlHelper {
     }
   }
 
-  static async setChannelPermissions(channelId: string, blockPrem: string): Promise<Blacklist>{
+  static async setChannelPermissions(prem: Blacklist): Promise<DBObject>{
 
-    return {
-      id: String(),
-      name: String(),
-      blockElo: Number(),
-      blockCommands: Number(),
-      blockReplay: Number(),
-      blockChannelElo: Number(),
-      blockServerElo: Number(),
-      blockGlobalElo: Number()
+    const data = {
+      id: prem.id,
+      name: prem.name,
+      blockElo: prem.blockElo,
+      blockCommands: prem.blockCommands,
+      blockReplay: prem.blockReplay,
+      blockChannelElo: prem.blockChannelElo,
+      blockServerElo: prem.blockServerElo,
+      blockGlobalElo: prem.blockGlobalElo
     }
+    return await SqlHelper.exec(SqlHelper.setChannelPermissionsSql,data,{id:sql.VarChar,name:sql.VarChar,blockElo:sql.Int,blockCommands:sql.Int,blockReplay:sql.Int,blockChannelElo:sql.Int,blockServerElo:sql.Int,blockGlobalElo:sql.Int})
     
   }
 
@@ -338,6 +339,7 @@ export class SqlHelper {
 
 
   static setDiscordUserSql = ""
+  static setChannelPermissionsSql = ""
   static addReplaySql = ""
   static addPlayerEloSql = ""
   static updatePlayerSql = ""
@@ -345,6 +347,7 @@ export class SqlHelper {
   static updateElosSql = ""
   static getElosSql = ""
   static getElosDiscordSql = ""
+  
 
   static connectionPoolConnect:Promise<sql.ConnectionPool>
 
@@ -358,6 +361,7 @@ export class SqlHelper {
     SqlHelper.updateElosSql = fs.readFileSync("sql/updateElos.sql").toLocaleString();
     SqlHelper.getElosDiscordSql = fs.readFileSync("sql/getElosDiscord.sql").toLocaleString();
     SqlHelper.updateDivEloSql = fs.readFileSync("sql/updateDivElo.sql").toLocaleString();
+    SqlHelper.setChannelPermissionsSql = fs.readFileSync("sql/updateChannelPermissions.sql").toLocaleString();
     SqlHelper.config.password = CommonUtil.config("sqlpassword");
     SqlHelper.config.user = CommonUtil.config("sqluser");
     SqlHelper.config.database = CommonUtil.config("database","sodbot")
