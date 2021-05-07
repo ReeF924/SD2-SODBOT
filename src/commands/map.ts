@@ -51,13 +51,14 @@ export class MapCommand {
         const importedMapData = Data.maps;
         console.log(JSON.stringify(importedMapData));
         const bannedMaps = MapCommand.bans[message.author.id];
+        const legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
         let embed = new MessageEmbed().setTitle(message.author.username + '\'s Maps')
         let text1v1 = "";
         let text2v2 = "";
         let text3v3 = "";
         let text4v4 = "";
-        for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) {
+        for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) { //this needs to be rewritten into 4 loops.
             let maps1 = importedMapData.mapData.byPlayerSize[2][i];
             let maps2 = importedMapData.mapData.byPlayerSize[4][i];
             let maps3 = importedMapData.mapData.byPlayerSize[6][i];
@@ -67,6 +68,8 @@ export class MapCommand {
               maps1 = "";
             }else if(bannedMaps && bannedMaps[maps1]){
                 maps1 = '~~'+maps1+'~~';
+            }else if(maps1 && legaueMaps.includes(maps1)){
+                maps1 += "*"
             }
             if (!maps2) {
               maps2 = "";
@@ -94,7 +97,7 @@ export class MapCommand {
             {name:"3v3", value: text3v3,inline:true},
             {name:"4v4", value: text4v4,inline:true}
         )
-        embed = embed.setFooter("Maps are stike-through'd when banned")
+        embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are in league pool (rmap without specifying 1v1)")
         message.channel.send(embed);
     }
 
