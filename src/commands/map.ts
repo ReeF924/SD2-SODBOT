@@ -28,6 +28,7 @@ export class MapCommand {
         
         let maplist:string[] = []
         const importedMapData = Data.maps;
+        let pickCount = 1;
         Logs.log("command Random Map with Inputs "+JSON.stringify(input));
         if(input.length == 0){
             maplist = importedMapData.mapData.sd2League;
@@ -38,7 +39,8 @@ export class MapCommand {
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
-                case "bb": maplist = MapCommand.burningBalticsMaps; break;
+                case "bb": maplist = MapCommand.burningBalticsMaps; pickCount = 3; break;
+                
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                 return
             }
@@ -51,13 +53,19 @@ export class MapCommand {
                 })
             }
         }
-        if(maplist.length == 0)
-            MsgHelper.reply(message,"all maps have been banned. Please unban some maps");
-        else{
-            const pick = maplist[Math.floor(Math.random()*maplist.length)]
-            Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
-            message.reply(pick, { files: ["./src/general/images/"+pick+".png"] });
-        
+        let picks = 0
+        while(picks < pickCount){
+            if(maplist.length == 0){
+                MsgHelper.reply(message,"all maps have been banned. Please unban some maps");
+                break;
+            }
+            else{
+                const pick = maplist[Math.floor(Math.random()*maplist.length)]
+                Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(maplist) + " side: " + input );
+                message.reply(pick, { files: ["./src/general/images/"+pick+".png"] });
+            
+            }
+            picks++;
         }
         
             
