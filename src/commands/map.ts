@@ -8,6 +8,21 @@ import { MessageEmbed } from "discord.js";
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
 
+    static burningBalticsMaps = [
+"Bobr",
+"Haroshaje",
+"Krupa",
+"Orsha, east",
+"Orsha, north",
+"Shchedrin",
+"Sianno",
+"Siedlce",
+"Slutsk",
+"Slutsk, east",
+"Slutsk, west",
+"Thali Ihantala",
+"Tsel",
+    ]
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message:Message,input:string[]):void {
         
@@ -23,6 +38,7 @@ export class MapCommand {
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
+                case "bb": maplist = this.burningBalticsMaps; break;
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                 return
             }
