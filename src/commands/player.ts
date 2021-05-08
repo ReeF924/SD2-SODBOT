@@ -35,16 +35,11 @@ export class PlayerCommand {
                 MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
             return
         }
-        
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
         embed.addField("Player Name", "<@!"+player+">",false)
-        embed.setThumbnail(icon)
-          
-        // 
+        embed.setThumbnail(icon) 
         // Add ELO Data
-        //
-  
         if (perms.isChannelEloShown){            
             embed.addField("Channel Rating", Math.round(Elos.channelElo),true)
         }
@@ -55,8 +50,7 @@ export class PlayerCommand {
             embed.addField("Global Rating", Math.round(Elos.globalElo),true)
 
             embed.addField("\u200b", "\u200b",true)
-        }
-          
+        }    
         // Extract recent games
         const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
         let opponent = "";
@@ -82,13 +76,8 @@ export class PlayerCommand {
                     const replayJson = JSON.parse(replayString);
 
                     console.log(replayJson.players.length)
-
                 //Check that each row is a 1v1 match    
                 if (replayJson.players.length == 2){
-
-
-
-
                     //identify who the opponent was
                     if (replayJson.players[0].id != Elos.eugenId){
                         opponent = replayJson.players[0].name + "\n";
@@ -140,9 +129,7 @@ export class PlayerCommand {
         else {
             console.log("No Games found")
         }
-
-        //Send Final Embed
-        
+        //Send Final Embed  
        MsgHelper.say(message,embed,false)
     }
 
