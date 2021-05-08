@@ -1,11 +1,12 @@
-import { Message } from "discord.js";
+import { Client, Message, GuildChannel } from "discord.js";
+import { Console } from "node:console";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { Logs } from "../general/logs";
 import { SqlHelper } from "../general/sqlHelper";
 
 export class AdminCommand {
 
-    static async setAdmin(message:Message,input:string[]){
+    static async setAdmin(message:Message, input:string[]){
         //Only RoguishTiger or Kuriosly can set Admin rights
         if (message.author.id == "687898043005272096" || message.author.id == "271792666910392325"){
             //Check for argument
@@ -36,9 +37,7 @@ export class AdminCommand {
                     }
                 })()
             }
-       
         }
-
     }
 
 
@@ -71,8 +70,18 @@ export class AdminCommand {
     }
 
 
-    static async setPrem(message:Message,input:string[]){
+    static async setChannelPrems(message:Message, input:string[]){
         let user = await SqlHelper.getDiscordUser(message.author.id)
+        let prem = {
+            id: "",
+            name: "",
+            blockElo: 0,
+            blockCommands: 0,
+            blockReplay: 0,
+            blockChannelElo: 0,
+            blockServerElo: 0,
+            blockGlobalElo: 0
+        }
         //Check if requestor has admin access
         if (user.globalAdmin == true){
             // Check if formatted correctly
@@ -81,45 +90,60 @@ export class AdminCommand {
                 return
             }
             else if (input.length > 1){
-                let channel = input[0]
-                let x = 1
-                for (const command of  input) {
+                // Check if server is already in ChannelBlacklist table
+                prem = await SqlHelper.getChannelPermissions(input[0])
+                console.log(prem)
+                let channel = DiscordBot.bot.channels.cache.get(input[0]) 
+                // If it isn't create a default
+                if (prem == null){
+                    prem = {
+                        id: input[0],
+                        name:(channel as GuildChannel).name,
+                        blockElo: 0,
+                        blockCommands: 0,
+                        blockReplay: 0,
+                        blockChannelElo: 0,
+                        blockServerElo: 0,
+                        blockGlobalElo: 0
+                    }
+                }
+                // Update the settings
+                for (let x = 1; x < input.length; x++) {
+                    let command = input[x]
                     switch (command) {
                         case "blockElo":
-                            
+                            prem.blockElo = 1
                             break;
-            
                         case "blockCommands":
-                            
+                            prem.blockCommands = 1
                             break;
-
                         case "blockReplay":
-                            
+                            prem.blockReplay = 1
                             break;
-                        
                         case "blockChannelElo":
-                            
+                            prem.blockChannelElo = 1
                             break;
-
                         case "blockServerElo":
-                            
+                            prem.blockServerElo = 1
                             break;
-
                         case "blockGlobalElo":
-                            
+                            prem.blockGlobalElo = 1
                             break;
-
                         case "blockall":
-
+                            prem.blockElo = 1
+                            prem.blockCommands = 1
+                            prem.blockReplay = 1
+                            prem.blockChannelElo = 1
+                            prem.blockServerElo = 1
+                            prem.blockGlobalElo = 1
                             break;
-
                         default:
-                            message.reply("Sorry that is not a valid command")
+                            console.log("we in in default of the case statement" + command);
+                            message.reply("One of the permission settings is not a valid command");
                     }
-
-
-
                 }
+                await SqlHelper.setChannelPermissions(prem);
+                MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been updated ")
             }
             else {
                 message.reply("This command is not correctly formatted, it requires one channel as a argument");
@@ -131,8 +155,29 @@ export class AdminCommand {
             message.reply("You do not have the admin access to use this command")
             return
         }
-
     }
+
+    static async resetChannelPrems(message:Message, input:string[]){
+        let channel = DiscordBot.bot.channels.cache.get(input[0]) 
+        if (input.length == 1){
+            let prem = {
+                id: input[0],
+                name:(channel as GuildChannel).name,
+                blockElo: 0,
+                blockCommands: 0,
+                blockReplay: 0,
+                blockChannelElo: 0,
+                blockServerElo: 0,
+                blockGlobalElo: 0
+            }
+            await SqlHelper.setChannelPermissions(prem);
+            MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been reset back to default settings.")
+        }
+        else {
+            MsgHelper.reply(message,"Command not formatted corrctly, this command just takes a channel id only as its argument")
+        }
+    }
+
 
 }
 
@@ -142,6 +187,7 @@ export class AdminCommandHelper {
     static addCommands(bot:DiscordBot):void{
         bot.registerCommand("adjustelo",AdminCommand.adjustElo);
         bot.registerCommand("setadmin",AdminCommand.setAdmin);
-        bot.registerCommand("setchannel",AdminCommand.setPrem);
+        bot.registerCommand("setchannel",AdminCommand.setChannelPrems);
+        bot.registerCommand("resetchannel",AdminCommand.resetChannelPrems);
     }
 }

@@ -35,105 +35,101 @@ export class PlayerCommand {
                 MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
             return
         }
-        
         embed.setTitle("Player Details")
         embed.setColor("75D1EA")
         embed.addField("Player Name", "<@!"+player+">",false)
-        embed.setThumbnail(icon)
-          
-        // 
-        //This code needs to be re-written once we have the blacklist tables up and working 
-        //
-  
+        embed.setThumbnail(icon) 
+        // Add ELO Data
         if (perms.isChannelEloShown){            
             embed.addField("Channel Rating", Math.round(Elos.channelElo),true)
-            //embed.setFooter("Note: This Elo rating is specific for this channel")
         }
         if(perms.isServerEloShown){
             embed.addField("Server Rating", Math.round(Elos.serverElo),true)
-            //embed.setFooter("Note: This Elo rating is specific for the " + message.guild.name + " server")
         } 
         if(perms.isGlobalEloShown){
             embed.addField("Global Rating", Math.round(Elos.globalElo),true)
-            //embed.setFooter("Note: G Elo rating is a global rating and takes into account all approved uploaded matches")
 
             embed.addField("\u200b", "\u200b",true)
-        }
-        
-        
+        }    
         // Extract recent games
-        //thou shall not use exec.
-        /*
         const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
         let opponent = "";
+        let playerDiv = "";
+        let opponentDiv = "";
         let gameMap = "";
         let gameResult = "";
         let numGames = 0;
-        //Check that rows were returned
+        //Check that rows were returned (ie Game Replays for this player exist)
         if(xx.rows.length > 0 ){  
-            if(xx.rows.length > 5){
-                numGames = 5;
+            embed.addFields([
+                {name:"Recent 1v1 Matches", value:"-----------------------------------------------------", inline:false}
+            ])
+            if(xx.rows.length > 3){
+                numGames = 3;
             } else {
                 numGames = xx.rows.length;
             } 
             for (let i = 0; i < numGames; i++) {        
                 const x = xx.rows[i];
                 try{
-                    const replayString = x.replay.value as string;
+                    const replayString = x.replay as string;
                     const replayJson = JSON.parse(replayString);
 
                     console.log(replayJson.players.length)
-
                 //Check that each row is a 1v1 match    
                 if (replayJson.players.length == 2){
                     //identify who the opponent was
                     if (replayJson.players[0].id != Elos.eugenId){
-                        opponent += replayJson.players[0].name + "\n";
+                        opponent = replayJson.players[0].name + "\n";
+                        opponentDiv = replayJson.players[0].division
+                        playerDiv = replayJson.players[1].division
                     }else{
-                        opponent += replayJson.players[1].name + "\n";
+                        opponent = replayJson.players[1].name + "\n";
+                        opponentDiv = replayJson.players[1].division
+                        playerDiv = replayJson.players[1].division
                     }
                     //Identify the map played
-                    gameMap += misc.map[replayJson.map_raw] + "\n";
+                    gameMap = misc.map[replayJson.map_raw] + "\n";
                     //Identify the result 
                     if (replayJson.result.victory > 3) {
                         for (const player of replayJson.players) {
                             if (replayJson.ingamePlayerId = player.alliance)
                                 if (player.name = Elos.eugenId)
-                                    gameResult += "Victory" + "\n"
+                                    gameResult = "Victory" + "\n"
                                     else
-                                    gameResult += "Defeat" + "\n" 
+                                    gameResult = "Defeat" + "\n" 
                         }  
                     } else if (replayJson.result.victory < 3) {
                         for (const player of replayJson.players) {
                             if (replayJson.ingamePlayerId = player.alliance)
                                 if (player.name = Elos.eugenId)
-                                    gameResult += "Defeat" + "\n"
+                                    gameResult = "Defeat" + "\n"
                                     else
-                                    gameResult += "Victory" + "\n"
-                                
+                                    gameResult = "Victory" + "\n"        
                         }  
                     } else {
-                           gameResult += "Draw" + "\n"
+                           gameResult = "Draw" + "\n"
                     }
+                    embed.addFields([
+                        {name:"Uploaded", value: "XX/XX/XXXX",inline:true},
+                        {name:"Result", value: gameResult,inline:true},
+                        {name:"Map", value: gameMap, inline:true},
+                        {name:"Player Divison", value: playerDiv,inline:false},
+                        {name:"Opponent Divison", value: opponentDiv,inline:true},
+                        {name:"Opponent", value: opponent,inline:true},
+                        {name:"---------------------------", value: "\u200b",inline:false}
+                    ])
                 }
                 }catch(err){
                     console.log("Error happended here")
                     console.error(err)
                 }
             }
-            //Complete embed by adding recent matches
-            embed.addFields([
-                {name:"Most Recent 1v1 Games Uploaded To The Bot", value:"-----------------------------------------------------", inline:false},
-                {name:"Opponent", value: opponent,inline:true},
-                {name:"Map", value: gameMap, inline:true},
-                {name:"Result", value: gameResult,inline:true}
-            ])
         }
         else {
             console.log("No Games found")
         }
-        //Send Final Embed
-        */
+        //Send Final Embed  
        MsgHelper.say(message,embed,false)
     }
 
