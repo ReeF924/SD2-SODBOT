@@ -39,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v1
       with:
         context: .
-        tags: user/sodbot:prod
+        tags: prod
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
