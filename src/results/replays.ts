@@ -49,13 +49,54 @@ export class Replays {
             if (g.result.victory < 3) {
                 for (const player of g.players) {
                     const playerid = player.name
-                    if (g.ingamePlayerId == player.alliance){
-                        loosers += playerid + "\n"
-                        looserList.push(player)
-                    }else{
-                        winners += playerid + "\n"
-                        winnerList.push(player)
-                    }    
+                    if (g.players.length == 2){
+                        if (g.ingamePlayerId == player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }  
+                    else if (g.players.length == 4){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 2 || g.ingamePlayerId == 3){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer == player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }
+                    else if (g.players.length == 6){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 3 || g.ingamePlayerId == 4 || g.ingamePlayerId == 4){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer == player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }                 
+                    else if (g.players.length == 8){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 4 || g.ingamePlayerId == 5 || g.ingamePlayerId == 6 || g.ingamePlayerId == 7 ){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer == player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }                 
                 }
                 if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
@@ -68,13 +109,54 @@ export class Replays {
             } else if (g.result.victory > 3) {
                 for (const player of g.players) {
                     const playerid = player.name
-                    if (g.ingamePlayerId != player.alliance){
-                        loosers += playerid + "\n"
-                        looserList.push(player)
-                    }else{
-                        winners += playerid + "\n"
-                        winnerList.push(player)
+                    if (g.players.length == 2){
+                        if (g.ingamePlayerId != player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }  
+                    else if (g.players.length == 4){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 2 || g.ingamePlayerId == 3){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer != player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
                     }
+                    else if (g.players.length == 6){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 3 || g.ingamePlayerId == 4 || g.ingamePlayerId == 4){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer != player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }                 
+                    else if (g.players.length == 8){
+                        let replayPlayer = 0
+                        if (g.ingamePlayerId == 4 || g.ingamePlayerId == 5 || g.ingamePlayerId == 6 || g.ingamePlayerId == 7 ){
+                            replayPlayer = 1
+                        }
+                        if (replayPlayer != player.alliance){
+                            loosers += playerid + "\n"
+                            looserList.push(player)
+                        }else{
+                            winners += playerid + "\n"
+                            winnerList.push(player)
+                        }
+                    }                 
                 }
                 if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                     const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)

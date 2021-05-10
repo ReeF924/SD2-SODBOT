@@ -137,11 +137,13 @@ export class PlayerCommand {
        MsgHelper.say(message,embed,false)
     }
 
+
     private static pad(num:number):string {
         var rounded = Math.round(num*10)/10
         var fixed = rounded.toFixed(1)
         return fixed.padEnd(7);
     }
+
 
     static async getLadder(message:Message, input:string[], perms:PermissionsSet){
         let ladder:EloLadderElement[]
@@ -179,7 +181,7 @@ export class PlayerCommand {
         }
         
         if(ladder.length == 0 || playerDetails.length == 0){
-            MsgHelper.reply(message,"Noone uploaded a ranked Replay within a year. The ladder is empty.")
+            MsgHelper.reply(message,"Noone uploaded a ranked replay within a year. The ladder is empty.")
             return;
         }
         embed.addField("Pos      Elo           Name", playerDetails, true)
