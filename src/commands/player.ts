@@ -7,6 +7,7 @@ import { misc } from "sd2-data";
 import { Logs } from "../general/logs";
 import e = require("express");
 import { PermissionsSet } from "../general/permissions";
+import { CommonUtil } from "../general/common";
 
 export class PlayerCommand {
     
@@ -53,6 +54,7 @@ export class PlayerCommand {
         }    
         // Extract recent games
         const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
+        let uploadDate = "";
         let opponent = "";
         let playerDiv = "";
         let opponentDiv = "";
@@ -78,15 +80,17 @@ export class PlayerCommand {
                     console.log(replayJson.players.length)
                 //Check that each row is a 1v1 match    
                 if (replayJson.players.length == 2){
-                    //identify who the opponent was
+                    //Identify the date uploaded
+                    uploadDate = CommonUtil.formatDate(x.uploadedAt as Date)
+                    //Identify who the opponent was
                     if (replayJson.players[0].id != Elos.eugenId){
                         opponent = replayJson.players[0].name + "\n";
-                        opponentDiv = replayJson.players[0].division
-                        playerDiv = replayJson.players[1].division
+                        opponentDiv = replayJson.players[0].deck.division
+                        playerDiv = replayJson.players[1].deck.division
                     }else{
                         opponent = replayJson.players[1].name + "\n";
-                        opponentDiv = replayJson.players[1].division
-                        playerDiv = replayJson.players[1].division
+                        opponentDiv = replayJson.players[1].deck.division
+                        playerDiv = replayJson.players[0].deck.division
                     }
                     //Identify the map played
                     gameMap = misc.map[replayJson.map_raw] + "\n";
@@ -111,11 +115,11 @@ export class PlayerCommand {
                            gameResult = "Draw" + "\n"
                     }
                     embed.addFields([
-                        {name:"Uploaded", value: "XX/XX/XXXX",inline:true},
-                        {name:"Result", value: gameResult,inline:true},
+                        {name:"Uploaded", value: uploadDate,inline:true},
                         {name:"Map", value: gameMap, inline:true},
-                        {name:"Player Divison", value: playerDiv,inline:false},
-                        {name:"Opponent Divison", value: opponentDiv,inline:true},
+                        {name:"Result", value: gameResult,inline:true},
+                        {name:"Player Division", value: playerDiv,inline:false},
+                        {name:"Opponent Division", value: opponentDiv,inline:true},
                         {name:"Opponent", value: opponent,inline:true},
                         {name:"---------------------------", value: "\u200b",inline:false}
                     ])

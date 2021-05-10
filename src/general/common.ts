@@ -31,6 +31,18 @@ export class CommonUtil {
         return defaultSetting;
     }
 
+    static formatDate(date: Date) {
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        let month = '' + months[date.getMonth()]
+        let day = '' + date.getDate()
+        let year = date.getFullYear()
+
+        if (day.length < 2) 
+            day = '0' + day;
+    
+        return [day, month, year].join('-');
+    }
+
     static lexicalGuesser = (input:string, obj:string[]):string => {
         let closestWord = "";
         let closestNumber = 9999999;
@@ -43,7 +55,6 @@ export class CommonUtil {
           }
         });
         return closestWord;
-      };
-
+    };
 
 }
