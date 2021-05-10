@@ -36,10 +36,9 @@ jobs:
         database: sodbot-prod
         
     - name: build and publish container
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v1
       with:
         context: .
-        push: true
         tags: user/sodbot:prod
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
