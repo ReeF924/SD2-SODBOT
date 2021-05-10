@@ -41,9 +41,9 @@ jobs:
         context: .
         tags: prod
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: docker.pkg.github.com
-        repository: my-org/my-repo/my-image
+        password: ${{ secrets.CR_PAT }}
+        registry: ghcr.io
+        repository: sd2-nerd-hq/sodbot
         
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
