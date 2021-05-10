@@ -148,6 +148,20 @@ export class SqlHelper {
     else
       return null;
   }
+
+  static async getAllDivisionElo():Promise<DivElo[]>{
+    const xx = await SqlHelper.exec("Select * from divisionElo ORDER BY elo DESC;")
+    const ret:DivElo[] = [];
+    if(xx.rows.length > 0){
+      for(const x of xx.rows)
+        ret.push({
+          id : Number(x.id),
+          divName : String(x.divName),
+          elo : Number(x.elo),
+        })
+    }
+    return ret;
+  }
   
   //permissions
   static async getServerPermissions(serverId: string): Promise<Blacklist>{

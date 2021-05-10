@@ -19,6 +19,10 @@ export class API {
                 res.send(results);
             }
         })
+        this.express.get('/divElo', async (req,res)=>{
+            const results = await SqlHelper.getAllDivisionElo()
+            res.send(results);
+        })
         this.express.get('/', (req,res)=>{res.send(200)})
         this.express.listen(this.port, ()=>{
             Logs.log("HTTP server started on " + this.port);
