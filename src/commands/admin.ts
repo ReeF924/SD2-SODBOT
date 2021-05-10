@@ -1,5 +1,4 @@
 import { Client, Message, GuildChannel } from "discord.js";
-import { Console } from "node:console";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { Logs } from "../general/logs";
 import { SqlHelper } from "../general/sqlHelper";
