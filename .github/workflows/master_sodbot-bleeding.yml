@@ -41,3 +41,10 @@ jobs:
         context: .
         push: true
         tags: user/sodbot:prod
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: docker.pkg.github.com
+        repository: my-org/my-repo/my-image
+        
+    - name: Image digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
