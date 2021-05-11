@@ -213,26 +213,32 @@ export class Replays {
                         playerid += "(id:" + player.id + ")";
                     }
 
+                    const raitingsString = (delta:number) => {
+                        let sign = "";
+                        if(delta > 0) sign = "+";
+                        return sign + Math.round(delta)
+                    }
+
                     if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
                         if(ratings.p1.eugenId == player.id){
                             if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${Math.round(ratings.p1.channelDelta)})||`
+                                elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
                             }
                             if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${Math.round(ratings.p1.serverDelta)})||`
+                                elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${raitingsString(ratings.p1.serverDelta)})||`
                             }
                             if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${Math.round(ratings.p1.globalDelta)})||`
+                                elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${raitingsString(ratings.p1.globalDelta)})||`
                             }
                         } else if(ratings.p2.eugenId == player.id){
                             if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${Math.round(ratings.p2.channelDelta)})||`
+                                elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${raitingsString(ratings.p2.channelDelta)})||`
                             }
                             if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${Math.round(ratings.p2.serverDelta)})||`
+                                elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${raitingsString(ratings.p2.serverDelta)})||`
                             }
                             if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${Math.round(ratings.p2.globalDelta)})||`
+                                elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${raitingsString(ratings.p2.globalDelta)})||`
                             }
                         }
                     } 
