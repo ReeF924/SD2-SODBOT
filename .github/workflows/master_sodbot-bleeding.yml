@@ -63,4 +63,4 @@ jobs:
         app-name: 'sodbot-bleeding-edge'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_297616ade86c41a6a042f3f36bf10658 }}
-        images: 'ghcr.io/sd2-nerd-hq//${{ secrets.AzureAppService_ContainerUsername_78e4109edf81453e815a9be09c6ec31b }}/sodbot:bleeding'
+        images: 'ghcr.io/sd2-nerd-hq/sodbot:bleeding'
