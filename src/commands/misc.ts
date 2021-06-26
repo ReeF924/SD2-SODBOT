@@ -198,6 +198,19 @@ export class MiscCommand {
         }
     }
 
+    static info(message: Message, input: string[]): void {
+        const embed = new MessageEmbed()
+            .setTitle("SODBOT III Info")
+            .setDescription("SODBOT III is is the latest version of the Steel Division 2 bot")
+            .addFields([
+                { name: "History", value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game.  The bot is now hosted on several Discord servers, all contributing to a Global ELO score for players of Steel Division 2.", inline: false },
+                {
+                    name: "Created By", value:
+                        "SD Nerd HQ Team", inline: false
+                }
+            ])
+            message.author.send(embed);
+    }
 
 }
 
@@ -209,5 +222,6 @@ export class MiscCommandHelper {
         bot.registerCommand("piat",MiscCommand.piat);
         bot.registerCommand("ptrd",MiscCommand.ptrd);
         bot.registerCommand("deck",MiscCommand.deck);
+        bot.registerCommand("info",MiscCommand.info);
     }
 }
