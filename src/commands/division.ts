@@ -35,9 +35,10 @@ export class DivisionCommand {
         if(divs.length == 0)
             MsgHelper.reply(message,"all divisions have been banned. Please unban some divisions");
         else{
-            const pick = divs[Math.floor(Math.random()*divs.length)].name
-            Logs.log(message.author.id + " has picked " + pick + " from "+ JSON.stringify(divs) + " side: " + input );
-            MsgHelper.reply(message,pick);
+            const pick = Math.floor(Math.random()*divs.length)
+            const pickname = divs[pick].name
+            Logs.log(message.author.id + " has picked " + pickname + " from "+ JSON.stringify(divs) + " side: " + input );
+            MsgHelper.reply(message,pickname);
         }
             
     }

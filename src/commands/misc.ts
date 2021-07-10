@@ -19,6 +19,7 @@ export class MiscCommand {
         "Miss! This piat is rubbish, just use your Sherman",
         "Miss! Just side shot it bro",
         "Miss! I know you will try again, like proto who always came back for another shot",
+        "Miss! You cabbage, aim straight next time",
         "Hit! He's Burning",
         "Hit! Jerry's in trouble now",
         "Bounce! You do know that is a King Tiger right?",
@@ -29,6 +30,15 @@ export class MiscCommand {
         "Hit! Payback’s a bitch and her stripper name is Karma",
         "Hit! Only the dead have seen the end of war",
         "Hit! Ideals are peaceful. History is violent.",
+        "Hit! In war there are no prizes for runner-up",
+        "Hit! It's better to stand and fight. If you run, you'll only die tired.",
+        "Hit! Any problem caused by a tank can be solved by a piat",
+        "Hit! Who needs a 0.50cal if you have the mighty piat!",
+        "Hit! I hope that after fighting a million battles in the same location for years now, the SD2 gods can create new maps for us mortals to explore.",
+        "Hit! You cannot hide from me Jerry, even under the sea isn't safe",
+        "Hit! Score one to me, Nilla for you.",
+        "Hit! Jack be nimble, Jack be quick, Jack claps your Panther tank!",
+        "Hit! That is a mighty fine Hungarian helmet you are wearing there sir.",
         "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
@@ -48,7 +58,8 @@ export class MiscCommand {
         "Hit! Never tell a soldier that he does not know the cost of war.",
         "Hit! Every war is different, every war is the same", 
         "Hit! Oh know there are PRTD squads in our rear",
-        "Hit! In the silence of the night, we will always hear the screams."
+        "Hit! In the silence of the night, we will always hear the screams.",
+        "Miss! Maybe you need the piat instead"
       ];
 
 
