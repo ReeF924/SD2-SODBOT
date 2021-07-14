@@ -10,7 +10,6 @@ import { Logs } from "../general/logs";
 export class MiscCommand {
 
     static sodbotReplies = [
-        "Hit! Target destroyed!",
         "Ping! Your shot bounced!",
         "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
         "Miss! Your shot couldn't hit the broad side of a barn!",
@@ -24,11 +23,9 @@ export class MiscCommand {
         "Hit! Jerry's in trouble now",
         "Bounce! You do know that is a King Tiger right?",
         "Hit! We're Airborne. We don't start fights, we finish 'em!",
-        "Hit! Your name is unknown. Your deed is immortal.",
         "Hit! Up the Ox and Bucks. Up the Ox and Bucks.",
         "Hit! There are few things more fundamentally encouraging and stimulating than seeing someone else die.",
         "Hit! Payback’s a bitch and her stripper name is Karma",
-        "Hit! Only the dead have seen the end of war",
         "Hit! Ideals are peaceful. History is violent.",
         "Hit! In war there are no prizes for runner-up",
         "Hit! It's better to stand and fight. If you run, you'll only die tired.",
@@ -39,13 +36,17 @@ export class MiscCommand {
         "Hit! Score one to me, Nilla for you.",
         "Hit! Jack be nimble, Jack be quick, Jack claps your Panther tank!",
         "Hit! That is a mighty fine Hungarian helmet you are wearing there sir.",
+        "Hit! Oh no, spiced ham is on the menu again.",
+        "Hit! Is that a Sturmpistole in your pocket or are you just happy to see me.",
+        "Hit! Ke mahi te tawa uho ki te riri.",
+        "Hit! Śmierć wrogom ojczyzny",
         "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
       static sodbotReplies2 = [
         "Hit! Target destroyed!",
         "Miss! Mission failed. We'll get em next time!",
-        "Miss! Damn it where's my 50 cal",
+        "Miss! Damn it where's my .50 cal",
         "Miss! Are you even trying to hit anymore?",
         "Oh come on, that shot was pathetic... Put your back into it!",
         "Bounce! You do know that is a King Tiger right?",
@@ -53,13 +54,14 @@ export class MiscCommand {
         "Hit! For Mother Russia",
         "Hit! We blew him away",
         "Hit!, Target Neutralised!",
-        "Hit!, Keep these trucks coming",
+        "Hit!, Keep those trucks coming",
         "Hit!, Ura!",
         "Hit! Never tell a soldier that he does not know the cost of war.",
         "Hit! Every war is different, every war is the same", 
-        "Hit! Oh know there are PRTD squads in our rear",
+        "Hit! Oh no, there are PRTD squads in our rear",
         "Hit! In the silence of the night, we will always hear the screams.",
-        "Miss! Maybe you need the piat instead"
+        "Miss! Maybe you need the piat instead",
+        "Hit! Only the dead have seen the end of war"
       ];
 
 
