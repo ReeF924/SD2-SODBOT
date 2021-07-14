@@ -30,7 +30,7 @@
     "mssql": "^6.3.2",
     "node": "^14.17.1",
     "sd2-data": "^0.5.7",
-    "sd2-utilities": "^0.1.10",
+    "sd2-utilities": "^0.1.12",
     "tedious": "^11.0.9",
     "winston": "3.3.3",
     "winston-azure-transport": "3.0.5"
