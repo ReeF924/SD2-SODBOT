@@ -1,0 +1,509 @@
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Connected to SQL @ sodbotdb.database.windows.net"}
+{"level":"error","message":"{\"message\":\"Login failed for user ''.\",\"code\":\"ELOGIN\"}"}
+{"message":"Requests can only be made in the LoggedIn state, not the SentLogin7WithStandardLogin state","code":"EINVALIDSTATE","level":"error"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Connected to SQL @ sodbotdb.database.windows.net"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Connected to SQL @ sodbotdb.database.windows.net"}
+{"level":"info","message":"Committing replay: e24aec36:6d4af26c:ec0c238d:52ba8462"}
+{"level":"info","message":"This reply is not a 1v1 player game, outcome will not be used in ELO"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Connected to SQL @ sodbotdb.database.windows.net"}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Slutsk 4 from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Brest West from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Ostrowno 4 from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Shchedrin 4 from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Ostrowno 4 from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Slutsk 4 from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"command Random Map with Inputs [\"4v4\"]"}
+{"level":"info","message":"687898043005272096 has picked Tannenberg from [\"Gora Kalwaria 4\",\"Lenina 4\",\"Ostrowno 4\",\"Shchedrin 4\",\"Slutsk 4\",\"Tannenberg\"] side: 4v4"}
+{"level":"info","message":"687898043005272096 has banned \"Tannenberg\""}
+{"level":"info","message":"687898043005272096 has unbanned all maps"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tali Ihantala from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"Committing replay: d11ce820:438be491:a82e5989:9160bdaa"}
+{"level":"info","message":"This reply is not a 1v1 player game, outcome will not be used in ELO"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"32","inline":true},{"name":"Global Rating","value":"1497","inline":true},{"name":"​","value":"​","inline":true}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"title":"Top 50 Players","type":"rich","description":"For full global leaderboard please goto http://eugenplz.com","url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Pos      Elo           Name","value":"1:     1530.5   yabo\n2:     1517.4   ReeF\n3:     1517.4   BEN-JAMMIN\n4:     1516.6   soontir\n5:     1516.6   karma\n6:     1516.0   #US MC Prestor John\n7:     1516.0   Syno\n8:     1516.0   ZnaT\n9:     1516.0   Underthesea Piatelo lì\n10:     1515.8   #US Varangian_Squrriel\n11:     1497.2  <@!687898043005272096> \n12:     1484.7   lucysky\n13:     1484.0   \u001c0;:0280=:0\n14:     1484.0   [EASY] BloodAndIron666\n15:     1484.0   Fuser\n16:     1484.0   Gearhead117\n17:     1484.0   #US Nilla\n18:     1480.7  <@!271792666910392325> \n19:     1469.5   J-K-W\n20:     1469.5   PigletsFury\n","inline":true}],"thumbnail":null,"image":null,"author":null,"footer":{"text":"Only those players who have been involved in a submitted match in the last year will appear in the ladder"}}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Division with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked 2-ya Gvard. Tankovy Korpus from [{\"id\":264,\"name\":\"1 Pancerna\",\"alias\":\"Pancerna\"},{\"id\":255,\"name\":\"1 Piechoty \\\"Tadeusza Kościuszki\\\"\",\"alias\":\"Piechoty\"},{\"id\":132,\"name\":\"2-ya Gvard. Tankovy Korpus\",\"alias\":\"2GT\"},{\"id\":153,\"name\":\"2e Blindée\",\"alias\":\"Blindee\"},{\"id\":628,\"name\":\"2nd Infantry Division \\\"Indianhead\\\"\",\"alias\":\"2ID\"},{\"id\":646,\"name\":\"2nd New-Zealand\",\"alias\":\"2NZ\"},{\"id\":144,\"name\":\"3-ya Gvard. Mechanizi. Korpus\",\"alias\":\"3GM\"},{\"id\":260,\"name\":\"3-ya Gvard. Tankovy Korpus\",\"alias\":\"3GT\"},{\"id\":436,\"name\":\"3-ya VDV\",\"alias\":\"VDV\"},{\"id\":70,\"name\":\"3rd Armoured \\\"Spearhead\\\"\",\"alias\":\"3US\"},{\"id\":66,\"name\":\"3rd Canadian Infantry\",\"alias\":\"3Can\"},{\"id\":627,\"name\":\"6th Airborne\",\"alias\":\"6AD\"},{\"id\":640,\"name\":\"7. Eesti Laskurdiviis\",\"alias\":\"7Est\"},{\"id\":437,\"name\":\"7-y Mechanizi. Korpus\",\"alias\":\"7Mech\"},{\"id\":150,\"name\":\"9-ya Gvard. Kavalerii\",\"alias\":\"9Kav\"},{\"id\":629,\"name\":\"10-y Gv. Tankovy Korpus\",\"alias\":\"10GT\"},{\"id\":152,\"name\":\"15th Infantry\",\"alias\":\"15ID\"},{\"id\":635,\"name\":\"19-y Tank Corpus\",\"alias\":\"19Tank\"},{\"id\":143,\"name\":\"26-ya Gvard. Strelkovy\",\"alias\":\"26Grd\"},{\"id\":134,\"name\":\"29-ya Tankovy Korpus\",\"alias\":\"29Tank\"},{\"id\":145,\"name\":\"44-ya Gvard. Strelkovy\",\"alias\":\"44Grd\"},{\"id\":270,\"name\":\"84-ya Gvard. Strelkovy\",\"alias\":\"84Grd\"},{\"id\":431,\"name\":\"97-ya Gvard. Strelkovy\",\"alias\":\"97Grd\"},{\"id\":352,\"name\":\"126-y L. Gornostrelkovy Korpus\",\"alias\":\"126LGK\"},{\"id\":142,\"name\":\"184-ya Strelkovy\",\"alias\":\"184ID\"},{\"id\":357,\"name\":\"358-ya Strelkovy\",\"alias\":\"358ID\"},{\"id\":261,\"name\":\"Armia Krajowa\",\"alias\":\"AK\"},{\"id\":438,\"name\":\"Morskaya Gruppa Bakhtina\",\"alias\":\"MGB\"},{\"id\":147,\"name\":\"Podv. Gruppa Bezuglogo\",\"alias\":\"PGB\"},{\"id\":641,\"name\":\"Podv. Gruppa Fedyunkin\",\"alias\":\"PGF\"},{\"id\":148,\"name\":\"Podv. Gruppa Tyurina\",\"alias\":\"PGT\"},{\"id\":351,\"name\":\"Podv. Gruppa Vyborg\",\"alias\":\"PGV\"},{\"id\":727,\"name\":\"Rezerv 43-y Armii\",\"alias\":\"43RA\"},{\"id\":433,\"name\":\"1 Blindată \\\"Romania Mare\\\"\",\"alias\":\"Blindata\"},{\"id\":643,\"name\":\"1. Fallschirmjäger\",\"alias\":\"1FSJ\"},{\"id\":140,\"name\":\"1. Lovas\",\"alias\":\"Lovas\"},{\"id\":259,\"name\":\"1. Skijäger\",\"alias\":\"1SJ\"},{\"id\":626,\"name\":\"3. Fallschirmjäger\",\"alias\":\"3FSJ\"},{\"id\":434,\"name\":\"4 Munte\",\"alias\":\"Munte\"},{\"id\":71,\"name\":\"5. Panzer\",\"alias\":\"5Pz\"},{\"id\":435,\"name\":\"5 Cavalerie Motorizată\",\"alias\":\"5Cav\"},{\"id\":262,\"name\":\"5. SS-Panzer \\\"Wiking\\\"\",\"alias\":\"5SSPz\"},{\"id\":636,\"name\":\"11. SS-Freiwilligen Panzergrenadier “Nordland”\",\"alias\":\"11SSPG\"},{\"id\":623,\"name\":\"12. SS-Panzer \\\"Hitlerjugend\\\"\",\"alias\":\"12SSPz\"},{\"id\":141,\"name\":\"12. Tartalék\",\"alias\":\"Tartalek\"},{\"id\":149,\"name\":\"14. Infanterie\",\"alias\":\"14ID\"},{\"id\":430,\"name\":\"16. Panzer\",\"alias\":\"16Pz\"},{\"id\":624,\"name\":\"17. SS-Panzergrenadier \\\"Götz von B.\\\"\",\"alias\":\"17SSPG\"},{\"id\":135,\"name\":\"20. Panzer\",\"alias\":\"20Pz\"},{\"id\":637,\"name\":\"20. Panzergrenadier\",\"alias\":\"20PG\"},{\"id\":155,\"name\":\"21. Panzer\",\"alias\":\"21Pz\"},{\"id\":269,\"name\":\"25. Panzergrenadier\",\"alias\":\"25PG\"},{\"id\":136,\"name\":\"28. Jäger\",\"alias\":\"28Jag\"},{\"id\":726,\"name\":\"52. Sicherungs-Division z.b.V\",\"alias\":\"52SD\"},{\"id\":137,\"name\":\"78. Sturm\",\"alias\":\"78Sturm\"},{\"id\":154,\"name\":\"116. Panzer\",\"alias\":\"116Pz\"},{\"id\":356,\"name\":\"122. Infanterie\",\"alias\":\"122ID\"},{\"id\":156,\"name\":\"352. Infanterie\",\"alias\":\"352ID\"},{\"id\":263,\"name\":\"Fallschirm-Panzer \\\"Hermann Göring\\\"\",\"alias\":\"FPzHG\"},{\"id\":138,\"name\":\"Gruppe Harteneck\",\"alias\":\"GH\"},{\"id\":139,\"name\":\"Korück 559\",\"alias\":\"Koruck\"},{\"id\":350,\"name\":\"Panssaridivisioona\",\"alias\":\"FINPz\"},{\"id\":638,\"name\":\"Panzergrenadier \\\"Grossdeutschland\\\"\",\"alias\":\"PGG\"},{\"id\":157,\"name\":\"Panzer Lehr\",\"alias\":\"PzLehr\"},{\"id\":648,\"name\":\"Panzerverband Strachwitz\",\"alias\":\"PzVS\"},{\"id\":354,\"name\":\"Ryhmä Raappana\",\"alias\":\"Raappana\"}] side: "}
+{"level":"info","message":"command Random Division with Inputs [\"axis\"]"}
+{"level":"info","message":"687898043005272096 has picked 28. Jäger from [{\"id\":433,\"name\":\"1 Blindată \\\"Romania Mare\\\"\",\"alias\":\"Blindata\"},{\"id\":643,\"name\":\"1. Fallschirmjäger\",\"alias\":\"1FSJ\"},{\"id\":140,\"name\":\"1. Lovas\",\"alias\":\"Lovas\"},{\"id\":259,\"name\":\"1. Skijäger\",\"alias\":\"1SJ\"},{\"id\":626,\"name\":\"3. Fallschirmjäger\",\"alias\":\"3FSJ\"},{\"id\":434,\"name\":\"4 Munte\",\"alias\":\"Munte\"},{\"id\":71,\"name\":\"5. Panzer\",\"alias\":\"5Pz\"},{\"id\":435,\"name\":\"5 Cavalerie Motorizată\",\"alias\":\"5Cav\"},{\"id\":262,\"name\":\"5. SS-Panzer \\\"Wiking\\\"\",\"alias\":\"5SSPz\"},{\"id\":636,\"name\":\"11. SS-Freiwilligen Panzergrenadier “Nordland”\",\"alias\":\"11SSPG\"},{\"id\":623,\"name\":\"12. SS-Panzer \\\"Hitlerjugend\\\"\",\"alias\":\"12SSPz\"},{\"id\":141,\"name\":\"12. Tartalék\",\"alias\":\"Tartalek\"},{\"id\":149,\"name\":\"14. Infanterie\",\"alias\":\"14ID\"},{\"id\":430,\"name\":\"16. Panzer\",\"alias\":\"16Pz\"},{\"id\":624,\"name\":\"17. SS-Panzergrenadier \\\"Götz von B.\\\"\",\"alias\":\"17SSPG\"},{\"id\":135,\"name\":\"20. Panzer\",\"alias\":\"20Pz\"},{\"id\":637,\"name\":\"20. Panzergrenadier\",\"alias\":\"20PG\"},{\"id\":155,\"name\":\"21. Panzer\",\"alias\":\"21Pz\"},{\"id\":269,\"name\":\"25. Panzergrenadier\",\"alias\":\"25PG\"},{\"id\":136,\"name\":\"28. Jäger\",\"alias\":\"28Jag\"},{\"id\":726,\"name\":\"52. Sicherungs-Division z.b.V\",\"alias\":\"52SD\"},{\"id\":137,\"name\":\"78. Sturm\",\"alias\":\"78Sturm\"},{\"id\":154,\"name\":\"116. Panzer\",\"alias\":\"116Pz\"},{\"id\":356,\"name\":\"122. Infanterie\",\"alias\":\"122ID\"},{\"id\":156,\"name\":\"352. Infanterie\",\"alias\":\"352ID\"},{\"id\":263,\"name\":\"Fallschirm-Panzer \\\"Hermann Göring\\\"\",\"alias\":\"FPzHG\"},{\"id\":138,\"name\":\"Gruppe Harteneck\",\"alias\":\"GH\"},{\"id\":139,\"name\":\"Korück 559\",\"alias\":\"Koruck\"},{\"id\":350,\"name\":\"Panssaridivisioona\",\"alias\":\"FINPz\"},{\"id\":638,\"name\":\"Panzergrenadier \\\"Grossdeutschland\\\"\",\"alias\":\"PGG\"},{\"id\":157,\"name\":\"Panzer Lehr\",\"alias\":\"PzLehr\"},{\"id\":648,\"name\":\"Panzerverband Strachwitz\",\"alias\":\"PzVS\"},{\"id\":354,\"name\":\"Ryhmä Raappana\",\"alias\":\"Raappana\"}] side: axis"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 1a06d297:284126a8:1fd34582:12deee90"}
+{"level":"info","message":"getElos User Not Found: 603155"}
+{"level":"info","message":"getElos User Not Found: 551"}
+{"level":"info","message":"saving elos: {\"playerId\":603155,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1516,\"pickBanGlobalElo\":1500,\"impliedName\":\"atkurtz\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":551,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1484,\"pickBanGlobalElo\":1500,\"impliedName\":\"Disheartnened Eugen Fan\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"Committing replay: 6206dbaa:2c497e9e:d99b8882:8e4ac87c"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1105554,\"playerName\":\"karma\",\"globalElo\":1516.604284925348,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":22121,\"playerName\":\"J-K-W\",\"globalElo\":1469.4695015289756,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"saving elos: {\"playerId\":1105554,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1530.4468674354218,\"pickBanGlobalElo\":1500,\"impliedName\":\"karma\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":22121,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1455.6269190189018,\"pickBanGlobalElo\":1500,\"impliedName\":\"J-K-W\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 1eeb25c2:4879dfdd:bc5b8dbe:55421a77"}
+{"level":"info","message":"getElos User Not Found: 108642"}
+{"level":"info","message":"getElos User Not Found: 306849"}
+{"level":"info","message":"saving elos: {\"playerId\":108642,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1516,\"pickBanGlobalElo\":1500,\"impliedName\":\"Vestly\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":306849,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1484,\"pickBanGlobalElo\":1500,\"impliedName\":\"[RKKA]AmberT\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: eafdd4ce:4538f52f:f8cbf6aa:4de41155"}
+{"level":"info","message":"This replay is from a older version of the game and won't be used in ELO Calcs"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":306849,\"playerName\":\"[RKKA]AmberT\",\"globalElo\":1484,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":1484,\"channelElo\":1484}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1545349,\"playerName\":\"Underthesea Piatelo lì\",\"globalElo\":1516,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"Committing replay: f2555c75:421fd1be:93cfc695:323e4820"}
+{"level":"info","message":"getElos User Not Found: 1503393"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1603302,\"playerName\":\"yabo\",\"globalElo\":1530.5304984710244,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"saving elos: {\"playerId\":1503393,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1517.402373648406,\"pickBanGlobalElo\":1500,\"impliedName\":\"#POL NoTeD\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":1603302,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1513.1281248226185,\"pickBanGlobalElo\":1500,\"impliedName\":\"yabo\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Top 25 Players","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Pos      Elo           Name","value":"1:     1500.0   Tigga\n2:     1500.0   Gensei Kakka\n3:     1500.0   Tactix\n4:     1500.0   Panzeh\n5:     1500.0   matrin\n6:     1500.0   BEN-JAMMIN\n7:     1500.0   ?????\n8:     1500.0   Danewcielo\n9:     1500.0   ADLER_750\n10:     1500.0   Johnnie Pavulon M.D.\n11:     1500.0   J-K-W\n12:     1500.0   Iadris\n13:     1500.0   hypokrass\n14:     1500.0   Tanner\n15:     1500.0   Heljumper117\n","inline":true}],"thumbnail":null,"image":null,"author":null,"footer":{"text":"Only those players who have been involved in a submitted match in the last year will appear in the ladder"}}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Added eugen account 1442542 to user 687898043005272096"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1500","inline":true},{"name":"Global Rating","value":"1500","inline":true},{"name":"​","value":"​","inline":true}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Committing replay: 6c17f03c:4f4a30cb:c70dc68a:ab592857"}
+{"level":"info","message":"getElos User Not Found: 1526280"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1442542,\"playerName\":\"Roguish Tiger\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"saving elos: {\"playerId\":1526280,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1516,\"pickBanGlobalElo\":1500,\"impliedName\":\"Steel666\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":1442542,\"serverId\":\"815812582656180274\",\"channelId\":\"815812582656180278\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1484,\"pickBanGlobalElo\":1500,\"impliedName\":\"#ANZ RoguishTiger\",\"serverName\":\"TigerTest\",\"channelName\":\"general\"}"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Most Recent 1v1 Games Uploaded To The Bot","value":"-----------------------------------------------------","inline":false},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"​","value":"***************","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Div","value":"XXXXXXXXXXXXXXXX","inline":false},{"name":"Opponent Div","value":"XXXXXXXXXXXXXXXX","inline":false},{"name":"Result","value":"Defeat\n","inline":false},{"name":"​","value":"********************************************","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Div","value":"XXXXXXXXXXXXXXXX","inline":false},{"name":"Opponent Div","value":"XXXXXXXXXXXXXXXX","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"​","value":"********************************************","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Div","value":"XXXXXXXXXXXXXXXX","inline":false},{"name":"Opponent Div","value":"XXXXXXXXXXXXXXXX","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"*******","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Div","value":"XXXXXXXXXXXXXXXX","inline":false},{"name":"Opponent Div","value":"XXXXXXXXXXXXXXXX","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1484","inline":true},{"name":"Global Rating","value":"1484","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Changed globalAdmin access to user RoguishTiger to true"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Brest West from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Division with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Podv. Gruppa Fedyunkin from [{\"id\":264,\"name\":\"1 Pancerna\",\"alias\":\"Pancerna\"},{\"id\":255,\"name\":\"1 Piechoty \\\"Tadeusza Kościuszki\\\"\",\"alias\":\"Piechoty\"},{\"id\":132,\"name\":\"2-ya Gvard. Tankovy Korpus\",\"alias\":\"2GT\"},{\"id\":153,\"name\":\"2e Blindée\",\"alias\":\"Blindee\"},{\"id\":628,\"name\":\"2nd Infantry Division \\\"Indianhead\\\"\",\"alias\":\"2ID\"},{\"id\":646,\"name\":\"2nd New-Zealand\",\"alias\":\"2NZ\"},{\"id\":144,\"name\":\"3-ya Gvard. Mechanizi. Korpus\",\"alias\":\"3GM\"},{\"id\":260,\"name\":\"3-ya Gvard. Tankovy Korpus\",\"alias\":\"3GT\"},{\"id\":436,\"name\":\"3-ya VDV\",\"alias\":\"VDV\"},{\"id\":70,\"name\":\"3rd Armoured \\\"Spearhead\\\"\",\"alias\":\"3US\"},{\"id\":66,\"name\":\"3rd Canadian Infantry\",\"alias\":\"3Can\"},{\"id\":627,\"name\":\"6th Airborne\",\"alias\":\"6AD\"},{\"id\":640,\"name\":\"7. Eesti Laskurdiviis\",\"alias\":\"7Est\"},{\"id\":437,\"name\":\"7-y Mechanizi. Korpus\",\"alias\":\"7Mech\"},{\"id\":150,\"name\":\"9-ya Gvard. Kavalerii\",\"alias\":\"9Kav\"},{\"id\":629,\"name\":\"10-y Gv. Tankovy Korpus\",\"alias\":\"10GT\"},{\"id\":152,\"name\":\"15th Infantry\",\"alias\":\"15ID\"},{\"id\":635,\"name\":\"19-y Tank Corpus\",\"alias\":\"19Tank\"},{\"id\":143,\"name\":\"26-ya Gvard. Strelkovy\",\"alias\":\"26Grd\"},{\"id\":134,\"name\":\"29-ya Tankovy Korpus\",\"alias\":\"29Tank\"},{\"id\":145,\"name\":\"44-ya Gvard. Strelkovy\",\"alias\":\"44Grd\"},{\"id\":270,\"name\":\"84-ya Gvard. Strelkovy\",\"alias\":\"84Grd\"},{\"id\":431,\"name\":\"97-ya Gvard. Strelkovy\",\"alias\":\"97Grd\"},{\"id\":352,\"name\":\"126-y L. Gornostrelkovy Korpus\",\"alias\":\"126LGK\"},{\"id\":142,\"name\":\"184-ya Strelkovy\",\"alias\":\"184ID\"},{\"id\":357,\"name\":\"358-ya Strelkovy\",\"alias\":\"358ID\"},{\"id\":261,\"name\":\"Armia Krajowa\",\"alias\":\"AK\"},{\"id\":438,\"name\":\"Morskaya Gruppa Bakhtina\",\"alias\":\"MGB\"},{\"id\":147,\"name\":\"Podv. Gruppa Bezuglogo\",\"alias\":\"PGB\"},{\"id\":641,\"name\":\"Podv. Gruppa Fedyunkin\",\"alias\":\"PGF\"},{\"id\":148,\"name\":\"Podv. Gruppa Tyurina\",\"alias\":\"PGT\"},{\"id\":351,\"name\":\"Podv. Gruppa Vyborg\",\"alias\":\"PGV\"},{\"id\":727,\"name\":\"Rezerv 43-y Armii\",\"alias\":\"43RA\"},{\"id\":433,\"name\":\"1 Blindată \\\"Romania Mare\\\"\",\"alias\":\"Blindata\"},{\"id\":643,\"name\":\"1. Fallschirmjäger\",\"alias\":\"1FSJ\"},{\"id\":140,\"name\":\"1. Lovas\",\"alias\":\"Lovas\"},{\"id\":259,\"name\":\"1. Skijäger\",\"alias\":\"1SJ\"},{\"id\":626,\"name\":\"3. Fallschirmjäger\",\"alias\":\"3FSJ\"},{\"id\":434,\"name\":\"4 Munte\",\"alias\":\"Munte\"},{\"id\":71,\"name\":\"5. Panzer\",\"alias\":\"5Pz\"},{\"id\":435,\"name\":\"5 Cavalerie Motorizată\",\"alias\":\"5Cav\"},{\"id\":262,\"name\":\"5. SS-Panzer \\\"Wiking\\\"\",\"alias\":\"5SSPz\"},{\"id\":636,\"name\":\"11. SS-Freiwilligen Panzergrenadier “Nordland”\",\"alias\":\"11SSPG\"},{\"id\":623,\"name\":\"12. SS-Panzer \\\"Hitlerjugend\\\"\",\"alias\":\"12SSPz\"},{\"id\":141,\"name\":\"12. Tartalék\",\"alias\":\"Tartalek\"},{\"id\":149,\"name\":\"14. Infanterie\",\"alias\":\"14ID\"},{\"id\":430,\"name\":\"16. Panzer\",\"alias\":\"16Pz\"},{\"id\":624,\"name\":\"17. SS-Panzergrenadier \\\"Götz von B.\\\"\",\"alias\":\"17SSPG\"},{\"id\":135,\"name\":\"20. Panzer\",\"alias\":\"20Pz\"},{\"id\":637,\"name\":\"20. Panzergrenadier\",\"alias\":\"20PG\"},{\"id\":155,\"name\":\"21. Panzer\",\"alias\":\"21Pz\"},{\"id\":269,\"name\":\"25. Panzergrenadier\",\"alias\":\"25PG\"},{\"id\":136,\"name\":\"28. Jäger\",\"alias\":\"28Jag\"},{\"id\":726,\"name\":\"52. Sicherungs-Division z.b.V\",\"alias\":\"52SD\"},{\"id\":137,\"name\":\"78. Sturm\",\"alias\":\"78Sturm\"},{\"id\":154,\"name\":\"116. Panzer\",\"alias\":\"116Pz\"},{\"id\":356,\"name\":\"122. Infanterie\",\"alias\":\"122ID\"},{\"id\":156,\"name\":\"352. Infanterie\",\"alias\":\"352ID\"},{\"id\":263,\"name\":\"Fallschirm-Panzer \\\"Hermann Göring\\\"\",\"alias\":\"FPzHG\"},{\"id\":138,\"name\":\"Gruppe Harteneck\",\"alias\":\"GH\"},{\"id\":139,\"name\":\"Korück 559\",\"alias\":\"Koruck\"},{\"id\":350,\"name\":\"Panssaridivisioona\",\"alias\":\"FINPz\"},{\"id\":638,\"name\":\"Panzergrenadier \\\"Grossdeutschland\\\"\",\"alias\":\"PGG\"},{\"id\":157,\"name\":\"Panzer Lehr\",\"alias\":\"PzLehr\"},{\"id\":419,\"name\":\"Panzerverband Strachwitz\",\"alias\":\"pig\"},{\"id\":354,\"name\":\"Ryhmä Raappana\",\"alias\":\"Raappana\"}] side: "}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 6b9a7618:4889af17:b6a670a2:11f30c9c"}
+{"level":"info","message":"getElos User Not Found: 1095872"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1442542,\"playerName\":\"Roguish Tiger\",\"globalElo\":1484,\"pickBanGlobalElo\":1500,\"channelId\":\"840094432070336573\",\"serverId\":\"815812582656180274\",\"serverElo\":1484,\"channelElo\":null}"}
+{"level":"info","message":"saving elos: {\"playerId\":1095872,\"serverId\":\"815812582656180274\",\"channelId\":\"840094432070336573\",\"channelElo\":1516,\"serverElo\":1515.263693206478,\"globalElo\":1515.263693206478,\"pickBanGlobalElo\":1500,\"impliedName\":\"NailBash\",\"serverName\":\"TigerTest\",\"channelName\":\"testchannel-2\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":1442542,\"serverId\":\"815812582656180274\",\"channelId\":\"840094432070336573\",\"channelElo\":1484,\"serverElo\":1468.736306793522,\"globalElo\":1468.736306793522,\"pickBanGlobalElo\":1500,\"impliedName\":\"#ANZ RoguishTiger\",\"serverName\":\"TigerTest\",\"channelName\":\"testchannel-2\"}"}
+{"level":"info","message":"Committing replay: 22e20f1a:406672d4:8ca7be80:3b88715f"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1442542,\"playerName\":\"Roguish Tiger\",\"globalElo\":1468.736306793522,\"pickBanGlobalElo\":1500,\"channelId\":\"840094432070336573\",\"serverId\":\"815812582656180274\",\"serverElo\":1468.736306793522,\"channelElo\":1484}"}
+{"level":"info","message":"getElos User Not Found: 1491306"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 3b97c589:764cfa6b:9f352b9a:c2062c0f"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":56189,\"playerName\":\"Tanner\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"840094432070336573\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":278817,\"playerName\":\"kuriosly\",\"globalElo\":1465.246025151545,\"pickBanGlobalElo\":1500,\"channelId\":\"840094432070336573\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"saving elos: {\"playerId\":56189,\"serverId\":\"815812582656180274\",\"channelId\":\"840094432070336573\",\"channelElo\":1516,\"serverElo\":1516,\"globalElo\":1514.4048371643357,\"pickBanGlobalElo\":1500,\"impliedName\":\"P.Uri.Tanner\",\"serverName\":\"TigerTest\",\"channelName\":\"testchannel-2\"}"}
+{"level":"info","message":"saving elos: {\"playerId\":278817,\"serverId\":\"815812582656180274\",\"channelId\":\"840094432070336573\",\"channelElo\":1484,\"serverElo\":1484,\"globalElo\":1450.8411879872092,\"pickBanGlobalElo\":1500,\"impliedName\":\"Kurios\",\"serverName\":\"TigerTest\",\"channelName\":\"testchannel-2\"}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"XX/XX/XXXX","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Slutsk from [\"Bobr\",\"Brest West\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Orsha East\",\"Orsha North\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Brest West from [\"Bobr\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Orsha East\",\"Orsha North\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk East\",\"Slutsk West\",\"Slutsk\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: 1v1"}
+{"level":"info","message":"687898043005272096 has banned \"Brest West\""}
+{"level":"info","message":"687898043005272096 has banned \"Orsha East\""}
+{"level":"info","message":"687898043005272096 has banned \"Orsha North\""}
+{"level":"info","message":"687898043005272096 has banned \"Slutsk\""}
+{"level":"info","message":"687898043005272096 has banned \"Slutsk West\""}
+{"level":"info","message":"687898043005272096 has banned \"Slutsk East\""}
+{"level":"info","message":"687898043005272096 has banned \"Tsel\""}
+{"level":"info","message":"687898043005272096 has banned \"Zbuczyn\""}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: "}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Sianno from [\"Bobr\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Ostrowno\",\"Shchedrin\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Shchedrin from [\"Bobr\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Ostrowno\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Gora Kalwaria\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Krupa from [\"Bobr\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Lenina\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Sianno from [\"Bobr\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Ostrowno\",\"Shchedrin\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Bobr from [\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Tali Ihantala\"] side: 1v1"}
+{"level":"info","message":"687898043005272096 has unbanned all maps"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 4990cf11:c44be4ed:4a129194:663a0a9f"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1448709,\"playerName\":\"DarkNeutron\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1582531,\"playerName\":\"StuH\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Divison","value":"undefined","inline":false},{"name":"Opponent Divison","value":"undefined","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Player Divison","value":"78. Sturm","inline":false},{"name":"Opponent Divison","value":"78. Sturm","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"2-ya Gvard. Tankovy Korpus","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"Morskaya Gruppa Bakhtina","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Player Divison","value":"15th Infantry","inline":false},{"name":"Opponent Divison","value":"78. Sturm","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"2-ya Gvard. Tankovy Korpus","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"Morskaya Gruppa Bakhtina","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Player Divison","value":"15th Infantry","inline":false},{"name":"Opponent Divison","value":"78. Sturm","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"2-ya Gvard. Tankovy Korpus","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Divison","value":"Panzer Lehr","inline":false},{"name":"Opponent Divison","value":"Morskaya Gruppa Bakhtina","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Player Division","value":"15th Infantry","inline":false},{"name":"Opponent Division","value":"78. Sturm","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Division","value":"Panzer Lehr","inline":false},{"name":"Opponent Division","value":"2-ya Gvard. Tankovy Korpus","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Division","value":"Panzer Lehr","inline":false},{"name":"Opponent Division","value":"Morskaya Gruppa Bakhtina","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 93a43b22:457ab3b3:6327d9b3:eab91725"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos User Not Found: 1476852"}
+{"level":"info","message":"getElos User Not Found: 161376"}
+{"level":"info","message":"getElos User Not Found: 1414472"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":56189,\"playerName\":\"Tanner\",\"globalElo\":1514.4048371643357,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":1516,\"channelElo\":null}"}
+{"level":"info","message":"Committing replay: f5ec182a:be42e950:5e9abc8a:6d8f5113"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1097961,\"playerName\":\"nate_aka_emperor\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"getElos User Not Found: 577185"}
+{"level":"info","message":"getElos User Not Found: 615509"}
+{"level":"info","message":"getElos User Not Found: 578384"}
+{"level":"info","message":"getElos User Not Found: 802778"}
+{"level":"info","message":"getElos User Not Found: 1103635"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":56189,\"playerName\":\"Tanner\",\"globalElo\":1514.4048371643357,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":1516,\"channelElo\":null}"}
+{"level":"info","message":"getElos User Not Found: 1414472"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"title":"Player Details","type":"rich","description":null,"url":null,"timestamp":null,"color":7721450,"fields":[{"name":"Player Name","value":"<@!687898043005272096>","inline":false},{"name":"Server Rating","value":"1469","inline":true},{"name":"Global Rating","value":"1469","inline":true},{"name":"​","value":"​","inline":true},{"name":"Recent 1v1 Matches","value":"-----------------------------------------------------","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Haroshaje\n","inline":true},{"name":"Result","value":"Victory\n","inline":true},{"name":"Player Division","value":"15th Infantry","inline":false},{"name":"Opponent Division","value":"78. Sturm","inline":true},{"name":"Opponent","value":"jaxgryder\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"08-May-2021","inline":true},{"name":"Map","value":"Slutsk\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Division","value":"Panzer Lehr","inline":false},{"name":"Opponent Division","value":"2-ya Gvard. Tankovy Korpus","inline":true},{"name":"Opponent","value":"NailBash\n","inline":true},{"name":"---------------------------","value":"​","inline":false},{"name":"Uploaded","value":"06-May-2021","inline":true},{"name":"Map","value":"Slutsk West\n","inline":true},{"name":"Result","value":"Defeat\n","inline":true},{"name":"Player Division","value":"Panzer Lehr","inline":false},{"name":"Opponent Division","value":"Morskaya Gruppa Bakhtina","inline":true},{"name":"Opponent","value":"Steel666\n","inline":true},{"name":"---------------------------","value":"​","inline":false}],"thumbnail":{"url":"https://cdn.discordapp.com/avatars/687898043005272096/52b8f3187e44c498b9335d77a791af52.webp"},"image":null,"author":null,"footer":null}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 4990cf11:c44be4ed:4a129194:663a0a9f"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1448709,\"playerName\":\"DarkNeutron\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1582531,\"playerName\":\"StuH\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tsel from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Brest West\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Brest West\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\",\"Zbuczyn\"] side: "}
+{"level":"info","message":"command Random Map with Inputs [\"1v1\"]"}
+{"level":"info","message":"687898043005272096 has picked Tsel from [\"Bobr\",\"Brest West\",\"Gora Kalwaria\",\"Haroshaje\",\"Ilomantsi\",\"Krupa\",\"Lenina\",\"Orsha East\",\"Orsha North\",\"Ostrowno\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk East\",\"Slutsk West\",\"Slutsk\",\"Tali Ihantala\",\"Zbuczyn\"] side: 1v1"}
+{"level":"info","message":"command Random Map with Inputs [\"2v2\"]"}
+{"level":"info","message":"687898043005272096 has picked Shchedrin 2 from [\"Autobahn Zur Holle\",\"Beshankovichy\",\"Bobrujsk West\",\"Brest West 2\",\"Ilomantsi 2\",\"Lenina 2\",\"Losnica\",\"Novka\",\"Ostrowno 2\",\"Siedlce 2\",\"Slutsk 2\",\"Tali Ihantala 2\",\"Veselovo\",\"Vitebsk East\",\"Zbuczyn 2\"] side: 2v2"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Orsha North from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tali Ihantala from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Orsha East from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Shchedrin from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Siedlce from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tsel from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tali Ihantala from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tsel from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Sianno from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Siedlce from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk East from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Krupa from [\"Bobr\",\"Haroshaje\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Siedlce from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Krupa from [\"Bobr\",\"Haroshaje\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Shchedrin from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk East from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Tali Ihantala from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Haroshaje from [\"Bobr\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Slutsk West\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"command Random Map with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked Slutsk West from [\"Bobr\",\"Haroshaje\",\"Krupa\",\"Orsha East\",\"Orsha North\",\"Shchedrin\",\"Sianno\",\"Siedlce\",\"Slutsk\",\"Slutsk East\",\"Tali Ihantala\",\"Tsel\"] side: "}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"command Random Division with Inputs []"}
+{"level":"info","message":"687898043005272096 has picked 3rd Armoured \"Spearhead\" from [{\"id\":264,\"name\":\"1 Pancerna\",\"alias\":[\"Pancerna\"]},{\"id\":255,\"name\":\"1 Piechoty \\\"Tadeusza Kościuszki\\\"\",\"alias\":[\"Piechoty\"]},{\"id\":132,\"name\":\"2-ya Gvard. Tankovy Korpus\",\"alias\":[\"2gtc\",\"2GT\"]},{\"id\":153,\"name\":\"2e Blindée\",\"alias\":[\"Blindee\"]},{\"id\":628,\"name\":\"2nd Infantry Division \\\"Indianhead\\\"\",\"alias\":[\"2inf\",\"2ID\"]},{\"id\":646,\"name\":\"2nd New-Zealand\",\"alias\":[\"nz\",\"kiwi\",\"2NZ\"]},{\"id\":144,\"name\":\"3-ya Gvard. Mechanizi. Korpus\",\"alias\":[\"3gmc\",\"3GM\"]},{\"id\":260,\"name\":\"3-ya Gvard. Tankovy Korpus\",\"alias\":[\"3gtc\",\"3GT\"]},{\"id\":436,\"name\":\"3-ya VDV\",\"alias\":[\"VDV\"]},{\"id\":70,\"name\":\"3rd Armoured \\\"Spearhead\\\"\",\"alias\":[\"3US\"]},{\"id\":66,\"name\":\"3rd Canadian Infantry\",\"alias\":[\"3Can\",\"can\",\"canada\"]},{\"id\":627,\"name\":\"6th Airborne\",\"alias\":[\"6AD\"]},{\"id\":640,\"name\":\"7. Eesti Laskurdiviis\",\"alias\":[\"7Est\"]},{\"id\":437,\"name\":\"7-y Mechanizi. Korpus\",\"alias\":[\"7Mech\"]},{\"id\":150,\"name\":\"9-ya Gvard. Kavalerii\",\"alias\":[\"9Cav\",\"9Kav\"]},{\"id\":629,\"name\":\"10-y Gv. Tankovy Korpus\",\"alias\":[\"10gtc\",\"10GT\"]},{\"id\":152,\"name\":\"15th Infantry\",\"alias\":[\"15\",\"15ID\"]},{\"id\":635,\"name\":\"19-y Tank Korpus\",\"alias\":[\"19gtc\",\"19Tank\"]},{\"id\":143,\"name\":\"26-ya Gvard. Strelkovy\",\"alias\":[\"26\",\"26Grd\"]},{\"id\":134,\"name\":\"29-ya Tankovy Korpus\",\"alias\":[\"29gtc\",\"29Tank\",\"29gt\"]},{\"id\":145,\"name\":\"44-ya Gvard. Strelkovy\",\"alias\":[\"44\",\"44Grd\"]},{\"id\":270,\"name\":\"84-ya Gvard. Strelkovy\",\"alias\":[\"84\",\"84Grd\"]},{\"id\":431,\"name\":\"97-ya Gvard. Strelkovy\",\"alias\":[\"97\",\"97Grd\"]},{\"id\":352,\"name\":\"126-y L. Gornostrelkovy Korpus\",\"alias\":[\"126\",\"126LGK\"]},{\"id\":142,\"name\":\"184-ya Strelkovy\",\"alias\":[\"184\",\"184ID\"]},{\"id\":357,\"name\":\"358-ya Strelkovy\",\"alias\":[\"358\",\"358ID\"]},{\"id\":261,\"name\":\"Armia Krajowa\",\"alias\":[\"AK\"]},{\"id\":438,\"name\":\"Morskaya Gruppa Bakhtina\",\"alias\":[\"morskaya\",\"MGB\"]},{\"id\":147,\"name\":\"Podv. Gruppa Bezuglogo\",\"alias\":[\"bezuglogo\",\"PGB\"]},{\"id\":641,\"name\":\"Podv. Gruppa Fedyunkin\",\"alias\":[\"fedyunkin\",\"PGF\"]},{\"id\":148,\"name\":\"Podv. Gruppa Tyurina\",\"alias\":[\"tyurina\",\"PGT\"]},{\"id\":351,\"name\":\"Podv. Gruppa Vyborg\",\"alias\":[\"vyborg\",\"PGV\"]},{\"id\":727,\"name\":\"Rezerv 43-y Armii\",\"alias\":[\"43\",\"43RA\"]},{\"id\":433,\"name\":\"1 Blindată \\\"Romania Mare\\\"\",\"alias\":[\"Blindata\"]},{\"id\":643,\"name\":\"1. Fallschirmjäger\",\"alias\":[\"1FSJ\"]},{\"id\":140,\"name\":\"1. Lovas\",\"alias\":[\"Lovas\"]},{\"id\":259,\"name\":\"1. Skijäger\",\"alias\":[\"1SJ\"]},{\"id\":626,\"name\":\"3. Fallschirmjäger\",\"alias\":[\"3FSJ\"]},{\"id\":434,\"name\":\"4 Munte\",\"alias\":[\"Munte\"]},{\"id\":71,\"name\":\"5. Panzer\",\"alias\":[\"5Pz\"]},{\"id\":435,\"name\":\"5 Cavalerie Motorizată\",\"alias\":[\"5Cav\"]},{\"id\":262,\"name\":\"5. SS-Panzer \\\"Wiking\\\"\",\"alias\":[\"5SSPz\",\"5ss\"]},{\"id\":636,\"name\":\"11. SS-Freiwilligen Panzergrenadier “Nordland”\",\"alias\":[\"11SSPG\",\"11ss\"]},{\"id\":623,\"name\":\"12. SS-Panzer \\\"Hitlerjugend\\\"\",\"alias\":[\"12SSPz\",\"12ss\"]},{\"id\":141,\"name\":\"12. Tartalék\",\"alias\":[\"Tartalek\"]},{\"id\":149,\"name\":\"14. Infanterie\",\"alias\":[\"14ID\"]},{\"id\":430,\"name\":\"16. Panzer\",\"alias\":[\"16Pz\"]},{\"id\":624,\"name\":\"17. SS-Panzergrenadier \\\"Götz von B.\\\"\",\"alias\":[\"17SSPG\",\"17SS\"]},{\"id\":135,\"name\":\"20. Panzer\",\"alias\":[\"20Pz\"]},{\"id\":637,\"name\":\"20. Panzergrenadier\",\"alias\":[\"20PG\"]},{\"id\":155,\"name\":\"21. Panzer\",\"alias\":[\"21Pz\"]},{\"id\":269,\"name\":\"25. Panzergrenadier\",\"alias\":[\"25PG\"]},{\"id\":136,\"name\":\"28. Jäger\",\"alias\":[\"28Jag\"]},{\"id\":726,\"name\":\"52. Sicherungs-Division z.b.V\",\"alias\":[\"52SD\"]},{\"id\":137,\"name\":\"78. Sturm\",\"alias\":[\"78Sturm\"]},{\"id\":154,\"name\":\"116. Panzer\",\"alias\":[\"116Pz\"]},{\"id\":356,\"name\":\"122. Infanterie\",\"alias\":[\"122ID\"]},{\"id\":156,\"name\":\"352. Infanterie\",\"alias\":[\"]352ID\"]},{\"id\":263,\"name\":\"Fallschirm-Panzer \\\"Hermann Göring\\\"\",\"alias\":[\"FPzHG\"]},{\"id\":138,\"name\":\"Gruppe Harteneck\",\"alias\":[\"GH\"]},{\"id\":139,\"name\":\"Korück 559\",\"alias\":[\"Koruck\"]},{\"id\":350,\"name\":\"Panssaridivisioona\",\"alias\":[\"FINPz\"]},{\"id\":638,\"name\":\"Panzergrenadier \\\"Grossdeutschland\\\"\",\"alias\":[\"PGG\",\"wiabu\"]},{\"id\":157,\"name\":\"Panzer Lehr\",\"alias\":[\"PzLehr\"]},{\"id\":419,\"name\":\"Panzerverband Strachwitz\",\"alias\":[\"pig\",\"piggy\"]},{\"id\":354,\"name\":\"Ryhmä Raappana\",\"alias\":[\"Raappana\"]}] side: "}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
+{"level":"info","message":"Committing replay: 220509a0:1a4f32b3:94231183:d79d8035"}
+{"level":"info","message":"This game is unranked"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1442542,\"playerName\":\"Roguish Tiger\",\"globalElo\":1468.736306793522,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":1468.736306793522,\"channelElo\":1484}"}
+{"level":"info","message":"getElos Fetched: {\"eugenId\":1295875,\"playerName\":\"colcol\",\"globalElo\":1500,\"pickBanGlobalElo\":1500,\"channelId\":\"815812582656180278\",\"serverId\":\"815812582656180274\",\"serverElo\":null,\"channelElo\":null}"}
+{"level":"info","message":"Starting Bot"}
+{"level":"info","message":"Starting healthcheck server on 8080"}
+{"level":"info","message":"HTTP server started on 8080"}
+{"level":"info","message":"Bot Online!"}
