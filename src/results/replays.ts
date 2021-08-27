@@ -182,6 +182,7 @@ export class Replays {
             if (g.players.length == 2){
                 const winnersLength = winners.length
                 const losersLength = loosers.length
+<<<<<<< HEAD
                 if (winnersLength < 20){
                     for(let i = winnersLength; i < 20; i++){    
                     winners = winners.concat("+")
