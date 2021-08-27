@@ -51,10 +51,10 @@ export class Replays {
                     const playerid = player.name
                     if (g.players.length == 2){
                         if (g.ingamePlayerId == player.alliance){
-                            loosers += playerid + "\n"
+                            loosers += playerid
                             looserList.push(player)
                         }else{
-                            winners += playerid + "\n"
+                            winners += playerid
                             winnerList.push(player)
                         }
                     }  
@@ -111,10 +111,10 @@ export class Replays {
                     const playerid = player.name
                     if (g.players.length == 2){
                         if (g.ingamePlayerId != player.alliance){
-                            loosers += playerid + "\n"
+                            loosers += playerid
                             looserList.push(player)
                         }else{
-                            winners += playerid + "\n"
+                            winners += playerid
                             winnerList.push(player)
                         }
                     }  
@@ -178,6 +178,26 @@ export class Replays {
                     RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,3)
                 }
             }
+            // For 1v1 Adjust Winner & Losers Fields to be same length
+            if (g.players.length == 2){
+                const winnersLength = winners.length
+                const losersLength = loosers.length
+                if (winnersLength < 22){
+                    for(let i = winnersLength; i < 22; i++){    
+                    winners = winners.concat("+")
+                    }
+                }else{
+                    winners = winners.substring(0, 22)
+                }
+                if (losersLength < 22){
+                    for(let i = losersLength; i < 22; i++){ 
+                    loosers = loosers.concat("+")
+                    }
+                }else{
+                    loosers = loosers.substring(0, 22)
+                }
+            }
+
             // Create embed header
             let embed = new MessageEmbed()
                 .setTitle(g.serverName)
