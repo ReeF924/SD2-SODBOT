@@ -182,19 +182,19 @@ export class Replays {
             if (g.players.length == 2){
                 const winnersLength = winners.length
                 const losersLength = loosers.length
-                if (winnersLength < 20){
-                    for(let i = winnersLength; i < 20; i++){    
-                    winners = winners.concat("+")
+                if (winnersLength < 19){
+                    for(let i = winnersLength; i < 19; i++){    
+                    winners = winners.concat("-")
                     }
                 }else{
-                    winners = winners.substring(0, 20)
+                    winners = winners.substring(0, 19)
                 }
                 if (losersLength < 20){
-                    for(let i = losersLength; i < 20; i++){ 
-                    loosers = loosers.concat("+")
+                    for(let i = losersLength; i < 19; i++){ 
+                    loosers = loosers.concat("-")
                     }
                 }else{
-                    loosers = loosers.substring(0, 20)
+                    loosers = loosers.substring(0, 19)
                 }
             }
 
