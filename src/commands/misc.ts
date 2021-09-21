@@ -17,7 +17,6 @@ export class MiscCommand {
         "Another miss! Your aim is like Gonzo's analysis....lacking",
         "Miss! This piat is rubbish, just use your Sherman",
         "Miss! Just side shot it bro",
-        "Miss! I know you will try again, like proto who always came back for another shot",
         "Miss! You cabbage, aim straight next time",
         "Hit! He's Burning",
         "Hit! Jerry's in trouble now",
@@ -27,19 +26,22 @@ export class MiscCommand {
         "Hit! There are few things more fundamentally encouraging and stimulating than seeing someone else die.",
         "Hit! Payback’s a bitch and her stripper name is Karma",
         "Hit! Ideals are peaceful. History is violent.",
-        "Hit! In war there are no prizes for runner-up",
         "Hit! It's better to stand and fight. If you run, you'll only die tired.",
         "Hit! Any problem caused by a tank can be solved by a piat",
         "Hit! Who needs a 0.50cal if you have the mighty piat!",
         "Hit! I hope that after fighting a million battles in the same location for years now, the SD2 gods can create new maps for us mortals to explore.",
         "Hit! You cannot hide from me Jerry, even under the sea isn't safe",
-        "Hit! Score one to me, Nilla for you.",
         "Hit! Jack be nimble, Jack be quick, Jack claps your Panther tank!",
         "Hit! That is a mighty fine Hungarian helmet you are wearing there sir.",
         "Hit! Oh no, spiced ham is on the menu again.",
         "Hit! Is that a Sturmpistole in your pocket or are you just happy to see me.",
         "Hit! Ke mahi te tawa uho ki te riri.",
         "Hit! Śmierć wrogom ojczyzny",
+        "Hit, I am so bad at this, only my fourth panther destroyed today",
+        "Hit, piat goes brrrrrrrrrrrrr",
+        "Miss!, keep practicing, one day you might be able to least 10mins with Nilla",
+        "Hit! Finally it’s the piat meta",
+        "Hit! Lets dance I will show you how to tango you hobo",
         "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
@@ -61,7 +63,11 @@ export class MiscCommand {
         "Hit! Oh no, there are PRTD squads in our rear",
         "Hit! In the silence of the night, we will always hear the screams.",
         "Miss! Maybe you need the piat instead",
-        "Hit! Only the dead have seen the end of war"
+        "Hit! Only the dead have seen the end of war",
+        "Hit! In war there are no prizes for runner-up",
+        "Hit!, Another cheese platter sir",
+        "Hit!, sneaky sneaky you little ptrd squad",
+        "Hit!, hi ho hi ho a transport sniping we go"
       ];
 
 
