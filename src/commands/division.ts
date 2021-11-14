@@ -44,21 +44,25 @@ export class DivisionCommand {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static allDivs(message:Message,input:string[]):void {        
-        let embed = new MessageEmbed().setTitle("-- All Divisions --")
         let allieddivs = "";
         let axisdivs = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
-            if(divisions.divisionsAllies[i]) allieddivs  += divisions.divisionsAllies[i].name + ` [ ${divisions.divisionsAllies[i].alias[0]} ]\n`;
+            if(divisions.divisionsAllies[i]) allieddivs  += divisions.divisionsAllies[i].name + '\n';
             //if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
-            if(divisions.divisionsAxis[i]) axisdivs += divisions.divisionsAxis[i].name + ` [ ${divisions.divisionsAxis[i].alias[0]} ]\n`;
+            if(divisions.divisionsAxis[i]) axisdivs += divisions.divisionsAxis[i].name + '\n';
+        
             //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
         }
-        embed = embed.addFields(
-            {name:"Allied Divisions   [Alias]", value: allieddivs,inline:true},
-            {name:'\u200b', value:'\u200b',inline:false},
-            {name:"Axis Divisions   [Alias]", value: axisdivs,inline:true},
+        let alliedembed = new MessageEmbed().setTitle("-- All Divisions --")
+        alliedembed = alliedembed.addFields(
+            {name:"Allied Divisions", value: allieddivs,inline:true},
             )
-        message.channel.send(embed);
+        message.channel.send(alliedembed);
+        let axisembed = new MessageEmbed()
+        axisembed = axisembed.addFields(
+            {name:"Axis Divisions", value: axisdivs,inline:true},
+            )
+        message.channel.send(axisembed);
 
     }
 
