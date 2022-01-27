@@ -9,21 +9,19 @@ import { map } from "mssql";
 export class MapCommand {
     static bans:Map<string,Map<string,boolean>> = new Map<string,Map<string,boolean>>() ; // 2d array of playerIds to banned divisions.
 
-    static burningBalticsMaps = [
-"Bobr",
-"Haroshaje",
-"Krupa",
-"Orsha East",
-"Orsha North",
-"Shchedrin",
-"Sianno",
-"Siedlce",
-"Slutsk",
-"Slutsk east",
-"Slutsk west",
-"Tali Ihantala",
-"Tsel",
+    static warnoMaps = [
+        "Death Row",
+        "Two Way (Deux Couloirs)"
     ]
+
+    static warnoMaps3v3 = [
+        "Danger Hills"    
+    ]
+
+    static warnoMaps4v4  = [
+        "Chemical"
+    ]
+
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message:Message,input:string[]):void {
         
@@ -40,7 +38,11 @@ export class MapCommand {
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
-                case "bb": maplist = MapCommand.burningBalticsMaps; pickCount = 3; break;
+                case "warno": maplist = MapCommand.warnoMaps; break;
+                case "warno 1v1": maplist = MapCommand.warnoMaps; break;
+                case "warno 2v2": maplist = MapCommand.warnoMaps; break;
+                case "warno 3v3": maplist = MapCommand.warnoMaps3v3; break;
+                case "warno 4v4": maplist = MapCommand.warnoMaps4v4; break;
                 
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                 return
