@@ -70,6 +70,23 @@ export class MiscCommand {
         "Hit!, hi ho hi ho a transport sniping we go"
       ];
 
+      static sodbotReplies3 = [
+        "Hit! Target destroyed!",
+        "Hit! We blew him away",
+        "Hit! They drew first blood!",
+        "Hit! Don't push it or I'll give you a war you won't believe.",
+        "Hit! I want them to know that death is coming, and there is nothing they can do to stop it.",
+        "Hit! Old men start it, young men fight It, nobody wins, everybody in the middle dies, and nobody tells the truth!",
+        "Hit! Live for nothing or die for something.",
+        "Hit! I like the smell of napalm in the morning. It smells like... victory.",
+        "Hit! Terminate... with extreme prejudice.",
+        "Miss! You can either surf, or you can fight!",
+        "Miss! I am sick and tired of filling body bags with your dumb fucking mistakes.",
+        "Hit! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
+        "Miss! Come one Marine, you can do better than that",
+        "Hit! Every war is different, every war is the same", 
+      ];
+
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static flip(message: Message, input: string[]): void {
@@ -169,6 +186,24 @@ export class MiscCommand {
         }
     }
 
+    static laws(message: Message, input: string[]): void {
+        const name = message.author.username;
+        const k = Math.random();
+        const i = Math.random();
+        if (i > 0.80){
+            MsgHelper.reply(
+                message,
+                MiscCommand.sodbotReplies2[Math.floor(Math.random() * MiscCommand.sodbotReplies3.length)],
+                true
+            );
+        } else  {
+            MsgHelper.reply(message, "Miss!");
+            return;
+        }
+    }
+
+
+
     static deck(message: Message, input: string[]): void {
         let embed = new MessageEmbed();
         if(String.length > 0){
@@ -240,6 +275,7 @@ export class MiscCommandHelper {
         bot.registerCommand("help", MiscCommand.help);
         bot.registerCommand("piat",MiscCommand.piat);
         bot.registerCommand("ptrd",MiscCommand.ptrd);
+        bot.registerCommand("laws",MiscCommand.laws);
         bot.registerCommand("deck",MiscCommand.deck);
         bot.registerCommand("info",MiscCommand.info);
     }
