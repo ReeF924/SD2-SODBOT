@@ -17,12 +17,13 @@ export class DivisionCommand {
             divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
         }else{
             const side = input[0].toLowerCase();
-            if (side !== "axis" && side !== "allies") {
-                MsgHelper.reply(message, "Unknown side, please specify 'axis' or 'allies' as a side if you want to pick a side.");
+            if (side !== "axis" && side !== "allies" && side !== "warno") {
+                MsgHelper.reply(message, "Unknown faction, please specify 'axis' or 'allies' or 'warno' as a faction if you want to pick a certain faction or choose a warno division.");
                 return;
             }
             if(side == "allies") divs = divisions.divisionsAllies;
             if(side == "axis") divs = divisions.divisionsAxis;
+            if(side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
         }
         //check for bans
         if(DivisionCommand.bans[message.member.id]){
