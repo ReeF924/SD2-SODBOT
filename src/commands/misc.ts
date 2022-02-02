@@ -83,7 +83,7 @@ export class MiscCommand {
         "Miss! You can either surf, or you can fight!",
         "Miss! I am sick and tired of filling body bags with your dumb fucking mistakes.",
         "Hit! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
-        "Miss! Come one Marine, you can do better than that",
+        "Miss! Come on Marine, you can do better than that",
         "Hit! Every war is different, every war is the same", 
       ];
 
