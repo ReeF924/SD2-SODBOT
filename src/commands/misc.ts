@@ -41,7 +41,7 @@ export class MiscCommand {
         "Hit, piat goes brrrrrrrrrrrrr",
         "Hit, Jai Mahakali, Ayo Gorkhali!",
         "Miss!, keep practicing, one day you might be able to least 10mins with Nilla",
-        "Hit! Finally it’s the piat meta",
+        "Hit! Finally it is the piat meta", 
         "Hit! Lets dance I will show you how to tango you hobo",
         "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
