@@ -83,9 +83,12 @@ export class MiscCommand {
         "Hit! Terminate... with extreme prejudice.",
         "Miss! You can either surf, or you can fight!",
         "Miss! I am sick and tired of filling body bags with your dumb fucking mistakes.",
-        "Hit! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
+        "Miss! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
         "Miss! Come on Marine, you can do better than that",
         "Hit! Every war is different, every war is the same", 
+        "Hit! To survive war you gotta become war",
+        "Hit!  I eat Green Berets for breakfast. And right now, I'm very hungry!",
+        "Hit! A strange game, the only winning move is to not play"
       ];
 
 
