@@ -39,6 +39,7 @@ export class MiscCommand {
         "Hit! Śmierć wrogom ojczyzny",
         "Hit, I am so bad at this, only my fourth panther destroyed today",
         "Hit, piat goes brrrrrrrrrrrrr",
+        "Hit, Jai Mahakali, Ayo Gorkhali!",
         "Miss!, keep practicing, one day you might be able to least 10mins with Nilla",
         "Hit! Finally it’s the piat meta",
         "Hit! Lets dance I will show you how to tango you hobo",
