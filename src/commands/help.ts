@@ -71,11 +71,11 @@ export class HelpCommand {
                 inline: false },
             { 
                 name: "$rmap XXX", 
-                value: "In addition to $rmap you can also add the following arguments 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories", 
+                value: "In addition to $rmap you can also add the following arguments warno, 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories or warno 1v1 maps", 
                 inline: false },
             { 
                 name: "$maps  or  $allmaps", 
-                value: "Returns a list of all the current maps\nIf a map is currently banned this will be indicated by its name being struck out.", 
+                value: "Returns a list of all the current sd2 maps\nIf a map is currently banned this will be indicated by its name being struck out.", 
                 inline: false },
             { 
                 name: "$banmaps", 
@@ -129,8 +129,8 @@ export class HelpCommand {
         const embed = new MessageEmbed()
         .setTitle("Help - Misc Commands")
         .addFields([
-            {   name: "$piat or $ptrd", 
-                value: "FIRE the Piat or PTRD.   Can you get a Hit?",
+            {   name: "$piat or $ptrd or $laws", 
+                value: "FIRE the Piat, PTRD or LAWS.   Can you get a Hit, find the secret messages?",
              inline: false },
             {   name: "$info", 
                 value: "Shows info about the bot.",

@@ -39,6 +39,10 @@ export class Replays {
             else if(g.version < 51345){
                 MsgHelper.say(message,"This replay is from a older version of the game and won't be used in ELO Calcs")
             }
+            else if(g.version > 66400){
+                MsgHelper.say(message,"This replay is from WARNO and will not be used in ELO Calcs at this time")
+            }
+
             //determine who won and lost, calculate ELO
             let winners = ""
             let loosers = ""
