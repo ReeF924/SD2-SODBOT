@@ -98,7 +98,7 @@ export class DiscordBot {
         if (message.author.id === "621269621823111182") {
             const user = message.author;
             if(message.content.includes('bad player') || message.content.includes('awful player') || message.content.includes('terrible player') || message.content.includes('a rookie')) {
-                message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a know understater, approach with caution.`)
+                message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a known understater, approach with caution!`)
                }
             
         }
