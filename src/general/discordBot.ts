@@ -92,6 +92,18 @@ export class DiscordBot {
                 }
             }
         }
+
+        // Check for certain message from certain players
+        // Checks for posts from Roguish Tiger
+        if (message.author.id === "687898043005272096") {
+            if(message.content.includes('bad player')) {
+                message.reply('WARNING....SODBOT has detected a player grossly underestimating their abilities.')
+               }
+            
+        }
+
+
+
     }
 
     private async onReady(){
