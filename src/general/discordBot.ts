@@ -97,7 +97,7 @@ export class DiscordBot {
         // Checks for posts from Roguish Tiger
         if (message.author.id === "687898043005272096") {
             const user = message.author;
-            if(message.content.includes('bad player' || 'a rookie')) {
+            if(message.content.includes('bad player') || message.content.includes('a rookie')) {
                 message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a know understater, approach with caution.`)
                }
             
