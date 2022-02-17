@@ -97,12 +97,20 @@ export class DiscordBot {
         // Checks for posts from QuadU
         if (message.author.id === "621269621823111182") {
             const user = message.author;
-            if(message.content.includes('bad player') || message.content.includes('awful player') || message.content.includes('terrible player') || message.content.includes('a rookie')) {
+            if(message.content.includes('bad player') || message.content.includes('BAD PLAYER') || message.content.includes('awful player') || message.content.includes('terrible player') || message.content.includes('a rookie')) {
                 message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a known understater, approach with caution!`)
                }
-            
+
+            if(message.content.includes('I m a') || message.content.includes('I M A') || message.content.includes('IM A') || message.content.includes('I m a') || message.content.includes('I am')) {
+                message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user}, you are not trying to dodge me are you?`)
+               }            
         }
 
+        // Check for other people helping UUUUU
+        if(message.content.includes('UUUU is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
+            const user = message.author;
+            message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating another player's abilities. ${user} although QuadU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
+        }
 
 
     }
