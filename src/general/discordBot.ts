@@ -107,7 +107,7 @@ export class DiscordBot {
         }
 
         // Check for other people helping UUUUU
-        if(message.content.includes('UUUU is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
+        if(message.content.includes('UUUU is a bad player') || message.content.includes('uuuu is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
             const user = message.author;
             message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating another player's abilities. ${user} although QuadU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
         }
