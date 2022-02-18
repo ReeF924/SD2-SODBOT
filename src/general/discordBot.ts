@@ -101,7 +101,7 @@ export class DiscordBot {
                 message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a known understater, approach with caution!`)
                }
 
-            if(message.content.includes('I m a') || message.content.includes('I M A') || message.content.includes('IM A') || message.content.includes('I m a') || message.content.includes('I am')) {
+            if(message.content.includes('I m a') || message.content.includes('I M A') || message.content.includes('I m the') || message.content.includes('IM A') || message.content.includes('I m a') || message.content.includes('I am')) {
                 message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user}, you are not trying to dodge me are you?`)
                }            
         }
