@@ -98,12 +98,12 @@ export class AdminCommand {
                     prem = {
                         id: input[0],
                         name:(channel as GuildChannel).name,
-                        blockElo: 0,
-                        blockCommands: 0,
-                        blockReplay: 0,
-                        blockChannelElo: 0,
-                        blockServerElo: 0,
-                        blockGlobalElo: 0
+                        blockElo: -1,
+                        blockCommands: -1,
+                        blockReplay: -1,
+                        blockChannelElo: -1,
+                        blockServerElo: -1,
+                        blockGlobalElo: -1
                     }
                 }
                 // Update the settings
@@ -162,12 +162,12 @@ export class AdminCommand {
             let prem = {
                 id: input[0],
                 name:(channel as GuildChannel).name,
-                blockElo: 0,
-                blockCommands: 0,
-                blockReplay: 0,
-                blockChannelElo: 0,
-                blockServerElo: 0,
-                blockGlobalElo: 0
+                blockElo: -1,
+                blockCommands: -1,
+                blockReplay: -1,
+                blockChannelElo: -1,
+                blockServerElo: -1,
+                blockGlobalElo: -1
             }
             await SqlHelper.setChannelPermissions(prem);
             MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been reset back to default settings.")
