@@ -23,7 +23,7 @@ export class DivisionCommand {
             }
             if(side == "allies") divs = divisions.divisionsAllies;
             if(side == "axis") divs = divisions.divisionsAxis;
-            //if(side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
+            if(side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
         }
         //check for bans
         if(DivisionCommand.bans[message.member.id]){
