@@ -107,7 +107,17 @@ export class DiscordBot {
             else if(message.content.includes('I m bad') || message.content.includes('I M BAD') || message.content.includes('Im bad') || message.content.includes('IM BAD') || message.content.includes('I am bad') || message.content.includes('I am bad')) {
                 message.channel.send(`B-B-B-B-Bad to the bone, when he walks the streets Kings and Queens step aside. ${user} is bad to the bone`)
                }            
-        }
+            else if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+                message.channel.send(`Sorry is this another UUUU that you speak of? ${user} is certainly not a bad player but there could be a false UUUU out there.`)
+               }
+            else {
+                const user = message.author;
+                const i = Math.random();
+                if (i > 0.90){
+                message.channel.send(`Just a reminder that in fact, ${user} is a very good player, not quite as good as Gonzo, he does seem to lose to him a lot but pretty good none the less.`)
+                }
+               }   
+        }   
 
         // Check for other people helping UUUUU
         if(message.content.includes('UUUU is a bad player') || message.content.includes('uuuu is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
@@ -115,9 +125,19 @@ export class DiscordBot {
             message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating another player's abilities. ${user} although QuadU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
         }
 
+        if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+            const user = message.author;
+            message.channel.send(`${user} although UUUU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
+        }
+
+        if((message.author.id != "621269621823111182") && (message.content.includes('I am') || message.content.includes('Im')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+            const user = message.author;
+            message.channel.send(`I am sorry ${user} but it just might be that you are indeed a Bad player!`)
+        }
+
 
         // Check for Knight in name
-        if(message.author.username.includes('Knight') || message.author.username.includes('Peasant')){
+        if(message.author.username.includes('Knight') || message.author.username.includes('knight') || message.author.username.includes('knight') || message.author.username.includes('Peasant')){
             const revolution = [
                 "Throw off your yoke of oppression, rise and take up arms against this false King",
                 "Is this King you serve a friend or tyrant? How long before he takes your lands that he dangles before you",
