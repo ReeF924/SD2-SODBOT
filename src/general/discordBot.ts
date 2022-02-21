@@ -107,9 +107,9 @@ export class DiscordBot {
             else if(message.content.includes('I m bad') || message.content.includes('I M BAD') || message.content.includes('Im bad') || message.content.includes('IM BAD') || message.content.includes('I am bad') || message.content.includes('I am bad')) {
                 message.channel.send(`B-B-B-B-Bad to the bone, when he walks the streets Kings and Queens step aside. ${user} is bad to the bone`)
                }            
-            else if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
-                message.channel.send(`Sorry is this another UUUU that you speak of? ${user} is certainly not a bad player but there could be a false UUUU out there.`)
-               }
+            //else if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+            //    message.channel.send(`Sorry is this another UUUU that you speak of? ${user} is certainly not a bad player but there could be a false UUUU out there.`)
+            //   }
             //else {
             //    const user = message.author;
             //    const i = Math.random();
