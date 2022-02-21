@@ -95,18 +95,18 @@ export class DiscordBot {
 
         // Check for certain message from certain players
         // Checks for posts from QuadU
-        if (message.author.id === "621269621823111182") {
-            const user = message.author;
-            if(message.content.includes('bad player') || message.content.includes('BAD PLAYER') || message.content.includes('awful player') || message.content.includes('terrible player') || message.content.includes('a rookie')) {
-                message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a known understater, approach with caution!`)
-               }
-
-            else if(message.content.includes('I m a') || message.content.includes('I M A') || message.content.includes('I m the') || message.content.includes('IM A') || message.content.includes('I m a') || message.content.includes('I am')) {
-                message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user}, you are not trying to dodge me are you?`)
-               }  
-            else if(message.content.includes('I m bad') || message.content.includes('I M BAD') || message.content.includes('Im bad') || message.content.includes('IM BAD') || message.content.includes('I am bad') || message.content.includes('I am bad')) {
-                message.channel.send(`B-B-B-B-Bad to the bone, when he walks the streets Kings and Queens step aside. ${user} is bad to the bone`)
-               }            
+        //if (message.author.id === "621269621823111182") {
+        //    const user = message.author;
+        //    if(message.content.includes('bad player') || message.content.includes('BAD PLAYER') || message.content.includes('awful player') || message.content.includes('terrible player') || message.content.includes('a rookie')) {
+        //        message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user} is a known understater, approach with caution!`)
+        //       }
+        //
+        //    else if(message.content.includes('I m a') || message.content.includes('I M A') || message.content.includes('I m the') || message.content.includes('IM A') || message.content.includes('I m a') || message.content.includes('I am')) {
+        //        message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating their abilities. ${user}, you are not trying to dodge me are you?`)
+        //       }  
+        //    else if(message.content.includes('I m bad') || message.content.includes('I M BAD') || message.content.includes('Im bad') || message.content.includes('IM BAD') || message.content.includes('I am bad') || message.content.includes('I am bad')) {
+        //        message.channel.send(`B-B-B-B-Bad to the bone, when he walks the streets Kings and Queens step aside. ${user} is bad to the bone`)
+        //       }            
             //else if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
             //    message.channel.send(`Sorry is this another UUUU that you speak of? ${user} is certainly not a bad player but there could be a false UUUU out there.`)
             //   }
@@ -117,7 +117,7 @@ export class DiscordBot {
             //    message.channel.send(`Just a reminder that in fact, ${user} is a very good player, not quite as good as Gonzo, he does seem to lose to him a lot but pretty good none the less.`)
             //    }
             // }   
-        }   
+        //}   
 
         // Check for other people helping UUUUU
         //if(message.content.includes('UUUU is a bad player') || message.content.includes('uuuu is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
