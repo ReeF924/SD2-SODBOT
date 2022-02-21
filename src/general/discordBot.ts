@@ -110,13 +110,13 @@ export class DiscordBot {
             else if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
                 message.channel.send(`Sorry is this another UUUU that you speak of? ${user} is certainly not a bad player but there could be a false UUUU out there.`)
                }
-            else {
-                const user = message.author;
-                const i = Math.random();
-                if (i > 0.90){
-                message.channel.send(`Just a reminder that in fact, ${user} is a very good player, not quite as good as Gonzo, he does seem to lose to him a lot but pretty good none the less.`)
-                }
-               }   
+            //else {
+            //    const user = message.author;
+            //    const i = Math.random();
+            //    if (i > 0.90){
+            //    message.channel.send(`Just a reminder that in fact, ${user} is a very good player, not quite as good as Gonzo, he does seem to lose to him a lot but pretty good none the less.`)
+            //    }
+            //   }   
         }   
 
         // Check for other people helping UUUUU
