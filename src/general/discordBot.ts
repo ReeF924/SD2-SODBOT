@@ -116,45 +116,45 @@ export class DiscordBot {
             //    if (i > 0.90){
             //    message.channel.send(`Just a reminder that in fact, ${user} is a very good player, not quite as good as Gonzo, he does seem to lose to him a lot but pretty good none the less.`)
             //    }
-            //   }   
+            // }   
         }   
 
         // Check for other people helping UUUUU
-        if(message.content.includes('UUUU is a bad player') || message.content.includes('uuuu is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
-            const user = message.author;
-            message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating another player's abilities. ${user} although QuadU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
-        }
+        //if(message.content.includes('UUUU is a bad player') || message.content.includes('uuuu is a bad player') || message.content.includes('UUUU IS A BAD PLAYER') || message.content.includes('UUUU is a awful player') || message.content.includes('UUUU is a terrible player') || message.content.includes('UUUU is a rookie')) {
+        //    const user = message.author;
+        //    message.channel.send(`WARNING....SODBOT has detected a player grossly underestimating another player's abilities. ${user} although QuadU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
+        //}
 
-        if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
-            const user = message.author;
-            message.channel.send(`${user} although UUUU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
-        }
+        //if((message.content.includes('UUUU') || message.content.includes('uuuu')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+        //    const user = message.author;
+        //    message.channel.send(`${user} although UUUU may be the best of the worst players, he certainly is not the baddest of the bad players.`)
+        //}
 
-        if((message.author.id != "621269621823111182") && (message.content.includes('I am') || message.content.includes('Im')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
-            const user = message.author;
-            message.channel.send(`I am sorry ${user} but it just might be that you are indeed a Bad player!`)
-        }
+        //if((message.author.id != "621269621823111182") && (message.content.includes('I am') || message.content.includes('Im')) && (message.content.includes('player') || message.content.includes('PLAYER')) ) {
+        //    const user = message.author;
+        //    message.channel.send(`I am sorry ${user} but it just might be that you are indeed a Bad player!`)
+        //}
 
 
         // Check for Knight in name
-        if(message.author.username.includes('Knight') || message.author.username.includes('knight') || message.author.username.includes('knight') || message.author.username.includes('Peasant')){
-            const revolution = [
-                "Throw off your yoke of oppression, rise and take up arms against this false King",
-                "Is this King you serve a friend or tyrant? How long before he takes your lands that he dangles before you",
-                "He promises Lenina and has you dance upon his whim, all the while keeping the rich Orshas to himself, who is this who calls himself King",
-                "I have heard this self appointed King is soon to be leaving for a tour of the countryside, no better time to strengthen you position, after all if he can appoint himself King maybe you can too",
-                "Maybe time to sharpen the guillotine",
-                "You grub around in the soil to put food upon his table, what right is he to command thee, rise up and throw off this unjust oppression",
-                "Today you obey Kings and bend the knee to emperors, yet you only need to kneel to truth",
-                "How long will you suffer this subjugation from this King Of Noobs",
-                "The people must rise in protest from this tyranny, the only good king is a dead king"
-              ];        
-            const user = message.author;
-            const i = Math.random();
-            if (i > 0.80){
-                message.channel.send(revolution[Math.floor(Math.random() * revolution.length)])
-            }
-        }
+        //if(message.author.username.includes('Knight') || message.author.username.includes('knight') || message.author.username.includes('knight') || message.author.username.includes('Peasant')){
+        //    const revolution = [
+        //        "Throw off your yoke of oppression, rise and take up arms against this false King",
+        //        "Is this King you serve a friend or tyrant? How long before he takes your lands that he dangles before you",
+        //        "He promises Lenina and has you dance upon his whim, all the while keeping the rich Orshas to himself, who is this who calls himself King",
+        //        "I have heard this self appointed King is soon to be leaving for a tour of the countryside, no better time to strengthen you position, after all if he can appoint himself King maybe you can too",
+        //        "Maybe time to sharpen the guillotine",
+        //        "You grub around in the soil to put food upon his table, what right is he to command thee, rise up and throw off this unjust oppression",
+        //        "Today you obey Kings and bend the knee to emperors, yet you only need to kneel to truth",
+        //        "How long will you suffer this subjugation from this King Of Noobs",
+        //        "The people must rise in protest from this tyranny, the only good king is a dead king"
+        //      ];        
+        //    const user = message.author;
+        //    const i = Math.random();
+        //    if (i > 0.80){
+        //        message.channel.send(revolution[Math.floor(Math.random() * revolution.length)])
+        //    }
+        //}
 
     }
 
