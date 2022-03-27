@@ -11,15 +11,18 @@ export class MapCommand {
 
     static warnoMaps = [
         "Death Row",
-        "Two Way"
+        "Two Way",
+        "Two Lakes"
     ]
 
     static warnoMaps3v3 = [
-        "Danger Hills"    
+        "Danger Hills",
+        "Mount River"    
     ]
 
     static warnoMaps4v4  = [
-        "Chemical"
+        "Chemical",
+        "Geisa"
     ]
 
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
