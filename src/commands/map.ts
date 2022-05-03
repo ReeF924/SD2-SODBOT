@@ -12,7 +12,8 @@ export class MapCommand {
     static warnoMaps = [
         "Death Row",
         "Two Way",
-        "Two Lakes"
+        "Two Lakes",
+        "Black Forest"
     ]
 
     static warnoMaps3v3 = [
@@ -22,6 +23,8 @@ export class MapCommand {
 
     static warnoMaps4v4  = [
         "Chemical",
+        "Iron Waters",
+        "Loop",
         "Geisa"
     ]
 
