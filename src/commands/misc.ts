@@ -193,10 +193,10 @@ export class MiscCommand {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.80){
+        if (i > 0.70){
             MsgHelper.reply(
                 message,
-                MiscCommand.sodbotReplies2[Math.floor(Math.random() * MiscCommand.sodbotReplies3.length)],
+                MiscCommand.sodbotReplies3[Math.floor(Math.random() * MiscCommand.sodbotReplies3.length)],
                 true
             );
         } else  {
