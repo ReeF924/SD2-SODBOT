@@ -13,12 +13,14 @@ export class MapCommand {
         "Death Row",
         "Two Way",
         "Two Lakes",
-        "Black Forest"
+        "Black Forest", 
+        "Vertigo"
     ]
 
     static warnoMaps3v3 = [
         "Danger Hills",
-        "Mount River"    
+        "Mount River",
+        "Triple Strike"    
     ]
 
     static warnoMaps4v4  = [
