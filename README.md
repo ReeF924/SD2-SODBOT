@@ -19,3 +19,9 @@ This bot is fan made and has no affiliation with Eugen Systems.
 ✖ How to install/run in README
 
 
+## Discord Bot Setup
+
+Mange your bot here: https://discord.com/developers/
+Set the BOT token in .env
+
+View .env.example as a guideline

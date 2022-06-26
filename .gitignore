@@ -29,4 +29,14 @@ src/Output.txt
 src/resultsDB.db
 src/config.json
 
+<<<<<<< Updated upstream
 coverage/
+=======
+coverage/
+config.json
+app.log
+
+.env
+
+.package-lock.json
+>>>>>>> Stashed changes

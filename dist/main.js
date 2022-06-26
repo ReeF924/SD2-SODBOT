@@ -1,0 +1,38 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
+var division_1 = require("./commands/division");
+var map_1 = require("./commands/map");
+var misc_1 = require("./commands/misc");
+var help_1 = require("./commands/help");
+var player_1 = require("./commands/player");
+var admin_1 = require("./commands/admin");
+var common_1 = require("./general/common");
+var discordBot_1 = require("./general/discordBot");
+var smp = require("source-map-support");
+var http = require("http");
+var logs_1 = require("./general/logs");
+var db_1 = require("./general/db");
+var api_1 = require("./api/api");
+smp.install();
+common_1.CommonUtil.init();
+db_1.DB.init();
+logs_1.Logs.log("Starting Bot");
+var bot = new discordBot_1.DiscordBot();
+division_1.DivisionCommandHelper.addCommands(bot);
+misc_1.MiscCommandHelper.addCommands(bot);
+map_1.MapCommandHelper.addCommands(bot);
+help_1.HelpCommandHelper.addCommands(bot);
+player_1.PlayerCommandHelper.addCommands(bot);
+admin_1.AdminCommandHelper.addCommands(bot);
+bot.login();
+var healthcheck = http.createServer(function (req, res) {
+    logs_1.Logs.log(req);
+    res.write("pong");
+    res.end();
+});
+logs_1.Logs.log("Starting healthcheck server on 8080");
+//healthcheck.listen(8080);
+var api = new api_1.API();
+api.start();
+//# sourceMappingURL=main.js.map
