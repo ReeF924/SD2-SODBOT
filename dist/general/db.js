@@ -595,12 +595,15 @@ var DB = /** @class */ (function () {
     DB.init = function () {
         console.log("DB initialized");
     };
+    // Returns 0 for new replay and 1 for existing replay
     DB.setReplay = function (message, replay) {
         return __awaiter(this, void 0, void 0, function () {
-            var replayData;
+            var existing, replayData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
+                    case 0: return [4 /*yield*/, replayStore.find({ uuid: replay.uniqueSessionId })];
+                    case 1:
+                        existing = _a.sent();
                         replayData = {
                             discordId: message.author.id,
                             serverId: message.guild.id,
@@ -609,12 +612,12 @@ var DB = /** @class */ (function () {
                             uuid: replay.uniqueSessionId
                         };
                         logs_1.Logs.log("Committing replay: " + replayData.uuid);
-                        return [4 /*yield*/, replayStore.update({ _id: replayData.uuid }, replay, { upsert: true })
+                        return [4 /*yield*/, replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, existing ? 1 : 0
                             // return await DB.exec(DB.addReplaySql, dbRow, type)
                         ];
-                    case 1: return [2 /*return*/, _a.sent()
-                        // return await DB.exec(DB.addReplaySql, dbRow, type)
-                    ];
                 }
             });
         });

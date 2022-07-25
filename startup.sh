@@ -1,0 +1,2 @@
+npm rebuild
+npm start

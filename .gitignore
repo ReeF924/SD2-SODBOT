@@ -28,10 +28,9 @@ node_modules/
 src/Output.txt
 src/resultsDB.db
 src/config.json
+dist
+dist/
 
-<<<<<<< Updated upstream
-coverage/
-=======
 coverage/
 config.json
 app.log
@@ -39,4 +38,3 @@ app.log
 .env
 
 .package-lock.json
->>>>>>> Stashed changes
