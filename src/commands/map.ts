@@ -10,25 +10,32 @@ export class MapCommand {
     static bans: Map<string, Map<string, boolean>> = new Map<string, Map<string, boolean>>(); // 2d array of playerIds to banned divisions.
 
     static warnoMaps = [
+        "Mount River",
+        "Geisa",
         "Death Row",
-        "Two Way",
         "Two Lakes",
+        "Vertigo",
+        "Two Ways",
         "Black Forest",
-        "Vertigo"
+        "Chemical"
     ]
 
     static warnoMaps3v3 = [
-        "Danger Hills",
-        "Mount River",
-        "Triple Strike"
+        "Two Ways 3v3",
+        "Danger Hills 3v3",
+        "Mount River 3v3",
+        "Volcano 3v3",
+        "Triple Strike 3v3",
+        "Cyrus 3v3"
     ]
 
     static warnoMaps4v4 = [
-        "Chemical",
-        "Iron Waters",
-        "Loop",
-        "Geisa"
+        "Chemical 4v4",
+        "Iron Waters 10",
+        "Loop 10",
+        "Geisa 10"
     ]
+
 
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message: Message, input: string[]): void {
