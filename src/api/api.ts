@@ -1,7 +1,7 @@
 import {Application} from 'express'
 import * as express from 'express'
 import { Logs } from '../general/logs'
-import { SqlHelper } from '../general/sqlHelper'
+import { DB } from '../general/db'
 
 export class API {
     
@@ -12,15 +12,15 @@ export class API {
     start():void{
         this.express.get('/leaderboard', async (req,res)=>{
             if(req.query.server){
-                const results = await SqlHelper.getServerLadder(req.query.server as string)
+                const results = await DB.getServerLadder(req.query.server as string)
                 res.send(results);
             }else{
-                const results = await SqlHelper.getGlobalLadder()
+                const results = await DB.getGlobalLadder()
                 res.send(results);
             }
         })
         this.express.get('/divElo', async (req,res)=>{
-            const results = await SqlHelper.getAllDivisionElo()
+            const results = await DB.getAllDivisionElo()
             res.send(results);
         })
         this.express.get('/', (req,res)=>{res.send(200)})

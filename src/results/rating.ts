@@ -1,7 +1,7 @@
 import { Connection, Request, TediousType, TYPES } from 'tedious'
 import { Message, MessageEmbed } from "discord.js"
 import * as axios from "axios"
-import { Elos, ElosDelta, Player, SqlHelper } from "../general/sqlHelper";
+import { Elos, ElosDelta, Player, DB} from "../general/db";
 import { DiscordBot } from "../general/discordBot";
 import { Logs } from '../general/logs';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
@@ -48,8 +48,8 @@ export class RatingEngine {
   }
 
   static async doDivisionElo(deck1:DeckData,deck2:DeckData,victoryState:number){
-      let div1 = SqlHelper.getDivisionElo(Number(deck1.raw.division));
-      let div2 = SqlHelper.getDivisionElo(Number(deck2.raw.division));
+      let div1 = DB.getDivisionElo(Number(deck1.raw.division));
+      let div2 = DB.getDivisionElo(Number(deck2.raw.division));
       let elo, e1, e2;
       if(!(await div1)) e1 = 1500; else e1 = (await div1).elo;
       if(!(await div2)) e2 = 1500; else e2 = (await div1).elo;
@@ -62,8 +62,8 @@ export class RatingEngine {
       }
       console.log(`div 1: ${deck1.division} div2: ${deck2.division}`)
       console.log(elo)
-      await SqlHelper.setDivisionElo({id:Number(deck1.raw.division),divName:deck1.division,elo:elo.p1Elo})
-      await SqlHelper.setDivisionElo({id:Number(deck2.raw.division),divName:deck2.division,elo:elo.p2Elo})
+      await DB.setDivisionElo({id:Number(deck1.raw.division),divName:deck1.division,elo:elo.p1Elo})
+      await DB.setDivisionElo({id:Number(deck2.raw.division),divName:deck2.division,elo:elo.p2Elo})
   }
 
 
@@ -74,11 +74,11 @@ export class RatingEngine {
   }
 
   static async getPlayerElo(discordId:string,message:Message):Promise<Elos>{
-    return SqlHelper.getDiscordElos(discordId,message.channel.id,message.guild.id)
+    return DB.getDiscordElos(discordId,message.channel.id,message.guild.id)
   }
 
   static async createLadder(){
-    return await SqlHelper.getGlobalLadder();
+    return await DB.getGlobalLadder();
   }
 }
 

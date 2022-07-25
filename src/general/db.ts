@@ -1,12 +1,45 @@
 const Datastore = require('nedb-promises')
-let serverStore = Datastore.create('/data/server.db')
-let userStore = Datastore.create('/data/user.db')
-
-let replayStore = Datastore.create('/data/replay.db')
-let eloStore = Datastore.create('/data/user.db')
 
 
-/* Tanner: nedb is a questionable database at scale, but it works "ok" at low (sub 30k entries) scale and with the freedom to use backups :D */
+class DatastoreWrapper {
+    private db
+
+    constructor(filename) {
+        this.db = Datastore.create(filename)
+    }
+
+    async find(...args) {
+        let res = await this.db.find(...args)
+        return res
+    }
+
+    async insert(...args) {
+        let res = await this.db.insert(...args)
+        return { rowCount: res.length, rows: res }
+    }
+
+    async update(...args) {
+        let res = await this.db.update(...args)
+        return res
+    }
+
+    async findOne(...args) {
+        let res = await this.db.findOne(...args)
+        return res
+    }
+
+}
+
+let serverStore = new DatastoreWrapper('./data/server.db')
+let userStore = new DatastoreWrapper('./data/user.db')
+let replayStore = new DatastoreWrapper('./data/replay.db')
+let eloStore = new DatastoreWrapper('./data/user.db')
+
+
+global["serverStore"] = serverStore
+global["replayStore"] = replayStore
+
+/* Tanner: This is a shitty database, but it works "ok" at low scale and with the freedom to use backups :D */
 /* Couldn't be bothered the pain to create Azure SQL DB */
 /* https://www.npmjs.com/package/nedb-promises */
 
@@ -42,6 +75,7 @@ async function findSorted(page, perPage = 10) {
 import { Logs } from "./logs";
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
+import { rows } from "mssql";
 
 
 export class DB {
@@ -220,7 +254,7 @@ export class DB {
     //discordUser
 
     static async getDiscordUser(discordId: string): Promise<DiscordUser> {
-        const user = await userStore.find({ discordId })
+        const user = await userStore.findOne({ discordId })
         //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
         if (!user) return null
 
@@ -234,7 +268,7 @@ export class DB {
     }
 
     static async getDiscordUserFromEugenId(eugenId: number): Promise<DiscordUser> {
-        const user = await userStore.find({ eugenId })
+        const user = await userStore.findOne({ eugenId })
         //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
         if (!user) return null
         return {
@@ -336,13 +370,14 @@ export class DB {
 
     static init(): void {
         console.log("DB initialized");
-
     }
 
 
-
-    static async setReplay(message: Message, replay: RawGameData): Promise<DBObject> {
+    // Returns 0 for new replay and 1 for existing replay
+    static async setReplay(message: Message, replay: RawGameData): Promise<Number> {
         //( @discordId, @serverId, @channelId, @replay, @gameId, @uuid )
+
+        let existing = await replayStore.find({ uuid: replay.uniqueSessionId })
         const replayData = {
             discordId: message.author.id,
             serverId: message.guild.id,
@@ -352,22 +387,23 @@ export class DB {
         }
 
         Logs.log("Committing replay: " + replayData.uuid)
-        return await replayStore.update({ _id: replayData.uuid }, replay, { upsert: true })
+        await replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })
+        return existing ? 1 : 0
         // return await DB.exec(DB.addReplaySql, dbRow, type)
     }
 
     //This is expensive. And an unprepared statement. and it returns *....
     //it needs work. @todo
     static async getReplaysByEugenId(eugenId: number): Promise<DBObject> {
-        return  await replayStore.find({eugenId})
-       // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
+        return await replayStore.find({ eugenId })
+        // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
     }
 
 
 
     private static async exec(...dots: any): Promise<DBObject> {
         console.log("Not implemented");
-        
+
         return { rowCount: 0, rows: [] }
     }
 }

@@ -1,7 +1,7 @@
 import { Client, Message, GuildChannel } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { Logs } from "../general/logs";
-import { SqlHelper } from "../general/sqlHelper";
+import { DB } from "../general/db";
 
 export class AdminCommand {
 
@@ -12,13 +12,13 @@ export class AdminCommand {
             if(input.length == 1){
                 (async () => {
                     //Get user from the DiscordUsers Table
-                    let user = await SqlHelper.getDiscordUser(input[0])
+                    let user = await DB.getDiscordUser(input[0])
                     const discordUser = await DiscordBot.bot.users.fetch(String(input[0]))
                     //If user is already registered up their Admin permisson
                     if(user){
                         if(user.globalAdmin == false){
                             user.globalAdmin =(true)
-                            await SqlHelper.setDiscordUser(user);
+                            await DB.setDiscordUser(user);
                             MsgHelper.reply(message,"Discord account " + discordUser.username +" has been updated with global admin access")
                             Logs.log("Changed globalAdmin access to user "+ discordUser.username + " to true")
                             return
@@ -41,7 +41,7 @@ export class AdminCommand {
 
 
     static async adjustElo(message:Message,input:string[]){
-        let user = await SqlHelper.getDiscordUser(message.author.id)
+        let user = await DB.getDiscordUser(message.author.id)
         //Check if requestor has admin access
         if (user.globalAdmin == true){
             //Check that the command is correctly formatted
@@ -54,7 +54,7 @@ export class AdminCommand {
                 let eugenId = input[0]
                 let newLeagueElo = input[1]
                 let newGlobalElo = input[2]
-                //await SqlHelper.setPlayer(eugenId, newLeagueElo, newGlobalElo);
+                //await DB.setPlayer(eugenId, newLeagueElo, newGlobalElo);
                 //message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
                 return
             }
@@ -70,7 +70,7 @@ export class AdminCommand {
 
 
     static async setChannelPrems(message:Message, input:string[]){
-        let user = await SqlHelper.getDiscordUser(message.author.id)
+        let user = await DB.getDiscordUser(message.author.id)
         let prem = {
             id: "",
             name: "",
@@ -90,7 +90,7 @@ export class AdminCommand {
             }
             else if (input.length > 1){
                 // Check if server is already in ChannelBlacklist table
-                prem = await SqlHelper.getChannelPermissions(input[0])
+                prem = await DB.getChannelPermissions(input[0])
                 console.log(prem)
                 let channel = DiscordBot.bot.channels.cache.get(input[0]) 
                 // If it isn't create a default
@@ -141,7 +141,7 @@ export class AdminCommand {
                             message.reply("One of the permission settings is not a valid command");
                     }
                 }
-                await SqlHelper.setChannelPermissions(prem);
+                await DB.setChannelPermissions(prem);
                 MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been updated ")
             }
             else {
@@ -169,7 +169,7 @@ export class AdminCommand {
                 blockServerElo: -1,
                 blockGlobalElo: -1
             }
-            await SqlHelper.setChannelPermissions(prem);
+            await DB.setChannelPermissions(prem);
             MsgHelper.reply(message,"The permission settings of Discord channel " + (channel as GuildChannel).name +" has been reset back to default settings.")
         }
         else {

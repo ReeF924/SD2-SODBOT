@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  sodbot:
+    build: .
+    ports:
+      - "8080"
+    environment:
+      DOMAIN: sd2.struktur.online
+      VIRTUAL_HOST: sd2.struktur.online
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: sd2.struktur.online
+      LETSENCRYPT_EMAIL: mirko.friedrich@blandland.de
+    networks:
+        - default
+        - backend
+networks:
+    backend:
+    default:
+        external:
+            name: web
+volumes:
+  db-data:

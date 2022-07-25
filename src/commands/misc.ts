@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from "discord.js";
 import { CommonUtil } from "../general/common";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
-import { SqlHelper } from "../general/sqlHelper";
+import { DB } from "../general/db";
 import { Logs } from "../general/logs";
 
 

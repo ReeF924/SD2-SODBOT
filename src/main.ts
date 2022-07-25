@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { DivisionCommandHelper } from "./commands/division";
 import { MapCommandHelper } from "./commands/map";
 import { MiscCommandHelper } from "./commands/misc";
@@ -11,13 +12,13 @@ import { DiscordBot } from "./general/discordBot";
 import * as smp from 'source-map-support';
 import * as http from 'http';
 import { Logs } from "./general/logs";
-import { SqlHelper } from "./general/sqlHelper";
+import { DB } from "./general/db";
 import { API } from "./api/api";
 
 smp.install();
 
 CommonUtil.init();
-SqlHelper.init();
+DB.init();
 Logs.log("Starting Bot");
 const bot = new DiscordBot();
 DivisionCommandHelper.addCommands(bot);

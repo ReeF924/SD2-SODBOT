@@ -1,7 +1,7 @@
 import { Message, User } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { MessageEmbed } from "discord.js";
-import { EloLadderElement, SqlHelper } from "../general/sqlHelper";
+import { EloLadderElement, DB} from "../general/db";
 import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
 import { Logs } from "../general/logs";
@@ -27,7 +27,7 @@ export class PlayerCommand {
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
             return;
         }
-        const Elos = await SqlHelper.getDiscordElos(player,message.channel.id,message.guild.id);
+        const Elos = await DB.getDiscordElos(player,message.channel.id,message.guild.id);
         console.log(Elos)
         if(Elos == null ){
             if(input.length == 0)
@@ -53,7 +53,7 @@ export class PlayerCommand {
             embed.addField("\u200b", "\u200b",true)
         }    
         // Extract recent games
-        const xx = await SqlHelper.getReplaysByEugenId(Elos.eugenId)
+        const xx = await DB.getReplaysByEugenId(Elos.eugenId)
         let uploadDate = "";
         let opponent = "";
         let playerDiv = "";
@@ -148,9 +148,9 @@ export class PlayerCommand {
     static async getLadder(message:Message, input:string[], perms:PermissionsSet){
         let ladder:EloLadderElement[]
         if(perms.isGlobalEloShown)
-            ladder = await SqlHelper.getGlobalLadder();
+            ladder = await DB.getGlobalLadder();
         else
-            ladder = await SqlHelper.getServerLadder(message.guild.id);
+            ladder = await DB.getServerLadder(message.guild.id);
 
 
         const embed = new MessageEmbed();
@@ -197,14 +197,14 @@ export class PlayerCommand {
         static register(message:Message, input:string[]):void{
             if(input.length == 1 && Number(input[0])){
                 (async () => {
-                    let user = await SqlHelper.getDiscordUserFromEugenId(Number(input[0]))
+                    let user = await DB.getDiscordUserFromEugenId(Number(input[0]))
                     if(user){
                         if(user.id = message.author.id){
                             MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
                             Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
                         }else{
                             user.id =(message.author.id)
-                            await SqlHelper.setDiscordUser(user);
+                            await DB.setDiscordUser(user);
                             MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
                             Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
                         }
@@ -217,7 +217,7 @@ export class PlayerCommand {
                             globalAdmin: false,
                             impliedName: message.author.username
                         }
-                        await SqlHelper.setDiscordUser(user);
+                        await DB.setDiscordUser(user);
                         MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
                         Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
                     }

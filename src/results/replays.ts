@@ -2,13 +2,12 @@ import { ChannelData, Message, MessageEmbed } from "discord.js"
 import { GameParser, RawPlayer } from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
-import { EloLadderElement, Elos, ElosDelta, SqlHelper } from "../general/sqlHelper";
+import { EloLadderElement, Elos, ElosDelta, DB} from "../general/db";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { RatingEngine } from "./rating";
 import { PermissionsSet } from "../general/permissions";
 
 const ax = axios.default;
-
 
 export class Replays {
     static extractReplayInfo(message: Message, perms:PermissionsSet): void {
@@ -19,9 +18,8 @@ export class Replays {
             const replayPlayer = g.players[g.ingamePlayerId];
 
             //we need to commit the replay to the DB
-            let uuid = await SqlHelper.setReplay(message,g);
+            let updatedDocumentCount = await DB.setReplay(message,g);
             message.channel.send("Results Submitted")
-            console.log(uuid.rows)
         
             // and check if game has been uploaded in a non-ELO channel
             if (!perms.isEloComputed){
@@ -32,7 +30,7 @@ export class Replays {
                 MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
             }
             // and check if the game already existed in DB 
-            else if(uuid.rows.length == 1){
+            else if(updatedDocumentCount == 1){
                 MsgHelper.say(message,"This is a duplicate upload and will not be counted for ELO")
             }
             // and check if the game already existed in DB 
@@ -99,12 +97,12 @@ export class Replays {
                         }
                     }                 
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
-                    const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
-                    const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
+                if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
+                    const p1Elo = await DB.getElos(winnerList[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await DB.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
-                    await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
-                    await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
                     RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,5)
                 }  
             } else if (g.result.victory > 3) {
@@ -159,23 +157,23 @@ export class Replays {
                         }
                     }                 
                 }
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
-                    const p1Elo = await SqlHelper.getElos(winnerList[0].id,message.channel.id,message.guild.id)
-                    const p2Elo = await SqlHelper.getElos(looserList[0].id,message.channel.id,message.guild.id)
+                if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
+                    const p1Elo = await DB.getElos(winnerList[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await DB.getElos(looserList[0].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,1)
-                    await SqlHelper.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
-                    await SqlHelper.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p1,{impliedName:winnerList[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p2,{impliedName:looserList[0].name,serverName:message.guild.name,channelName:channel.name})
                     RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,5)
                 }
             } else {
                 winners = "no one"
                 loosers = "everyone"
-                if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
-                    const p1Elo = await SqlHelper.getElos(g.players[0].id,message.channel.id,message.guild.id)
-                    const p2Elo = await SqlHelper.getElos(g.players[1].id,message.channel.id,message.guild.id)
+                if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
+                    const p1Elo = await DB.getElos(g.players[0].id,message.channel.id,message.guild.id)
+                    const p2Elo = await DB.getElos(g.players[1].id,message.channel.id,message.guild.id)
                     ratings = RatingEngine.rateMatch(p1Elo,p2Elo,.5)
-                    await SqlHelper.setElos(ratings.p1,{impliedName:g.players[0].name,serverName:message.guild.name,channelName:channel.name})
-                    await SqlHelper.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p1,{impliedName:g.players[0].name,serverName:message.guild.name,channelName:channel.name})
+                    await DB.setElos(ratings.p2,{impliedName:g.players[1].name,serverName:message.guild.name,channelName:channel.name})
                     RatingEngine.doDivisionElo(winnerList[0].deck,looserList[0].deck,3)
                 }
             }
@@ -221,7 +219,7 @@ export class Replays {
                     let playerid = player.name;
                     let discordId = ""
                     let elo = ""
-                    const discordUser = await SqlHelper.getDiscordUserFromEugenId(player.id);
+                    const discordUser = await DB.getDiscordUserFromEugenId(player.id);
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
@@ -240,7 +238,7 @@ export class Replays {
                         return sign + Math.round(delta)
                     }
 
-                    if(g.players.length == 2 && uuid.rows.length == 0 && perms.isEloComputed && g.version >= 51345){
+                    if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
                         if(ratings.p1.eugenId == player.id){
                             if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
@@ -264,7 +262,7 @@ export class Replays {
                         }
                     } 
                     else {
-                            const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
+                            const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
                             if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ${Math.round(elox.channelElo)}`
                             }
@@ -296,7 +294,7 @@ export class Replays {
                 for (const player of g.players) {
                     let playerid = player.name;
                     let discordId = ""
-                    const discordUser = await SqlHelper.getDiscordUserFromEugenId(player.id);
+                    const discordUser = await DB.getDiscordUserFromEugenId(player.id);
                     if(discordUser)
                         discordId = discordUser.id
                     if (discordId != "") {
@@ -309,7 +307,7 @@ export class Replays {
                         playerid += " (id:" + player.id + ")";
                     }
                     let elo = ""
-                    const elox = await SqlHelper.getElos(player.id,message.channel.id,message.guild.id)
+                    const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
                             if (perms.isChannelEloShown){            
                                 elo += `Channel ELO: ${Math.round(elox.channelElo)}`
                             }

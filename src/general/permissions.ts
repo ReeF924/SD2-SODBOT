@@ -1,5 +1,5 @@
 import { Channel, Guild } from "discord.js";
-import { Blacklist, SqlHelper } from "./sqlHelper";
+import { Blacklist, DB} from "./db";
 
 export class Permissions {
 
@@ -8,10 +8,10 @@ export class Permissions {
         const perms = new PermissionsSet();
         let serverPerms
         console.log(server)
-        if(server) serverPerms = SqlHelper.getServerPermissions(server);
+        if(server) serverPerms = DB.getServerPermissions(server);
         let channelPerms 
         console.log(channel)
-        if(channel) channelPerms = SqlHelper.getChannelPermissions(channel);
+        if(channel) channelPerms = DB.getChannelPermissions(channel);
         if(await serverPerms)
             perms.apply(await serverPerms)
         if(await channelPerms)
