@@ -271,22 +271,28 @@ var MapCommand = /** @class */ (function () {
     };
     MapCommand.bans = new Map(); // 2d array of playerIds to banned divisions.
     MapCommand.warnoMaps = [
+        "Mount River",
+        "Geisa",
         "Death Row",
-        "Two Way",
         "Two Lakes",
+        "Vertigo",
+        "Two Ways",
         "Black Forest",
-        "Vertigo"
+        "Chemical"
     ];
     MapCommand.warnoMaps3v3 = [
-        "Danger Hills",
-        "Mount River",
-        "Triple Strike"
+        "Two Ways 3v3",
+        "Danger Hills 3v3",
+        "Mount River 3v3",
+        "Volcano 3v3",
+        "Triple Strike 3v3",
+        "Cyrus 3v3"
     ];
     MapCommand.warnoMaps4v4 = [
-        "Chemical",
-        "Iron Waters",
-        "Loop",
-        "Geisa"
+        "Chemical 4v4",
+        "Iron Waters 10",
+        "Loop 10",
+        "Geisa 10"
     ];
     return MapCommand;
 }());
