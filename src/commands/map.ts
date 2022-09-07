@@ -17,6 +17,7 @@ export class MapCommand {
         "Vertigo",
         "Two Ways",
         "Black Forest",
+        "Ripple",
         "Chemical"
     ]
 
@@ -26,6 +27,7 @@ export class MapCommand {
         "Mount River 3v3",
         "Volcano 3v3",
         "Triple Strike 3v3",
+        "Rift 3v3",
         "Cyrus 3v3"
     ]
 
@@ -33,6 +35,7 @@ export class MapCommand {
         "Chemical 4v4",
         "Iron Waters 10",
         "Loop 10",
+        "Crown 10",
         "Geisa 10"
     ]
 
