@@ -1,6 +1,5 @@
-import { DMChannel, Message } from "discord.js";
+import { Message } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
 
 export class HelpCommand {

@@ -278,6 +278,7 @@ var MapCommand = /** @class */ (function () {
         "Vertigo",
         "Two Ways",
         "Black Forest",
+        "Ripple",
         "Chemical"
     ];
     MapCommand.warnoMaps3v3 = [
@@ -286,12 +287,14 @@ var MapCommand = /** @class */ (function () {
         "Mount River 3v3",
         "Volcano 3v3",
         "Triple Strike 3v3",
+        "Rift 3v3",
         "Cyrus 3v3"
     ];
     MapCommand.warnoMaps4v4 = [
         "Chemical 4v4",
         "Iron Waters 10",
         "Loop 10",
+        "Crown 10",
         "Geisa 10"
     ];
     return MapCommand;
