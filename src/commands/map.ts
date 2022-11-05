@@ -74,6 +74,7 @@ export class MapCommand {
                 case "get5": maplist = importedMapData.mapData.byPlayerSize[2]; count = 5; break;
                 case "get6": maplist = importedMapData.mapData.byPlayerSize[2]; count = 6; break;
                 case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
+                case "get5 2v2": maplist = importedMapData.mapData.byPlayerSize[4]; count = 5; break;
                 case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
                 case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
 
