@@ -39,6 +39,16 @@ export class MapCommand {
         "Geisa 10"
     ]
 
+    static warnoMapsWaryes2v2 = [
+      "Two Lakes",
+      "Two Ways 2v2",
+      "Vertigo",
+      "Chemical 2v2",
+      "Ripple",
+      "Mount River 3v3",
+      "Cyrus 3v3"
+    ]
+
 
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
     static randomMap(message: Message, input: string[]): void {
@@ -83,6 +93,8 @@ export class MapCommand {
                 case "warno 2v2": maplist = MapCommand.warnoMaps; break;
                 case "warno 3v3": maplist = MapCommand.warnoMaps3v3; break;
                 case "warno 4v4": maplist = MapCommand.warnoMaps4v4; break;
+
+                case "warno waryes 2v2": maplist = MapCommand.warnoMapsWaryes2v2; break;
 
                 default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
                     return
