@@ -2,6 +2,7 @@ version: '3'
 
 services:
   sodbot:
+    restart: always
     build: .
     volumes:
       - ./data:/db/sd2.struktur.online

@@ -73,6 +73,10 @@ var MapCommand = /** @class */ (function () {
                 case "2v2":
                     maplist = importedMapData.mapData.byPlayerSize[4];
                     break;
+                case "get5 2v2":
+                    maplist = importedMapData.mapData.byPlayerSize[4];
+                    count = 5;
+                    break;
                 case "3v3":
                     maplist = importedMapData.mapData.byPlayerSize[6];
                     break;
@@ -93,6 +97,9 @@ var MapCommand = /** @class */ (function () {
                     break;
                 case "warno 4v4":
                     maplist = MapCommand.warnoMaps4v4;
+                    break;
+                case "warno waryes 2v2":
+                    maplist = MapCommand.warnoMapsWaryes2v2;
                     break;
                 default:
                     discordBot_1.MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
@@ -296,6 +303,15 @@ var MapCommand = /** @class */ (function () {
         "Loop 10",
         "Crown 10",
         "Geisa 10"
+    ];
+    MapCommand.warnoMapsWaryes2v2 = [
+        "Two Lakes",
+        "Two Ways 2v2",
+        "Vertigo",
+        "Chemical 2v2",
+        "Ripple",
+        "Mount River 3v3",
+        "Cyrus 3v3"
     ];
     return MapCommand;
 }());

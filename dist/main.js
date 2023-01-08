@@ -14,6 +14,7 @@ var http = require("http");
 var logs_1 = require("./general/logs");
 var db_1 = require("./general/db");
 var api_1 = require("./api/api");
+var p = require("../package.json");
 smp.install();
 common_1.CommonUtil.init();
 db_1.DB.init();
@@ -31,7 +32,7 @@ var healthcheck = http.createServer(function (req, res) {
     res.write("pong");
     res.end();
 });
-logs_1.Logs.log("Starting healthcheck server on 8080");
+logs_1.Logs.log("Starting healthcheck server on 8080, version ".concat(p.version));
 //healthcheck.listen(8080);
 var api = new api_1.API();
 api.start();

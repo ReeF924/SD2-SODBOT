@@ -14,7 +14,8 @@ import * as http from 'http';
 import { Logs } from "./general/logs";
 import { DB } from "./general/db";
 import { API } from "./api/api";
-import p from "../package.json"
+
+const p = require("../package.json")
 
 smp.install();
 
@@ -34,7 +35,7 @@ const healthcheck = http.createServer(function (req,res){
     res.write("pong");
     res.end();
 });
-Logs.log("Starting healthcheck server on 8080", p.version)
+Logs.log(`Starting healthcheck server on 8080, version ${p.version}`)
 //healthcheck.listen(8080);
 const api = new API()
 api.start();
