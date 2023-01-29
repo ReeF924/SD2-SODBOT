@@ -18,7 +18,8 @@ export class MapCommand {
         "Two Ways",
         "Black Forest",
         "Ripple",
-        "Chemical"
+        "Chemical",
+        "Loop"
     ]
 
     static warnoMaps3v3 = [
@@ -28,7 +29,8 @@ export class MapCommand {
         "Volcano 3v3",
         "Triple Strike 3v3",
         "Rift 3v3",
-        "Cyrus 3v3"
+        "Cyrus 3v3",
+        "Rocks 3v3"
     ]
 
     static warnoMaps4v4 = [
@@ -46,7 +48,8 @@ export class MapCommand {
       "Chemical 2v2",
       "Ripple",
       "Mount River 3v3",
-      "Cyrus 3v3"
+      "Cyrus 3v3",
+      "Loop"
     ]
 
 
