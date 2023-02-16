@@ -30,11 +30,13 @@ export class MapCommand {
         "Triple Strike 3v3",
         "Rift 3v3",
         "Cyrus 3v3",
-        "Rocks 3v3"
+        "Rocks 3v3",
+        "Twin Cities 3v3"
     ]
 
     static warnoMaps4v4 = [
         "Chemical 4v4",
+        "Dark Stream 4v4",
         "Iron Waters 10",
         "Loop 10",
         "Crown 10",
