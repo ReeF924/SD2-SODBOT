@@ -32,8 +32,8 @@
     "mssql": "^6.3.2",
     "nedb-promises": "^6.1.0",
     "node": "^14.17.1",
-    "sd2-data": "^0.7.2",
-    "sd2-utilities": "^0.1.25",
+    "sd2-data": "^0.7.3",
+    "sd2-utilities": "^0.1.26",
     "winston": "3.3.3",
     "winston-azure-transport": "3.0.5"
   },
