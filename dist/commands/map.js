@@ -286,7 +286,8 @@ var MapCommand = /** @class */ (function () {
         "Two Ways",
         "Black Forest",
         "Ripple",
-        "Chemical"
+        "Chemical",
+        "Loop"
     ];
     MapCommand.warnoMaps3v3 = [
         "Two Ways 3v3",
@@ -295,10 +296,13 @@ var MapCommand = /** @class */ (function () {
         "Volcano 3v3",
         "Triple Strike 3v3",
         "Rift 3v3",
-        "Cyrus 3v3"
+        "Cyrus 3v3",
+        "Rocks 3v3",
+        "Twin Cities 3v3"
     ];
     MapCommand.warnoMaps4v4 = [
         "Chemical 4v4",
+        "Dark Stream 4v4",
         "Iron Waters 10",
         "Loop 10",
         "Crown 10",
@@ -311,7 +315,8 @@ var MapCommand = /** @class */ (function () {
         "Chemical 2v2",
         "Ripple",
         "Mount River 3v3",
-        "Cyrus 3v3"
+        "Cyrus 3v3",
+        "Loop"
     ];
     return MapCommand;
 }());

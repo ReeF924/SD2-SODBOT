@@ -67,16 +67,12 @@ var Replays = /** @class */ (function () {
                             discordBot_1.MsgHelper.say(message, "This game is unranked");
                         }
                         // and check the game is 1v1, if it isn't warn that results will not be rated
-                        else if (g.players.length > 2) {
-                            discordBot_1.MsgHelper.say(message, "This reply is not a 1v1 player game, outcome will not be used in ELO");
-                        }
+                        // else if (g.players.length > 2){
+                        //     MsgHelper.say(message,"This reply is not a 1v1 player game, outcome will not be used in ELO")
+                        // }
                         // and check if the game already existed in DB 
                         else if (updatedDocumentCount == 1) {
                             discordBot_1.MsgHelper.say(message, "This is a duplicate upload and will not be counted for ELO");
-                        }
-                        // and check if the game already existed in DB 
-                        else if (g.version < 51345) {
-                            discordBot_1.MsgHelper.say(message, "This replay is from a older version of the game and won't be used in ELO Calcs");
                         }
                         winners = "";
                         loosers = "";

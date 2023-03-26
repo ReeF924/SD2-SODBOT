@@ -18,7 +18,6 @@ This bot is fan made and has no affiliation with Eugen Systems.
 ✖ Results Querying
 ✖ How to install/run in README
 
-
 ## Discord Bot Setup
 
 Mange your bot here: https://discord.com/developers/
