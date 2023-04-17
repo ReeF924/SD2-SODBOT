@@ -217,8 +217,9 @@ export class Replays {
             if (g.players.length < 4){
                 for (const player of g.players) {
                     let playerid = player.name;
+                    let playerElo = player.elo;
                     let discordId = ""
-                    let elo = ""
+                    //let elo = ""
                     const discordUser = await DB.getDiscordUserFromEugenId(player.id);
                     if(discordUser)
                         discordId = discordUser.id
@@ -238,46 +239,47 @@ export class Replays {
                         return sign + Math.round(delta)
                     }
 
-                    if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
-                        if(ratings.p1.eugenId == player.id){
-                            if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
-                            }
-                            if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${raitingsString(ratings.p1.serverDelta)})||`
-                            }
-                            if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${raitingsString(ratings.p1.globalDelta)})||`
-                            }
-                        } else if(ratings.p2.eugenId == player.id){
-                            if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${raitingsString(ratings.p2.channelDelta)})||`
-                            }
-                            if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${raitingsString(ratings.p2.serverDelta)})||`
-                            }
-                            if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${raitingsString(ratings.p2.globalDelta)})||`
-                            }
-                        }
-                    } 
-                    else {
-                            const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
-                            if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-                            }
-                            if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
-                            }
-                            if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
-                            }
-                    }
+                    // This code is not longer used as the bot has lost the elo db
+                    //if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
+                    //    if(ratings.p1.eugenId == player.id){
+                    //        if (perms.isChannelEloShown){            
+                    //            elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
+                    //        }
+                    //        if (perms.isServerEloShown){
+                    //            elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${raitingsString(ratings.p1.serverDelta)})||`
+                    //        }
+                    //        if (perms.isGlobalEloShown){
+                    //            elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${raitingsString(ratings.p1.globalDelta)})||`
+                    //        }
+                    //    } else if(ratings.p2.eugenId == player.id){
+                    //        if (perms.isChannelEloShown){            
+                    //            elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${raitingsString(ratings.p2.channelDelta)})||`
+                    //        }
+                    //        if (perms.isServerEloShown){
+                    //            elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${raitingsString(ratings.p2.serverDelta)})||`
+                    //        }
+                    //        if (perms.isGlobalEloShown){
+                    //            elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${raitingsString(ratings.p2.globalDelta)})||`
+                    //        }
+                    //    }
+                    //} 
+                    //else {
+                    //        const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
+                    //        if (perms.isChannelEloShown){            
+                    //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
+                    //        }
+                    //        if (perms.isServerEloShown){
+                    //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                    //        }
+                    //        if (perms.isGlobalEloShown){
+                    //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
+                    //        }
+                    //}
 
                     // Add the player details to the embed
                     embed = embed.addField("\u200b", "-------------------------------------------------")
                         .addField("Player", playerid, false)
-                        .addField("Elo", elo, false)
+                        .addField("Elo", playerElo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
@@ -293,6 +295,7 @@ export class Replays {
                             .setColor("#0099ff")
                 for (const player of g.players) {
                     let playerid = player.name;
+                    let playerElo = player.elo;
                     let discordId = ""
                     const discordUser = await DB.getDiscordUserFromEugenId(player.id);
                     if(discordUser)
@@ -306,20 +309,21 @@ export class Replays {
                     } else {
                         playerid += " (id:" + player.id + ")";
                     }
-                    let elo = ""
-                    const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
-                            if (perms.isChannelEloShown){            
-                                elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-                            }
-                            if (perms.isServerEloShown){
-                                elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
-                            }
-                            if (perms.isGlobalEloShown){
-                                elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
-                            }
+                    // This code is no longer used as bot has lost the elo DB
+                    //let elo = ""
+                    //const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
+                    //        if (perms.isChannelEloShown){            
+                    //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
+                    //        }
+                    //        if (perms.isServerEloShown){
+                    //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                    //        }
+                    //        if (perms.isGlobalEloShown){
+                    //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
+                    //        }
                     embed = embed.addField("-------------------------------------------------", "\u200B")
                         .addField("Player", playerid, false)
-                        .addField("Elo", elo, false)
+                        .addField("Elo", playerElo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
