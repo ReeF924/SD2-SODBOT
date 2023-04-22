@@ -10,6 +10,17 @@ export class API {
 
 
     start():void{
+
+        this.express.get('/replay', async (req,res)=>{
+            if(req.query.user){
+                const results = await DB.getServerLadder(req.query.server as string)
+                res.send(results);
+            }else{
+                const results = await DB.getGlobalLadder()
+                res.send(results);
+            }
+        })
+
         this.express.get('/leaderboard', async (req,res)=>{
             if(req.query.server){
                 const results = await DB.getServerLadder(req.query.server as string)

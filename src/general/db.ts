@@ -374,10 +374,7 @@ export class DB {
 
     // Returns 0 for new replay and 1 for existing replay
     static async setReplay(message: Message, replay: RawGameData): Promise<number> {
-        //( @discordId, @serverId, @channelId, @replay, @gameId, @uuid )
-
         let existing = await replayStore.find({ uuid: replay.uniqueSessionId })
-        debugger;
         const replayData = {
             discordId: message.author.id,
             serverId: message.guild.id,
