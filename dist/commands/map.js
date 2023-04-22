@@ -24,7 +24,7 @@ var MapCommand = /** @class */ (function () {
             if (count === void 0) { count = 1; }
             var availableMaps = __spreadArray([], mapList, true);
             var maps = [];
-            var _loop_3 = function () {
+            var _loop_2 = function () {
                 var pickIndex = Math.floor(Math.random() * availableMaps.length);
                 var pick = availableMaps[pickIndex];
                 availableMaps = availableMaps.filter(function (m) { return m !== pick; });
@@ -32,7 +32,7 @@ var MapCommand = /** @class */ (function () {
                 count--;
             };
             while (count > 0) {
-                _loop_3();
+                _loop_2();
             }
             return maps;
         }
@@ -106,20 +106,16 @@ var MapCommand = /** @class */ (function () {
                     return;
             }
         }
-        //check for bans
-        if (MapCommand.bans[message.member.id]) {
-            var _loop_1 = function (key) {
-                maplist = maplist.filter(function (x) {
-                    return x != key;
-                });
-            };
-            for (var _i = 0, _a = Object.keys(MapCommand.bans[message.member.id]); _i < _a.length; _i++) {
-                var key = _a[_i];
-                _loop_1(key);
-            }
-        }
+        /*         //check for bans
+                if (MapCommand.bans[message.member.id]) {
+                    for (const key of Object.keys(MapCommand.bans[message.member.id])) {
+                        maplist = maplist.filter((x) => {
+                            return x != key;
+                        })
+                    }
+                } */
         var picks = 0;
-        var _loop_2 = function () {
+        var _loop_1 = function () {
             if (maplist.length == 0) {
                 discordBot_1.MsgHelper.reply(message, "all maps have been banned. Please unban some maps");
                 return "break";
@@ -140,7 +136,7 @@ var MapCommand = /** @class */ (function () {
             picks++;
         };
         while (picks < pickCount) {
-            var state_1 = _loop_2();
+            var state_1 = _loop_1();
             if (typeof state_1 === "object")
                 return state_1.value;
             if (state_1 === "break")
@@ -211,7 +207,7 @@ var MapCommand = /** @class */ (function () {
             discordBot_1.MsgHelper.reply(message, 'unbanned all maps');
             return;
         }
-        var _loop_4 = function (line) {
+        var _loop_3 = function (line) {
             var mapPool = Data.maps.allMapNames;
             var target = mapPool.filter(function (x) {
                 return 0 == line.toLocaleLowerCase().localeCompare(x.toLocaleLowerCase());
@@ -236,7 +232,7 @@ var MapCommand = /** @class */ (function () {
         };
         for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
             var line = input_1[_i];
-            var state_2 = _loop_4(line);
+            var state_2 = _loop_3(line);
             if (typeof state_2 === "object")
                 return state_2.value;
         }
@@ -246,7 +242,7 @@ var MapCommand = /** @class */ (function () {
             discordBot_1.MsgHelper.reply(message, "Please specify a map to ban. Use ".concat(common_1.CommonUtil.config("prefix"), "maps, to get the list of all maps."));
             return;
         }
-        var _loop_5 = function (line) {
+        var _loop_4 = function (line) {
             var targetMaps = Data.maps.allMapNames;
             var target = targetMaps.filter(function (x) {
                 return 0 == line.toLocaleLowerCase().localeCompare(x.toLocaleLowerCase());
@@ -266,7 +262,7 @@ var MapCommand = /** @class */ (function () {
         };
         for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
             var line = input_2[_i];
-            var state_3 = _loop_5(line);
+            var state_3 = _loop_4(line);
             if (typeof state_3 === "object")
                 return state_3.value;
         }

@@ -47,6 +47,26 @@ var API = /** @class */ (function () {
     }
     API.prototype.start = function () {
         var _this = this;
+        this.express.get('/replay', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var results, results;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!req.query.user) return [3 /*break*/, 2];
+                        return [4 /*yield*/, db_1.DB.getServerLadder(req.query.server)];
+                    case 1:
+                        results = _a.sent();
+                        res.send(results);
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, db_1.DB.getGlobalLadder()];
+                    case 3:
+                        results = _a.sent();
+                        res.send(results);
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
+                }
+            });
+        }); });
         this.express.get('/leaderboard', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var results, results;
             return __generator(this, function (_a) {

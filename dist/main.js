@@ -7,6 +7,7 @@ var misc_1 = require("./commands/misc");
 var help_1 = require("./commands/help");
 var player_1 = require("./commands/player");
 var admin_1 = require("./commands/admin");
+var matchup_1 = require("./commands/matchup");
 var common_1 = require("./general/common");
 var discordBot_1 = require("./general/discordBot");
 var smp = require("source-map-support");
@@ -26,6 +27,7 @@ map_1.MapCommandHelper.addCommands(bot);
 help_1.HelpCommandHelper.addCommands(bot);
 player_1.PlayerCommandHelper.addCommands(bot);
 admin_1.AdminCommandHelper.addCommands(bot);
+matchup_1.MatchupCommandHelper.addCommands(bot);
 bot.login();
 var healthcheck = http.createServer(function (req, res) {
     logs_1.Logs.log(req);

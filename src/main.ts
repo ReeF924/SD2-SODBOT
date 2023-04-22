@@ -5,6 +5,7 @@ import { MiscCommandHelper } from "./commands/misc";
 import { HelpCommandHelper } from "./commands/help";
 import { PlayerCommandHelper } from "./commands/player";
 import { AdminCommandHelper } from "./commands/admin";
+import { MatchupCommandHelper} from "./commands/matchup"
 
 import { CommonUtil } from "./general/common";
 import { DiscordBot } from "./general/discordBot";
@@ -29,6 +30,8 @@ MapCommandHelper.addCommands(bot);
 HelpCommandHelper.addCommands(bot);
 PlayerCommandHelper.addCommands(bot);
 AdminCommandHelper.addCommands(bot);
+MatchupCommandHelper.addCommands(bot);
+
 bot.login();
 const healthcheck = http.createServer(function (req,res){
     Logs.log(req);

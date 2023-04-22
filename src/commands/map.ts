@@ -105,14 +105,14 @@ export class MapCommand {
                     return
             }
         }
-        //check for bans
+/*         //check for bans
         if (MapCommand.bans[message.member.id]) {
             for (const key of Object.keys(MapCommand.bans[message.member.id])) {
                 maplist = maplist.filter((x) => {
                     return x != key;
                 })
             }
-        }
+        } */
         let picks = 0
         while (picks < pickCount) {
             if (maplist.length == 0) {

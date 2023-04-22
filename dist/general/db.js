@@ -604,7 +604,6 @@ var DB = /** @class */ (function () {
                     case 0: return [4 /*yield*/, replayStore.find({ uuid: replay.uniqueSessionId })];
                     case 1:
                         existing = _a.sent();
-                        debugger;
                         replayData = {
                             discordId: message.author.id,
                             serverId: message.guild.id,

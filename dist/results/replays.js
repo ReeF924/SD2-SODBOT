@@ -52,7 +52,7 @@ var Replays = /** @class */ (function () {
         var _this = this;
         var url = message.attachments.first().url;
         ax.get(url).then(function (res) { return __awaiter(_this, void 0, void 0, function () {
-            var g, replayPlayer, updatedDocumentCount, winners, loosers, winnerList, looserList, ratings, channel, _i, _a, player, playerid, replayPlayer_1, replayPlayer_2, replayPlayer_3, p1Elo, p2Elo, _b, _c, player, playerid, replayPlayer_4, replayPlayer_5, replayPlayer_6, p1Elo, p2Elo, p1Elo, p2Elo, winnersLength, losersLength, i, i, embed, _d, _e, player, playerid, discordId, elo, discordUser, user, raitingsString, elox, counter, _f, _g, player, playerid, discordId, discordUser, user, elo, elox;
+            var g, replayPlayer, updatedDocumentCount, winners, loosers, winnerList, looserList, ratings, channel, _i, _a, player, playerid, replayPlayer_1, replayPlayer_2, replayPlayer_3, p1Elo, p2Elo, _b, _c, player, playerid, replayPlayer_4, replayPlayer_5, replayPlayer_6, p1Elo, p2Elo, p1Elo, p2Elo, winnersLength, losersLength, i, i, embed, _d, _e, player, playerid, playerElo, discordId, discordUser, user, raitingsString, counter, _f, _g, player, playerid, playerElo, discordId, discordUser, user;
             return __generator(this, function (_h) {
                 switch (_h.label) {
                     case 0:
@@ -289,15 +289,15 @@ var Replays = /** @class */ (function () {
                             .addField('Game Mode', sd2_data_1.misc.mode[g.gameMode], true)
                             .addField('Starting Points', g.initMoney + " pts", true)
                             .addField('Map', sd2_data_1.misc.map[g.map_raw], true);
-                        if (!(g.players.length < 4)) return [3 /*break*/, 29];
+                        if (!(g.players.length < 4)) return [3 /*break*/, 26];
                         _d = 0, _e = g.players;
                         _h.label = 20;
                     case 20:
-                        if (!(_d < _e.length)) return [3 /*break*/, 29];
+                        if (!(_d < _e.length)) return [3 /*break*/, 26];
                         player = _e[_d];
                         playerid = player.name;
+                        playerElo = player.elo;
                         discordId = "";
-                        elo = "";
                         return [4 /*yield*/, db_1.DB.getDiscordUserFromEugenId(player.id)];
                     case 21:
                         discordUser = _h.sent();
@@ -322,102 +322,100 @@ var Replays = /** @class */ (function () {
                                 sign = "+";
                             return sign + Math.round(delta);
                         };
-                        if (!(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345)) return [3 /*break*/, 25];
-                        if (ratings.p1.eugenId == player.id) {
-                            if (perms.isChannelEloShown) {
-                                elo += "Channel ELO: ||".concat(Math.round(ratings.p1.channelElo), " (").concat(raitingsString(ratings.p1.channelDelta), ")||");
-                            }
-                            if (perms.isServerEloShown) {
-                                elo += "\nServer ELO: ||".concat(Math.round(ratings.p1.serverElo), "   (").concat(raitingsString(ratings.p1.serverDelta), ")||");
-                            }
-                            if (perms.isGlobalEloShown) {
-                                elo += "\nGlobal ELO: ||".concat(Math.round(ratings.p1.globalElo), "   (").concat(raitingsString(ratings.p1.globalDelta), ")||");
-                            }
-                        }
-                        else if (ratings.p2.eugenId == player.id) {
-                            if (perms.isChannelEloShown) {
-                                elo += "Channel ELO: ||".concat(Math.round(ratings.p2.channelElo), " (").concat(raitingsString(ratings.p2.channelDelta), ")||");
-                            }
-                            if (perms.isServerEloShown) {
-                                elo += "\nServer ELO: ||".concat(Math.round(ratings.p2.serverElo), "   (").concat(raitingsString(ratings.p2.serverDelta), ")||");
-                            }
-                            if (perms.isGlobalEloShown) {
-                                elo += "\nGlobal ELO: ||".concat(Math.round(ratings.p2.globalElo), "   (").concat(raitingsString(ratings.p2.globalDelta), ")||");
-                            }
-                        }
-                        return [3 /*break*/, 27];
-                    case 25: return [4 /*yield*/, db_1.DB.getElos(player.id, message.channel.id, message.guild.id)];
-                    case 26:
-                        elox = _h.sent();
-                        if (perms.isChannelEloShown) {
-                            elo += "Channel ELO: ".concat(Math.round(elox.channelElo));
-                        }
-                        if (perms.isServerEloShown) {
-                            elo += "\nServer ELO: ".concat(Math.round(elox.serverElo));
-                        }
-                        if (perms.isGlobalEloShown) {
-                            elo += "\nGlobal ELO: ".concat(Math.round(elox.globalElo));
-                        }
-                        _h.label = 27;
-                    case 27:
+                        // This code is not longer used as the bot has lost the elo db
+                        //if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
+                        //    if(ratings.p1.eugenId == player.id){
+                        //        if (perms.isChannelEloShown){            
+                        //            elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
+                        //        }
+                        //        if (perms.isServerEloShown){
+                        //            elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${raitingsString(ratings.p1.serverDelta)})||`
+                        //        }
+                        //        if (perms.isGlobalEloShown){
+                        //            elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${raitingsString(ratings.p1.globalDelta)})||`
+                        //        }
+                        //    } else if(ratings.p2.eugenId == player.id){
+                        //        if (perms.isChannelEloShown){            
+                        //            elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${raitingsString(ratings.p2.channelDelta)})||`
+                        //        }
+                        //        if (perms.isServerEloShown){
+                        //            elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${raitingsString(ratings.p2.serverDelta)})||`
+                        //        }
+                        //        if (perms.isGlobalEloShown){
+                        //            elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${raitingsString(ratings.p2.globalDelta)})||`
+                        //        }
+                        //    }
+                        //} 
+                        //else {
+                        //        const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
+                        //        if (perms.isChannelEloShown){            
+                        //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
+                        //        }
+                        //        if (perms.isServerEloShown){
+                        //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                        //        }
+                        //        if (perms.isGlobalEloShown){
+                        //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
+                        //        }
+                        //}
                         // Add the player details to the embed
                         embed = embed.addField("\u200b", "-------------------------------------------------")
                             .addField("Player", playerid, false)
-                            .addField("Elo", elo, false)
+                            .addField("Elo", playerElo, false)
                             .addField("Division", player.deck.division, true)
                             .addField("Income", player.deck.income, true)
                             .addField("Deck Code", player.deck.raw.code, false);
-                        _h.label = 28;
-                    case 28:
+                        _h.label = 25;
+                    case 25:
                         _d++;
                         return [3 /*break*/, 20];
-                    case 29:
+                    case 26:
                         message.channel.send(embed);
-                        if (!(g.players.length >= 4)) return [3 /*break*/, 38];
+                        if (!(g.players.length >= 4)) return [3 /*break*/, 34];
                         counter = 0;
                         embed = new discord_js_1.MessageEmbed()
                             .setColor("#0099ff");
                         _f = 0, _g = g.players;
-                        _h.label = 30;
-                    case 30:
-                        if (!(_f < _g.length)) return [3 /*break*/, 37];
+                        _h.label = 27;
+                    case 27:
+                        if (!(_f < _g.length)) return [3 /*break*/, 33];
                         player = _g[_f];
                         playerid = player.name;
+                        playerElo = player.elo;
                         discordId = "";
                         return [4 /*yield*/, db_1.DB.getDiscordUserFromEugenId(player.id)];
-                    case 31:
+                    case 28:
                         discordUser = _h.sent();
                         if (discordUser)
                             discordId = discordUser.id;
-                        if (!(discordId != "")) return [3 /*break*/, 33];
+                        if (!(discordId != "")) return [3 /*break*/, 30];
                         return [4 /*yield*/, discordBot_1.DiscordBot.bot.users.fetch(String(discordId))];
-                    case 32:
+                    case 29:
                         user = _h.sent();
                         if (!user)
                             playerid = "BORKED! Please yell at <@!271792666910392325>";
                         else
                             playerid += "*<@!" + user.id + ">*";
-                        return [3 /*break*/, 34];
-                    case 33:
+                        return [3 /*break*/, 31];
+                    case 30:
                         playerid += " (id:" + player.id + ")";
-                        _h.label = 34;
-                    case 34:
-                        elo = "";
-                        return [4 /*yield*/, db_1.DB.getElos(player.id, message.channel.id, message.guild.id)];
-                    case 35:
-                        elox = _h.sent();
-                        if (perms.isChannelEloShown) {
-                            elo += "Channel ELO: ".concat(Math.round(elox.channelElo));
-                        }
-                        if (perms.isServerEloShown) {
-                            elo += "\nServer ELO: ".concat(Math.round(elox.serverElo));
-                        }
-                        if (perms.isGlobalEloShown) {
-                            elo += "\nGlobal ELO: ".concat(Math.round(elox.globalElo));
-                        }
+                        _h.label = 31;
+                    case 31:
+                        // This code is no longer used as bot has lost the elo DB
+                        //let elo = ""
+                        //const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
+                        //        if (perms.isChannelEloShown){            
+                        //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
+                        //        }
+                        //        if (perms.isServerEloShown){
+                        //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
+                        //        }
+                        //        if (perms.isGlobalEloShown){
+                        //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
+                        //        }
                         embed = embed.addField("-------------------------------------------------", "\u200B")
                             .addField("Player", playerid, false)
-                            .addField("Elo", elo, false)
+                            .addField("Elo", playerElo, false)
                             .addField("Division", player.deck.division, true)
                             .addField("Income", player.deck.income, true)
                             .addField("Deck Code", player.deck.raw.code, false);
@@ -428,14 +426,14 @@ var Replays = /** @class */ (function () {
                                 .setColor("#0099ff");
                             counter = 0;
                         }
-                        _h.label = 36;
-                    case 36:
+                        _h.label = 32;
+                    case 32:
                         _f++;
-                        return [3 /*break*/, 30];
-                    case 37:
+                        return [3 /*break*/, 27];
+                    case 33:
                         message.channel.send(embed);
-                        _h.label = 38;
-                    case 38: return [2 /*return*/];
+                        _h.label = 34;
+                    case 34: return [2 /*return*/];
                 }
             });
         }); });
