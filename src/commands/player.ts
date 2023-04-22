@@ -13,15 +13,15 @@ export class PlayerCommand {
     
     static async getPlayer(message:Message,input:string[],perms:PermissionsSet){
         const embed = new MessageEmbed();
-        var player:string;
-        var icon:string
+        let player:string;
+        let icon:string
         //Determine the target player
         if(input.length == 0){
             player = message.author.id
             icon = message.author.displayAvatarURL()
         }else if(input.length == 1){
             player = input[0].slice(3,-1) //this is magic.
-            let usr = message.mentions.users.first();
+            const usr = message.mentions.users.first();
             icon = usr.displayAvatarURL()
         }else{
             MsgHelper.reply(message,`This command can only query 1 player at a time`)

@@ -142,7 +142,7 @@ export class MapCommand {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static allMaps(message: Message, input: string[]): void {
         const importedMapData = Data.maps;
-        console.log(JSON.stringify(importedMapData));
+        // console.log(JSON.stringify(importedMapData));
         const bannedMaps = MapCommand.bans[message.author.id];
         const legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
