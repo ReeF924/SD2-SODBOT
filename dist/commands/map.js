@@ -146,7 +146,7 @@ var MapCommand = /** @class */ (function () {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     MapCommand.allMaps = function (message, input) {
         var importedMapData = Data.maps;
-        console.log(JSON.stringify(importedMapData));
+        // console.log(JSON.stringify(importedMapData));
         var bannedMaps = MapCommand.bans[message.author.id];
         var legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
