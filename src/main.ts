@@ -4,8 +4,8 @@ import { MapCommandHelper } from "./commands/map";
 import { MiscCommandHelper } from "./commands/misc";
 import { HelpCommandHelper } from "./commands/help";
 import { PlayerCommandHelper } from "./commands/player";
-import { AdminCommandHelper } from "./commands/admin";
-import { MatchupCommandHelper} from "./commands/matchup"
+import { AdminCommand } from "./commands/admin";
+import { MatchupCommandHelper } from "./commands/matchup"
 
 import { CommonUtil } from "./general/common";
 import { DiscordBot } from "./general/discordBot";
@@ -19,21 +19,23 @@ import { API } from "./api/api";
 const p = require("../package.json")
 
 smp.install();
+Logs.log("Starting Bot");
+const bot = new DiscordBot();
 
 CommonUtil.init();
 DB.init();
-Logs.log("Starting Bot");
-const bot = new DiscordBot();
+const adminCommand: AdminCommand = new AdminCommand();
+
 DivisionCommandHelper.addCommands(bot);
 MiscCommandHelper.addCommands(bot);
 MapCommandHelper.addCommands(bot);
 HelpCommandHelper.addCommands(bot);
 PlayerCommandHelper.addCommands(bot);
-AdminCommandHelper.addCommands(bot);
+adminCommand.addCommands(bot);
 MatchupCommandHelper.addCommands(bot);
 
 bot.login();
-const healthcheck = http.createServer(function (req,res){
+const healthcheck = http.createServer(function (req, res) {
     Logs.log(req);
     res.write("pong");
     res.end();

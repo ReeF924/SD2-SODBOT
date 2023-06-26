@@ -76,6 +76,7 @@ import { Logs } from "./logs";
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { rows } from "mssql";
+import { DiscordBot } from "./discordBot"
 
 
 export class DB {
@@ -417,6 +418,11 @@ export interface DiscordUser {
     serverAdmin: number[],
     globalAdmin: boolean,
     impliedName: string
+}
+
+export interface DiscordServer{
+    id:string,
+    primaryMode:string
 }
 
 export interface EloLadderElement {
