@@ -9,7 +9,7 @@ import { Logs } from "../general/logs";
 
 export class MiscCommand {
 
-    static sodbotReplies = [
+    private sodbotReplies = [
         "Ping! Your shot bounced!",
         "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
         "Miss! Your shot couldn't hit the broad side of a barn!",
@@ -45,7 +45,7 @@ export class MiscCommand {
         "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
       ];
 
-      static sodbotReplies2 = [
+      private sodbotReplies2 = [
         "Hit! Target destroyed!",
         "Miss! Mission failed. We'll get em next time!",
         "Miss! Damn it where's my .50 cal",
@@ -70,7 +70,7 @@ export class MiscCommand {
         "Hit!, hi ho hi ho a transport sniping we go"
       ];
 
-      static sodbotReplies3 = [
+      private sodbotReplies3 = [
         "Hit! Target destroyed!",
         "Hit! We blew him away",
         "Hit! They drew first blood!",
@@ -92,7 +92,7 @@ export class MiscCommand {
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static flip(message: Message, input: string[]): void {
+    private flip(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Heads");
         } else {
@@ -100,7 +100,7 @@ export class MiscCommand {
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static faction(message: Message, input: string[]): void {
+    private faction(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Axis");
         } else {
@@ -108,7 +108,7 @@ export class MiscCommand {
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static help(message: Message, input: string[]): void {
+    private help(message: Message, input: string[]): void {
         const embed = new MessageEmbed()
             .setTitle("Help")
             .setDescription("prefix commands with " + CommonUtil.config('prefix'))
@@ -123,16 +123,15 @@ export class MiscCommand {
             ])
         message.channel.send(embed);
     } 
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static piat(message: Message, input: string[]): void {
+    private piat(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
         if (i > 0.80){
             MsgHelper.reply(
                 message,
-                MiscCommand.sodbotReplies[Math.floor(Math.random() * MiscCommand.sodbotReplies.length)],
+                this.sodbotReplies[Math.floor(Math.random() * this.sodbotReplies.length)],
                 true
             );
         } else if (i > 0.005) {
@@ -172,15 +171,14 @@ export class MiscCommand {
                     }, 10000));
                 }
     }
-
-    static ptrd(message: Message, input: string[]): void {
+    private ptrd(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
         if (i > 0.80){
             MsgHelper.reply(
                 message,
-                MiscCommand.sodbotReplies2[Math.floor(Math.random() * MiscCommand.sodbotReplies2.length)],
+                this.sodbotReplies2[Math.floor(Math.random() * this.sodbotReplies2.length)],
                 true
             );
         } else  {
@@ -188,15 +186,14 @@ export class MiscCommand {
             return;
         }
     }
-
-    static laws(message: Message, input: string[]): void {
+    private laws(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
         if (i > 0.70){
             MsgHelper.reply(
                 message,
-                MiscCommand.sodbotReplies3[Math.floor(Math.random() * MiscCommand.sodbotReplies3.length)],
+                this.sodbotReplies3[Math.floor(Math.random() * this.sodbotReplies3.length)],
                 true
             );
         } else  {
@@ -204,10 +201,7 @@ export class MiscCommand {
             return;
         }
     }
-
-
-
-    static deck(message: Message, input: string[]): void {
+    private deck(message: Message, input: string[]): void {
         let embed = new MessageEmbed();
         if(String.length > 0){
             const deck = DeckParser.parse(input[0])
@@ -254,8 +248,7 @@ export class MiscCommand {
             message.channel.send(embed);
         }
     }
-
-    static info(message: Message, input: string[]): void {
+    private info(message: Message, input: string[]): void {
         const embed = new MessageEmbed()
             .setTitle("SODBOT III Info")
             .setDescription("SODBOT III is is the latest version of the Steel Division 2 bot")
@@ -268,18 +261,14 @@ export class MiscCommand {
             ])
             message.author.send(embed);
     }
-
-}
-
-export class MiscCommandHelper {
-    static addCommands(bot: DiscordBot): void {
-        bot.registerCommand("flip", MiscCommand.flip);
-        bot.registerCommand("faction", MiscCommand.faction);
-        bot.registerCommand("help", MiscCommand.help);
-        bot.registerCommand("piat",MiscCommand.piat);
-        bot.registerCommand("ptrd",MiscCommand.ptrd);
-        bot.registerCommand("laws",MiscCommand.laws);
-        bot.registerCommand("deck",MiscCommand.deck);
-        bot.registerCommand("info",MiscCommand.info);
+    public addCommands(bot:DiscordBot): void{
+        bot.registerCommand("flip", this.flip);
+        bot.registerCommand("faction", this.faction);
+        bot.registerCommand("help", this.help);
+        bot.registerCommand("piat",this.piat);
+        bot.registerCommand("ptrd",this.ptrd);
+        bot.registerCommand("laws",this.laws);
+        bot.registerCommand("deck",this.deck);
+        bot.registerCommand("info",this.info);
     }
 }

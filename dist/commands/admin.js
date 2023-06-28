@@ -254,19 +254,20 @@ var AdminCommand = /** @class */ (function () {
                         discordBot_1.MsgHelper.reply(message, "The permission settings of Discord channel " + channel.name + " has been reset back to default settings.");
                         return [3 /*break*/, 3];
                     case 2:
-                        discordBot_1.MsgHelper.reply(message, "Command not formatted corrctly, this command just takes a channel id only as its argument");
+                        discordBot_1.MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument");
                         _a.label = 3;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    AdminCommand.prototype.setPrimaryMode = function (message, input) {
+    AdminCommand.prototype.primaryMode = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var user, serverId;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        message.reply("foobar");
                         if (!!(message.member instanceof discord_js_1.GuildMember)) return [3 /*break*/, 2];
                         return [4 /*yield*/, db_1.DB.getDiscordUser(message.author.id)];
                     case 1:
@@ -282,6 +283,10 @@ var AdminCommand = /** @class */ (function () {
                             return [2 /*return*/];
                         }
                         serverId = message.guild.id;
+                        if (input.length == 0) {
+                            message.reply("PrimaryMode");
+                            return [2 /*return*/];
+                        }
                         return [2 /*return*/];
                 }
             });
@@ -292,7 +297,7 @@ var AdminCommand = /** @class */ (function () {
         bot.registerCommand("setadmin", this.setAdmin);
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
-        // bot.registerCommand("setPrimaryMode", this.setPrimaryMode);
+        bot.registerCommand("primaryMode", this.primaryMode);
     };
     return AdminCommand;
 }());

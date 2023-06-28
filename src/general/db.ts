@@ -1,5 +1,5 @@
 const Datastore = require('nedb-promises')
-
+const Redis = require("redis");
 
 class DatastoreWrapper {
     private db
@@ -34,7 +34,7 @@ let serverStore = new DatastoreWrapper('./data/server.db')
 let userStore = new DatastoreWrapper('./data/user.db')
 let replayStore = new DatastoreWrapper('./data/replay.db')
 let eloStore = new DatastoreWrapper('./data/user.db')
-
+const redisClient = Redis.createClient();
 
 global["serverStore"] = serverStore
 global["replayStore"] = replayStore
@@ -78,11 +78,29 @@ import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { rows } from "mssql";
 import { DiscordBot } from "./discordBot"
 
-
 export class DB {
-
     //players
+    static async setServer(server: DiscordServer): Promise<DBObject> {
+        const data = {
+            _id: server.id,
+            serverName: server.serverName,
+            primaryMode: server.primaryMode,
+            oppositeChannelIds: server.oppositeChannelIds
+        };
+        return serverStore.insert(data);
+    }
+    static async getAllServers(): Promise<DiscordServer> {
+        const servers = await serverStore.find({});
+        return servers;
+    }
+    static async getServer(serverId: string): Promise<DiscordServer> {
+        const server = await serverStore.find({serverId});
 
+        return server;
+    }
+    static async putServer(serverId: string, server:DiscordServer){
+        
+    }
     static async setPlayer(player: Player): Promise<DBObject> {
         const data = {
             _id: player.id,
@@ -96,7 +114,6 @@ export class DB {
         return userStore.insert(data)
         // return await DB.exec(DB.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
     }
-
     static async getPlayer(eugenId: number): Promise<Player> {
         const player = await userStore.find({ eugenId })
         if (!player) return null
@@ -108,9 +125,7 @@ export class DB {
             lastPlayed: player.lastPlayed != null ? new Date(player.lastPlayed as Date) : null
         }
     }
-
     //elos
-
     static async getElos(eugenId: number, channel: string, server: string): Promise<Elos> {
 
         const elo = await eloStore.find({ eugenId, channel, server })
@@ -140,7 +155,6 @@ export class DB {
             playerName: String(elo.playerName)
         }
     }
-
     static async getDiscordElos(discordId: string, channel: string, server: string): Promise<Elos> {
         const elo = await eloStore.find({ discordId, channel, server })
         // const xx = await DB.exec(DB.getElosDiscordSql, { playerId: discordId, channelId: channel, serverId: server }, { playerId: sql.VarChar, channelId: sql.VarChar, serverId: sql.VarChar })
@@ -156,13 +170,11 @@ export class DB {
             playerName: String(elo.playerName)
         }
     }
-
     static async setElos(elos: Elos, info: EloInfo): Promise<DBObject> {
         const elosData = { _id: elos.eugenId, playerId: elos.eugenId, serverId: elos.serverId, channelId: elos.channelId, channelElo: elos.channelElo, serverElo: elos.serverElo, globalElo: elos.globalElo, pickBanGlobalElo: elos.pickBanGlobalElo, ...info }
         Logs.log("saving elos: " + JSON.stringify(elosData))
         return await eloStore.update({ _id: elos.eugenId }, elosData, { upsert: true })
     }
-
     static async setDivisionElo(elo: DivElo): Promise<number> {
         console.log(elo)
         const data = {
@@ -177,7 +189,6 @@ export class DB {
         console.log(i)
         return i
     }
-
     static async getDivisionElo(id: number): Promise<DivElo> {
         const elo = await eloStore.find({ _id: id })
         if (!elo) return null
@@ -188,7 +199,6 @@ export class DB {
             elo: Number(elo.elo),
         }
     }
-
     static async getAllDivisionElo(): Promise<DivElo[]> {
         const elos = await eloStore.find({})
         const ret: DivElo[] = elos.map(elo => {
@@ -201,7 +211,6 @@ export class DB {
 
         return ret;
     }
-
     //permissions
     static async getServerPermissions(serverId: string): Promise<Blacklist> {
         const perms = await serverStore.find({ serverId, type: "perms" })
@@ -217,7 +226,6 @@ export class DB {
             blockGlobalElo: Number(perms.blockGlobalElo)
         }
     }
-
     static async getChannelPermissions(channelId: string): Promise<Blacklist> {
         const perms = await serverStore.find({ channelId, type: "perms-channel" })
         if (!perms) return null
@@ -232,7 +240,6 @@ export class DB {
             blockGlobalElo: Number(perms.blockGlobalElo)
         }
     }
-
     static async setChannelPermissions(prem: Blacklist): Promise<DBObject> {
 
         const data = {
@@ -249,10 +256,7 @@ export class DB {
         // return await DB.exec(DB.setChannelPermissionsSql, data, { id: sql.VarChar, name: sql.VarChar, blockElo: sql.Int, blockCommands: sql.Int, blockReplay: sql.Int, blockChannelElo: sql.Int, blockServerElo: sql.Int, blockGlobalElo: sql.Int })
 
     }
-
-
     //discordUser
-
     static async getDiscordUser(discordId: string): Promise<DiscordUser> {
         const user = await userStore.findOne({ discordId })
         //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
@@ -266,7 +270,6 @@ export class DB {
             impliedName: String(user.impliedName)
         }
     }
-
     static async getDiscordUserFromEugenId(eugenId: number): Promise<DiscordUser> {
         const user = await userStore.findOne({ eugenId })
         //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
@@ -279,7 +282,6 @@ export class DB {
             impliedName: String(user.impliedName)
         }
     }
-
     static async setDiscordUser(user: DiscordUser): Promise<DBObject> {
         const data = {
             id: String(user.id),
@@ -292,10 +294,7 @@ export class DB {
         return await userStore.update({ _id: data.id }, data, { upsert: true })
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
-
     //Other functions
-
-
     static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
         const users = await eloStore.find({})
@@ -311,8 +310,6 @@ export class DB {
             }
         })
     }
-
-
     static async getServerLadder(serverId: string): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
         const users = await eloStore.find({ serverId })
@@ -328,7 +325,6 @@ export class DB {
             }
         })
     }
-
     /*
     static async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
@@ -367,12 +363,9 @@ export class DB {
         return 
     }
     */
-
     static init(): void {
         console.log("DB initialized");
     }
-
-
     // Returns 0 for new replay and 1 for existing replay
     static async setReplay(message: Message, replay: RawGameData): Promise<number> {
         let existing = await replayStore.find({ uuid: replay.uniqueSessionId })
@@ -396,16 +389,12 @@ export class DB {
         return await replayStore.find({ eugenId })
         // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
     }
-
-
-
     private static async exec(...dots: any): Promise<DBObject> {
         console.log("Not implemented");
 
         return { rowCount: 0, rows: [] }
     }
 }
-
 
 interface DBObject {
     rows?: Record<string, unknown>[],
@@ -420,9 +409,11 @@ export interface DiscordUser {
     impliedName: string
 }
 
-export interface DiscordServer{
-    id:string,
-    primaryMode:string
+export interface DiscordServer {
+    id: string,
+    serverName: string,
+    primaryMode: string,
+    oppositeChannelIds: string[]
 }
 
 export interface EloLadderElement {

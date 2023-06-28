@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { DivisionCommandHelper } from "./commands/division";
 import { MapCommandHelper } from "./commands/map";
-import { MiscCommandHelper } from "./commands/misc";
+import { MiscCommand} from "./commands/misc";
 import { HelpCommandHelper } from "./commands/help";
 import { PlayerCommandHelper } from "./commands/player";
 import { AdminCommand } from "./commands/admin";
@@ -15,19 +15,22 @@ import * as http from 'http';
 import { Logs } from "./general/logs";
 import { DB } from "./general/db";
 import { API } from "./api/api";
+import { misc } from 'sd2-data';
 
 const p = require("../package.json")
+
+CommonUtil.init();
+DB.init();
+Logs.init();
 
 smp.install();
 Logs.log("Starting Bot");
 const bot = new DiscordBot();
-
-CommonUtil.init();
-DB.init();
 const adminCommand: AdminCommand = new AdminCommand();
+const miscCommand: MiscCommand = new MiscCommand();
 
 DivisionCommandHelper.addCommands(bot);
-MiscCommandHelper.addCommands(bot);
+miscCommand.addCommands(bot);
 MapCommandHelper.addCommands(bot);
 HelpCommandHelper.addCommands(bot);
 PlayerCommandHelper.addCommands(bot);

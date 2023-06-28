@@ -170,10 +170,10 @@ export class AdminCommand {
             MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been reset back to default settings.")
         }
         else {
-            MsgHelper.reply(message, "Command not formatted corrctly, this command just takes a channel id only as its argument")
+            MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
         }
     }
-    private async setPrimaryMode(message: Message, input: string[]) {
+    private async primaryMode(message: Message, input: string[]) {
         if (!(message.member instanceof GuildMember)) {
             const user = await DB.getDiscordUser(message.author.id);
             if(user.globalAdmin == false){
@@ -186,8 +186,11 @@ export class AdminCommand {
             return;
         }
         const serverId: string = message.guild.id;
+        if(input.length == 0){
+            message.reply("PrimaryMode");
+            return;
+        }
         
-
 
     }
     public addCommands(bot: DiscordBot): void {
@@ -195,6 +198,6 @@ export class AdminCommand {
         bot.registerCommand("setadmin", this.setAdmin);
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
-        // bot.registerCommand("setPrimaryMode", this.setPrimaryMode);
+        bot.registerCommand("primaryMode", this.primaryMode);
     }
 }
