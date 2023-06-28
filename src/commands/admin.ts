@@ -195,6 +195,6 @@ export class AdminCommand {
         bot.registerCommand("setadmin", this.setAdmin);
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
-        bot.registerCommand("setPrimaryMode", this.setPrimaryMode);
+        // bot.registerCommand("setPrimaryMode", this.setPrimaryMode);
     }
 }

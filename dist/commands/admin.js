@@ -36,19 +36,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminCommandHelper = exports.AdminCommand = void 0;
+exports.AdminCommand = void 0;
+var discord_js_1 = require("discord.js");
 var discordBot_1 = require("../general/discordBot");
 var logs_1 = require("../general/logs");
 var db_1 = require("../general/db");
+// import {redis} from "redis";
 var AdminCommand = /** @class */ (function () {
     function AdminCommand() {
+        //Only RoguishTiger or Kuriosly can set Admin rights 
+        //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
+        this.admins = ["687898043005272096", "271792666910392325", "607962880154927113"];
     }
-    AdminCommand.setAdmin = function (message, input) {
+    AdminCommand.prototype.setAdmin = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                //Only RoguishTiger or Kuriosly can set Admin rights
-                if (message.author.id == "687898043005272096" || message.author.id == "271792666910392325") {
+                if (this.admins.some(function (adminId) { return message.author.id == adminId; })) {
                     //Check for argument
                     if (input.length == 1) {
                         (function () { return __awaiter(_this, void 0, void 0, function () {
@@ -93,7 +97,7 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.adjustElo = function (message, input) {
+    AdminCommand.prototype.adjustElo = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var user, eugenId, newLeagueElo, newGlobalElo;
             return __generator(this, function (_a) {
@@ -131,7 +135,7 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.setChannelPrems = function (message, input) {
+    AdminCommand.prototype.setChannelPrems = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var user, prem, channel, x, command;
             return __generator(this, function (_a) {
@@ -226,7 +230,7 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.resetChannelPrems = function (message, input) {
+    AdminCommand.prototype.resetChannelPrems = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var channel, prem;
             return __generator(this, function (_a) {
@@ -257,19 +261,40 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
+    AdminCommand.prototype.setPrimaryMode = function (message, input) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user, serverId;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!!(message.member instanceof discord_js_1.GuildMember)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, db_1.DB.getDiscordUser(message.author.id)];
+                    case 1:
+                        user = _a.sent();
+                        if (user.globalAdmin == false) {
+                            message.reply("Only server admin can change the primary mode");
+                            return [2 /*return*/];
+                        }
+                        _a.label = 2;
+                    case 2:
+                        if (input.length > 1) {
+                            message.reply("Invalid arguments for method set primary mode.");
+                            return [2 /*return*/];
+                        }
+                        serverId = message.guild.id;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("adjustelo", this.adjustElo);
+        bot.registerCommand("setadmin", this.setAdmin);
+        bot.registerCommand("setchannel", this.setChannelPrems);
+        bot.registerCommand("resetchannel", this.resetChannelPrems);
+        // bot.registerCommand("setPrimaryMode", this.setPrimaryMode);
+    };
     return AdminCommand;
 }());
 exports.AdminCommand = AdminCommand;
-var AdminCommandHelper = /** @class */ (function () {
-    function AdminCommandHelper() {
-    }
-    AdminCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("adjustelo", AdminCommand.adjustElo);
-        bot.registerCommand("setadmin", AdminCommand.setAdmin);
-        bot.registerCommand("setchannel", AdminCommand.setChannelPrems);
-        bot.registerCommand("resetchannel", AdminCommand.resetChannelPrems);
-    };
-    return AdminCommandHelper;
-}());
-exports.AdminCommandHelper = AdminCommandHelper;
 //# sourceMappingURL=admin.js.map
