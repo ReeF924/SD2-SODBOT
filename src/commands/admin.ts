@@ -190,6 +190,23 @@ export class AdminCommand {
             message.reply("PrimaryMode");
             return;
         }
+        const server = DB.getServer(message.serverId);
+        switch(input[0].toLocaleLowerCase()){
+            case "steeldivision":
+            case "steeldivision2":
+            case "sd":
+            case "sd2":
+                server.primaryMode = "sd2";
+            return;
+
+            case "warno":
+            case "objectivelyWorseEugenGame":
+                server.primaryMode = "warno";
+
+            return;
+
+
+        }
         
 
     }

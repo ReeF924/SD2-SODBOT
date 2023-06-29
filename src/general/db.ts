@@ -81,13 +81,13 @@ import { DiscordBot } from "./discordBot"
 export class DB {
     //players
     static async setServer(server: DiscordServer): Promise<DBObject> {
-        const data = {
-            _id: server.id,
-            serverName: server.serverName,
-            primaryMode: server.primaryMode,
-            oppositeChannelIds: server.oppositeChannelIds
-        };
-        return serverStore.insert(data);
+        // const data = {
+        //     _id: server.id,
+        //     serverName: server.serverName,
+        //     primaryMode: server.primaryMode,
+        //     oppositeChannelIds: server.oppositeChannelIds
+        // };
+        return serverStore.insert(server);
     }
     static async getAllServers(): Promise<DiscordServer> {
         const servers = await serverStore.find({});
@@ -98,9 +98,12 @@ export class DB {
 
         return server;
     }
-    static async putServer(serverId: string, server:DiscordServer){
-        
+    
+    static async putServer(server:DiscordServer){
+        // const oldServer = DB.getServer(server.id)
+        await serverStore.update({id: server.id}, server);
     }
+
     static async setPlayer(player: Player): Promise<DBObject> {
         const data = {
             _id: player.id,
