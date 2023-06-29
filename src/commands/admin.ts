@@ -190,7 +190,7 @@ export class AdminCommand {
             message.reply("PrimaryMode");
             return;
         }
-        const server = DB.getServer(message.serverId);
+        const server = await DB.getServer(serverId);
         switch(input[0].toLocaleLowerCase()){
             case "steeldivision":
             case "steeldivision2":
@@ -204,8 +204,6 @@ export class AdminCommand {
                 server.primaryMode = "warno";
 
             return;
-
-
         }
         
 

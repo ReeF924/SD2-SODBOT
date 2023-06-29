@@ -5,6 +5,7 @@ import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "disc
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
+import {DiscordServer} from "./db";
 
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
@@ -14,9 +15,9 @@ export class DiscordBot {
     static bot: Client;
     commands: Map<string, BotCommand> = new Map<string, BotCommand>();
 
-    constructor() {
+    constructor(client: Client) {
         //this.loadBlacklist();
-        DiscordBot.bot = new Client();
+        DiscordBot.bot = client;
         DiscordBot.bot.on("message", this.onMessage.bind(this));
         DiscordBot.bot.on("ready", this.onReady.bind(this));
         DiscordBot.bot.on("error", this.onError.bind(this));
@@ -33,6 +34,13 @@ export class DiscordBot {
 
     removeCommand(command: string): void {
         this.commands.delete(command);
+    }
+    public getSodbotServers() :DiscordServer[]{
+        let servers: DiscordServer[];
+         DiscordBot.bot.guilds.cache.forEach(guild => {
+            servers.push(new DiscordServer(guild.id, guild.name));
+         });
+         return servers;
     }
 
     private onError(message: unknown) {

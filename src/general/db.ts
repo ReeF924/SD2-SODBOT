@@ -77,6 +77,7 @@ import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { rows } from "mssql";
 import { DiscordBot } from "./discordBot"
+import { Client } from 'discord.js';
 
 export class DB {
     //players
@@ -86,7 +87,7 @@ export class DB {
         //     serverName: server.serverName,
         //     primaryMode: server.primaryMode,
         //     oppositeChannelIds: server.oppositeChannelIds
-        // };
+        // };S
         return serverStore.insert(server);
     }
     static async getAllServers(): Promise<DiscordServer> {
@@ -297,6 +298,20 @@ export class DB {
         return await userStore.update({ _id: data.id }, data, { upsert: true })
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
+    static async saveNewServers(client:Client):Promise<void>{
+        const servers: DiscordServer[] = client.getSodbotServers();
+
+        for (const server of servers) {
+            const savedServer = await DB.getServer(server.id);
+            if(!savedServer){
+                DB.setServer(server);   
+                continue;
+            }
+            if(savedServer.serverName != server.serverName){
+                DB.putServer(server);
+            }
+        }
+    }
     //Other functions
     static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
@@ -357,6 +372,7 @@ export class DB {
       }
       return null
     }
+
   
     static async createPlayerElo(eugenId: number) {
       const data = {
@@ -366,9 +382,12 @@ export class DB {
         return 
     }
     */
-    static init(): void {
+    static init(client: Client): void {
+        this.saveNewServers(client);
+
         console.log("DB initialized");
     }
+
     // Returns 0 for new replay and 1 for existing replay
     static async setReplay(message: Message, replay: RawGameData): Promise<number> {
         let existing = await replayStore.find({ uuid: replay.uniqueSessionId })
@@ -412,11 +431,18 @@ export interface DiscordUser {
     impliedName: string
 }
 
-export interface DiscordServer {
-    id: string,
-    serverName: string,
-    primaryMode: string,
-    oppositeChannelIds: string[]
+export class DiscordServer {
+    id: string;
+    serverName: string;
+    primaryMode: string;
+    oppositeChannelIds: Array<string>;
+
+    public constructor(id:string, serverName:string, primaryMode:string = "sd2", oppositeChannelIds = new Array<string>()){
+        this.id = id
+        this.serverName = serverName;
+        this.primaryMode = primaryMode;
+        this.oppositeChannelIds = oppositeChannelIds;
+    }
 }
 
 export interface EloLadderElement {

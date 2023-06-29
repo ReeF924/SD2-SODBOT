@@ -16,16 +16,18 @@ import { Logs } from "./general/logs";
 import { DB } from "./general/db";
 import { API } from "./api/api";
 import { misc } from 'sd2-data';
+import { Client } from 'discord.js';
 
 const p = require("../package.json")
+const client:Client = new Client();
 
 CommonUtil.init();
-DB.init();
+DB.init(client);
 Logs.init();
 
 smp.install();
 Logs.log("Starting Bot");
-const bot = new DiscordBot();
+const bot = new DiscordBot(client);
 const adminCommand: AdminCommand = new AdminCommand();
 const miscCommand: MiscCommand = new MiscCommand();
 
