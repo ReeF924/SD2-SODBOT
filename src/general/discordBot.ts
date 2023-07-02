@@ -5,7 +5,7 @@ import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "disc
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
-import {DiscordServer} from "./db";
+import {DiscordServer , DB} from "./db";
 
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
@@ -15,11 +15,14 @@ export class DiscordBot {
     static bot: Client;
     commands: Map<string, BotCommand> = new Map<string, BotCommand>();
 
-    constructor(client: Client) {
+    constructor() {
         //this.loadBlacklist();
-        DiscordBot.bot = client;
+        DiscordBot.bot = new Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", this.onReady.bind(this));
+        DiscordBot.bot.on("ready", async () => {
+            await DB.saveNewServers(DiscordBot.bot);
+            await this.onReady();
+        });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
     }
@@ -106,6 +109,7 @@ export class DiscordBot {
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"
         });
+        // DB.saveNewServers(DiscordBot.bot);
     }
 }
 

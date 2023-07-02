@@ -197,14 +197,16 @@ export class AdminCommand {
             case "sd":
             case "sd2":
                 server.primaryMode = "sd2";
-            return;
+            break;
 
             case "warno":
             case "objectivelyWorseEugenGame":
                 server.primaryMode = "warno";
-
-            return;
+            break;
+            default:
+                return;
         }
+        //update
         
 
     }

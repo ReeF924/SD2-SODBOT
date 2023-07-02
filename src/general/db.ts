@@ -299,8 +299,8 @@ export class DB {
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
     static async saveNewServers(client:Client):Promise<void>{
-        const servers: DiscordServer[] = client.getSodbotServers();
-
+        const servers: DiscordServer[] = DB.getSodbotServers(client);
+        // if(servers == null) return;
         for (const server of servers) {
             const savedServer = await DB.getServer(server.id);
             if(!savedServer){
@@ -312,6 +312,19 @@ export class DB {
             }
         }
     }
+    static getSodbotServers(client:Client):DiscordServer[]{
+        // let servers: DiscordServer[];
+        // client.guilds.cache.forEach(guild => {
+        //    servers.push(new DiscordServer(guild.id, guild.name));
+        // });
+        let servers1 :DiscordServer[]
+         client.guilds.cache.map(guild => {
+            new DiscordServer(guild.id, guild.name);
+        }, servers1);
+        return servers1;
+   }
+    
+    
     //Other functions
     static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
@@ -382,8 +395,8 @@ export class DB {
         return 
     }
     */
-    static init(client: Client): void {
-        this.saveNewServers(client);
+    static init(): void {
+        // this.saveNewServers(client);
 
         console.log("DB initialized");
     }

@@ -263,11 +263,10 @@ var AdminCommand = /** @class */ (function () {
     };
     AdminCommand.prototype.primaryMode = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, serverId;
+            var user, serverId, server;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        message.reply("foobar");
                         if (!!(message.member instanceof discord_js_1.GuildMember)) return [3 /*break*/, 2];
                         return [4 /*yield*/, db_1.DB.getDiscordUser(message.author.id)];
                     case 1:
@@ -286,6 +285,23 @@ var AdminCommand = /** @class */ (function () {
                         if (input.length == 0) {
                             message.reply("PrimaryMode");
                             return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, db_1.DB.getServer(serverId)];
+                    case 3:
+                        server = _a.sent();
+                        switch (input[0].toLocaleLowerCase()) {
+                            case "steeldivision":
+                            case "steeldivision2":
+                            case "sd":
+                            case "sd2":
+                                server.primaryMode = "sd2";
+                                break;
+                            case "warno":
+                            case "objectivelyWorseEugenGame":
+                                server.primaryMode = "warno";
+                                break;
+                            default:
+                                return [2 /*return*/];
                         }
                         return [2 /*return*/];
                 }

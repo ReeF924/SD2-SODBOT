@@ -47,8 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DB = void 0;
+exports.DiscordServer = exports.DB = void 0;
 var Datastore = require('nedb-promises');
+var Redis = require("redis");
 var DatastoreWrapper = /** @class */ (function () {
     function DatastoreWrapper(filename) {
         this.db = Datastore.create(filename);
@@ -131,6 +132,7 @@ var serverStore = new DatastoreWrapper('./data/server.db');
 var userStore = new DatastoreWrapper('./data/user.db');
 var replayStore = new DatastoreWrapper('./data/replay.db');
 var eloStore = new DatastoreWrapper('./data/user.db');
+var redisClient = Redis.createClient();
 global["serverStore"] = serverStore;
 global["replayStore"] = replayStore;
 /* Tanner: This is a shitty database, but it works "ok" at low scale and with the freedom to use backups :D */
@@ -169,6 +171,60 @@ var DB = /** @class */ (function () {
     function DB() {
     }
     //players
+    DB.setServer = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                // const data = {
+                //     _id: server.id,
+                //     serverName: server.serverName,
+                //     primaryMode: server.primaryMode,
+                //     oppositeChannelIds: server.oppositeChannelIds
+                // };S
+                return [2 /*return*/, serverStore.insert(server)];
+            });
+        });
+    };
+    DB.getAllServers = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var servers;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, serverStore.find({})];
+                    case 1:
+                        servers = _a.sent();
+                        return [2 /*return*/, servers];
+                }
+            });
+        });
+    };
+    DB.getServer = function (serverId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var server;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, serverStore.find({ serverId: serverId })];
+                    case 1:
+                        server = _a.sent();
+                        return [2 /*return*/, server];
+                }
+            });
+        });
+    };
+    DB.putServer = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: 
+                    // const oldServer = DB.getServer(server.id)
+                    return [4 /*yield*/, serverStore.update({ id: server.id }, server)];
+                    case 1:
+                        // const oldServer = DB.getServer(server.id)
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     DB.setPlayer = function (player) {
         return __awaiter(this, void 0, void 0, function () {
             var data;
@@ -501,6 +557,48 @@ var DB = /** @class */ (function () {
             });
         });
     };
+    DB.saveNewServers = function (client) {
+        return __awaiter(this, void 0, void 0, function () {
+            var servers, _i, servers_1, server, savedServer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        servers = DB.getSodbotServers(client);
+                        _i = 0, servers_1 = servers;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < servers_1.length)) return [3 /*break*/, 4];
+                        server = servers_1[_i];
+                        return [4 /*yield*/, DB.getServer(server.id)];
+                    case 2:
+                        savedServer = _a.sent();
+                        if (!savedServer) {
+                            DB.setServer(server);
+                            return [3 /*break*/, 3];
+                        }
+                        if (savedServer.serverName != server.serverName) {
+                            DB.putServer(server);
+                        }
+                        _a.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DB.getSodbotServers = function (client) {
+        // let servers: DiscordServer[];
+        // client.guilds.cache.forEach(guild => {
+        //    servers.push(new DiscordServer(guild.id, guild.name));
+        // });
+        var servers1;
+        client.guilds.cache.map(function (guild) {
+            new DiscordServer(guild.id, guild.name);
+        }, servers1);
+        return servers1;
+    };
     //Other functions
     DB.getGlobalLadder = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -583,6 +681,7 @@ var DB = /** @class */ (function () {
       }
       return null
     }
+
   
     static async createPlayerElo(eugenId: number) {
       const data = {
@@ -593,6 +692,7 @@ var DB = /** @class */ (function () {
     }
     */
     DB.init = function () {
+        // this.saveNewServers(client);
         console.log("DB initialized");
     };
     // Returns 0 for new replay and 1 for existing replay
@@ -653,5 +753,17 @@ var DB = /** @class */ (function () {
     return DB;
 }());
 exports.DB = DB;
+var DiscordServer = /** @class */ (function () {
+    function DiscordServer(id, serverName, primaryMode, oppositeChannelIds) {
+        if (primaryMode === void 0) { primaryMode = "sd2"; }
+        if (oppositeChannelIds === void 0) { oppositeChannelIds = new Array(); }
+        this.id = id;
+        this.serverName = serverName;
+        this.primaryMode = primaryMode;
+        this.oppositeChannelIds = oppositeChannelIds;
+    }
+    return DiscordServer;
+}());
+exports.DiscordServer = DiscordServer;
 exports.default = DB;
 //# sourceMappingURL=db.js.map

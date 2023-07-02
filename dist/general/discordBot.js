@@ -42,13 +42,27 @@ var discord_js_1 = require("discord.js");
 var logs_1 = require("./logs");
 var replays_1 = require("../results/replays");
 var permissions_1 = require("./permissions");
+var db_1 = require("./db");
 var DiscordBot = /** @class */ (function () {
     function DiscordBot() {
+        var _this = this;
         this.commands = new Map();
         //this.loadBlacklist();
         DiscordBot.bot = new discord_js_1.Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", this.onReady.bind(this));
+        DiscordBot.bot.on("ready", function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, db_1.DB.saveNewServers(DiscordBot.bot)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.onReady()];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        }); });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
     }
@@ -60,6 +74,13 @@ var DiscordBot = /** @class */ (function () {
     };
     DiscordBot.prototype.removeCommand = function (command) {
         this.commands.delete(command);
+    };
+    DiscordBot.prototype.getSodbotServers = function () {
+        var servers;
+        DiscordBot.bot.guilds.cache.forEach(function (guild) {
+            servers.push(new db_1.DiscordServer(guild.id, guild.name));
+        });
+        return servers;
     };
     DiscordBot.prototype.onError = function (message) {
         logs_1.Logs.error(message);
