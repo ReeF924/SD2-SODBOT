@@ -33,7 +33,7 @@ export class MatchupCommand {
         let [side = "sd2", count = 1] = input[0].toLowerCase().split(" ")
         side = side || "sd2"
         count = Math.min(parseInt(`${count}` || "1"), 20)
-        console.log({side, count})
+        console.log({side, count});
 
         if (input.length == 0) {
             MsgHelper.reply(message, "Unknown game, please specify 'sd2' or 'warno'");

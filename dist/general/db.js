@@ -49,7 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordServer = exports.DB = void 0;
 var Datastore = require('nedb-promises');
-var Redis = require("redis");
+// const Redis = require("redis");
 var DatastoreWrapper = /** @class */ (function () {
     function DatastoreWrapper(filename) {
         this.db = Datastore.create(filename);
@@ -126,13 +126,21 @@ var DatastoreWrapper = /** @class */ (function () {
             });
         });
     };
+    DatastoreWrapper.prototype.loadDatabase = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.db.loadDatabase();
+                return [2 /*return*/];
+            });
+        });
+    };
     return DatastoreWrapper;
 }());
 var serverStore = new DatastoreWrapper('./data/server.db');
 var userStore = new DatastoreWrapper('./data/user.db');
 var replayStore = new DatastoreWrapper('./data/replay.db');
 var eloStore = new DatastoreWrapper('./data/user.db');
-var redisClient = Redis.createClient();
+// const redisClient = Redis.createClient();
 global["serverStore"] = serverStore;
 global["replayStore"] = replayStore;
 /* Tanner: This is a shitty database, but it works "ok" at low scale and with the freedom to use backups :D */
@@ -176,10 +184,9 @@ var DB = /** @class */ (function () {
             return __generator(this, function (_a) {
                 // const data = {
                 //     _id: server.id,
-                //     serverName: server.serverName,
                 //     primaryMode: server.primaryMode,
                 //     oppositeChannelIds: server.oppositeChannelIds
-                // };S
+                // };
                 return [2 /*return*/, serverStore.insert(server)];
             });
         });
@@ -202,7 +209,7 @@ var DB = /** @class */ (function () {
             var server;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.find({ serverId: serverId })];
+                    case 0: return [4 /*yield*/, serverStore.findOne({ _id: serverId })];
                     case 1:
                         server = _a.sent();
                         return [2 /*return*/, server];
@@ -214,12 +221,12 @@ var DB = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: 
-                    // const oldServer = DB.getServer(server.id)
-                    return [4 /*yield*/, serverStore.update({ id: server.id }, server)];
+                    case 0: return [4 /*yield*/, serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } })];
                     case 1:
-                        // const oldServer = DB.getServer(server.id)
                         _a.sent();
+                        serverStore.loadDatabase();
+                        // DB.setRedis(server);
+                        console.log("succesful Put");
                         return [2 /*return*/];
                 }
             });
@@ -557,6 +564,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
+    //Called on ready in discordBot.ts
     DB.saveNewServers = function (client) {
         return __awaiter(this, void 0, void 0, function () {
             var servers, _i, servers_1, server, savedServer;
@@ -569,15 +577,15 @@ var DB = /** @class */ (function () {
                     case 1:
                         if (!(_i < servers_1.length)) return [3 /*break*/, 4];
                         server = servers_1[_i];
-                        return [4 /*yield*/, DB.getServer(server.id)];
+                        return [4 /*yield*/, DB.getServer(server._id)];
                     case 2:
                         savedServer = _a.sent();
-                        if (!savedServer) {
+                        console.log(server._id);
+                        console.log(savedServer);
+                        if (savedServer == null) {
+                            console.log("new");
                             DB.setServer(server);
-                            return [3 /*break*/, 3];
-                        }
-                        if (savedServer.serverName != server.serverName) {
-                            DB.putServer(server);
+                            // DB.setRedis(server);
                         }
                         _a.label = 3;
                     case 3:
@@ -593,12 +601,35 @@ var DB = /** @class */ (function () {
         // client.guilds.cache.forEach(guild => {
         //    servers.push(new DiscordServer(guild.id, guild.name));
         // });
-        var servers1;
-        client.guilds.cache.map(function (guild) {
-            new DiscordServer(guild.id, guild.name);
-        }, servers1);
-        return servers1;
+        // let servers :DiscordServer[]
+        //  client.guilds.cache.map(guild => {
+        //     new DiscordServer(guild.id);
+        // }, servers);
+        var servers = new Array();
+        var guildIds = client.guilds.cache.map(function (guild) { return guild.id; });
+        guildIds.forEach(function (guild) { return servers.push(new DiscordServer(guild)); });
+        if (servers == null || servers.length == 0) {
+            console.log("empty");
+        }
+        return servers;
+        // client.on("ready", () => {
+        //     const Guilds = client.guilds.cache.map(guild => guild.id);
+        //     console.log(Guilds);
+        // });
     };
+    // static setRedis(server: DiscordServer): void {
+    //     // redisClient.set("servers", JSON.stringify(servers));
+    //     const data = {
+    //         primaryMode: server.primaryMode,
+    //         oppositeChannelIds: server.oppositeChannelIds
+    //     }
+    //     redisClient.set(server._id, JSON.stringify(data));
+    // }
+    // static getFromRedis(serverId: string): DiscordServer {
+    //     const data = redisClient.get(serverId);
+    //     const parsed = data.parse();
+    //     return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+    // }
     //Other functions
     DB.getGlobalLadder = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -754,11 +785,10 @@ var DB = /** @class */ (function () {
 }());
 exports.DB = DB;
 var DiscordServer = /** @class */ (function () {
-    function DiscordServer(id, serverName, primaryMode, oppositeChannelIds) {
+    function DiscordServer(id, primaryMode, oppositeChannelIds) {
         if (primaryMode === void 0) { primaryMode = "sd2"; }
         if (oppositeChannelIds === void 0) { oppositeChannelIds = new Array(); }
-        this.id = id;
-        this.serverName = serverName;
+        this._id = id;
         this.primaryMode = primaryMode;
         this.oppositeChannelIds = oppositeChannelIds;
     }

@@ -1,13 +1,15 @@
-import { Client, Message, GuildChannel, GuildMember } from "discord.js";
+import { Client, Message, GuildChannel, GuildMember, Guild, Channel } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { Logs } from "../general/logs";
 import { DB } from "../general/db";
 import { DiscordServer } from "../general/db";
+import { serialize } from "v8";
+import { measureMemory } from "vm";
 // import {redis} from "redis";
 export class AdminCommand {
     //Only RoguishTiger or Kuriosly can set Admin rights 
     //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
-    private admins:string[] = ["687898043005272096" , "271792666910392325", "607962880154927113"];
+    private admins: string[] = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
     private async setAdmin(message: Message, input: string[]) {
         if (this.admins.some(adminId => message.author.id == adminId)) {
             //Check for argument
@@ -174,47 +176,133 @@ export class AdminCommand {
         }
     }
     private async primaryMode(message: Message, input: string[]) {
-        if (!(message.member instanceof GuildMember)) {
-            const user = await DB.getDiscordUser(message.author.id);
-            if(user.globalAdmin == false){
-                message.reply("Only server admin can change the primary mode");
-                return;
+        console.log("starting");
+
+        const guild: Guild = message.guild;
+        console.log(guild.id);
+
+        //ReeF: No idea why it doesn't work, the below works for some reason so who cares
+        // let server:DiscordServer = await DB.getServer(serverId); 
+
+        let servers: DiscordServer[] = await DB.getAllServers();
+        let server = servers.find(server => server._id == guild.id);
+
+        if (server == null) {
+            await DB.saveNewServers(DiscordBot.bot);
+            servers = await DB.getAllServers();
+            server = servers.find(server => server._id == guild.id);
+        }
+
+        if (input.length == 0) {
+            // const reply: string = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
+            // message.reply(`Server's primary mode is ${server.primaryMode}, ${reply}`);
+
+            let reply: string;
+            if (server.oppositeChannelIds.length == 0)
+                reply = "server has no oppositeChannels";
+            else {
+                let names: string[] = [];
+                server.oppositeChannelIds.forEach(async channelId => {
+                    names.push(guild.channels.cache.find(channel => channel.id == channelId).name);
+                });
+                reply = `opposite channels are: ${names.join(',')}`;
             }
-        }
-        if (input.length > 1) {
-            message.reply("Invalid arguments for method set primary mode.");
+
+            message.reply(`Server's primary mode is ${server.primaryMode}, ${reply}`);
             return;
         }
-        const serverId: string = message.guild.id;
-        if(input.length == 0){
-            message.reply("PrimaryMode");
+
+        if (input[0].split(' ').length > 1) {
+            message.reply("Invalid arguments for the command.");
             return;
         }
-        const server = await DB.getServer(serverId);
-        switch(input[0].toLocaleLowerCase()){
+
+        //Check if the user has rights to change the primary mode (the commments implemented user.db but it's not used appereantly)
+        if (!this.checkAccess(message)) {
+            message.reply("Only server admin can change the primary mode");
+            return;
+        }
+
+        switch (input[0].toLocaleLowerCase()) {
             case "steeldivision":
             case "steeldivision2":
             case "sd":
             case "sd2":
                 server.primaryMode = "sd2";
-            break;
+                break;
 
             case "warno":
             case "objectivelyWorseEugenGame":
                 server.primaryMode = "warno";
-            break;
+                break;
             default:
+                message.reply("Invalid input, try sd2 or warno");
                 return;
         }
-        //update
-        
+        await DB.putServer(server);
+        message.reply(`Primary mode changed to ${server.primaryMode}`);
+    }
+    private checkAccess(message: Message): boolean {
+        return (message.member instanceof GuildMember) || this.admins.some(adminID => message.member.id == adminID)
+    }
+    private async addOppositeChannel(message: Message, input: string[]) {
+        if (!checkAccess(message, this.admins)) {
+            message.reply("Only server admin can add new oppositeChannels");
+            return;
+        }
+        // if(input.length > 1 || (input.length == 1 && input[0].split(' ').length > 1)){
+        //     message.reply("Invalid input. Try $addchannel");
+        //     return;
+        // }
+        if (input.length > 0) {
+            message.reply("Invalid input. Try $addchannel");
+            return;
+        }
 
+        const guild: Guild = message.guild;
+        const channel: Channel = message.channel;
+        let server = await DB.getServer(guild.id);
+
+        if (server == null) {
+            await DB.saveNewServers(DiscordBot.bot);
+            server = await DB.getServer(guild.id);
+        }
+        server.oppositeChannelIds.push(channel.id);
+        await DB.putServer(server);
     }
     public addCommands(bot: DiscordBot): void {
         bot.registerCommand("adjustelo", this.adjustElo);
         bot.registerCommand("setadmin", this.setAdmin);
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
-        bot.registerCommand("primaryMode", this.primaryMode);
+        bot.registerCommand("primarymode", this.primaryMode);
+        bot.registerCommand("addchannel", this.addOppositeChannel);
+    }
+
+    private getOppositeChannelsReply(guild: Guild, channelIds: string[]): string {
+        console.log("inOppositeMethod");
+        if (channelIds.length == 0)
+            return "server has no oppositeChannels";
+        let names: string[] = [];
+        channelIds.forEach(async channelId => {
+            names.push(guild.channels.cache.find(channel => channel.id == channelId).name);
+        });
+        return `opposite channels are: ${names.join(',')}`;
     }
 }
+function checkAccess(message: Message, admins:string[]): boolean {
+    // return (message.member instanceof GuildMember) || admins.some(adminID => message.member.id == adminID)
+    console.log("hello");
+    console.log(admins);
+    return true;
+}
+    function getOppositeChannelsReply(guild: Guild, channelIds: string[]): string {
+        console.log("inOppositeMethod");
+        if (channelIds.length == 0)
+            return "server has no oppositeChannels";
+        let names: string[] = [];
+        channelIds.forEach(async channelId => {
+            names.push(guild.channels.cache.find(channel => channel.id == channelId).name);
+        });
+        return `opposite channels are: ${names.join(',')}`;
+    }

@@ -1,5 +1,5 @@
 const Datastore = require('nedb-promises')
-const Redis = require("redis");
+// const Redis = require("redis");
 
 class DatastoreWrapper {
     private db
@@ -27,6 +27,9 @@ class DatastoreWrapper {
         let res = await this.db.findOne(...args)
         return res
     }
+    async loadDatabase() {
+        this.db.loadDatabase();
+    }
 
 }
 
@@ -34,7 +37,7 @@ let serverStore = new DatastoreWrapper('./data/server.db')
 let userStore = new DatastoreWrapper('./data/user.db')
 let replayStore = new DatastoreWrapper('./data/replay.db')
 let eloStore = new DatastoreWrapper('./data/user.db')
-const redisClient = Redis.createClient();
+// const redisClient = Redis.createClient();
 
 global["serverStore"] = serverStore
 global["replayStore"] = replayStore
@@ -75,36 +78,34 @@ async function findSorted(page, perPage = 10) {
 import { Logs } from "./logs";
 import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
-import { rows } from "mssql";
-import { DiscordBot } from "./discordBot"
 import { Client } from 'discord.js';
+import { DiscordBot } from "./discordBot";
 
 export class DB {
     //players
     static async setServer(server: DiscordServer): Promise<DBObject> {
         // const data = {
         //     _id: server.id,
-        //     serverName: server.serverName,
         //     primaryMode: server.primaryMode,
         //     oppositeChannelIds: server.oppositeChannelIds
-        // };S
+        // };
         return serverStore.insert(server);
     }
-    static async getAllServers(): Promise<DiscordServer> {
+    static async getAllServers(): Promise<DiscordServer[]> {
         const servers = await serverStore.find({});
         return servers;
     }
     static async getServer(serverId: string): Promise<DiscordServer> {
-        const server = await serverStore.find({serverId});
-
+        let server = await serverStore.findOne({ _id: serverId });
+        
         return server;
     }
-    
-    static async putServer(server:DiscordServer){
-        // const oldServer = DB.getServer(server.id)
-        await serverStore.update({id: server.id}, server);
+    static async putServer(server: DiscordServer) {
+        await serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
+        serverStore.loadDatabase();
+        // DB.setRedis(server);
+        console.log("succesful Put");
     }
-
     static async setPlayer(player: Player): Promise<DBObject> {
         const data = {
             _id: player.id,
@@ -298,33 +299,61 @@ export class DB {
         return await userStore.update({ _id: data.id }, data, { upsert: true })
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
-    static async saveNewServers(client:Client):Promise<void>{
+    //Called on ready in discordBot.ts
+    static async saveNewServers(client: Client): Promise<void> {
         const servers: DiscordServer[] = DB.getSodbotServers(client);
+
         // if(servers == null) return;
         for (const server of servers) {
-            const savedServer = await DB.getServer(server.id);
-            if(!savedServer){
-                DB.setServer(server);   
-                continue;
-            }
-            if(savedServer.serverName != server.serverName){
-                DB.putServer(server);
+            const savedServer = await DB.getServer(server._id);
+            console.log(server._id);
+            console.log(savedServer);
+            if (savedServer == null) {
+                console.log("new");
+                DB.setServer(server);
+                // DB.setRedis(server);
             }
         }
     }
-    static getSodbotServers(client:Client):DiscordServer[]{
+    static getSodbotServers(client: Client): DiscordServer[] {
         // let servers: DiscordServer[];
         // client.guilds.cache.forEach(guild => {
         //    servers.push(new DiscordServer(guild.id, guild.name));
         // });
-        let servers1 :DiscordServer[]
-         client.guilds.cache.map(guild => {
-            new DiscordServer(guild.id, guild.name);
-        }, servers1);
-        return servers1;
-   }
-    
-    
+        // let servers :DiscordServer[]
+        //  client.guilds.cache.map(guild => {
+        //     new DiscordServer(guild.id);
+        // }, servers);
+        const servers: DiscordServer[] = new Array<DiscordServer>();
+        let guildIds = client.guilds.cache.map(guild => guild.id);
+        guildIds.forEach(guild => servers.push(new DiscordServer(guild)));
+
+
+        if (servers == null || servers.length == 0) {
+            console.log("empty");
+        }
+        return servers;
+
+        // client.on("ready", () => {
+        //     const Guilds = client.guilds.cache.map(guild => guild.id);
+        //     console.log(Guilds);
+        // });
+    }
+    // static setRedis(server: DiscordServer): void {
+    //     // redisClient.set("servers", JSON.stringify(servers));
+    //     const data = {
+    //         primaryMode: server.primaryMode,
+    //         oppositeChannelIds: server.oppositeChannelIds
+    //     }
+    //     redisClient.set(server._id, JSON.stringify(data));
+    // }
+    // static getFromRedis(serverId: string): DiscordServer {
+    //     const data = redisClient.get(serverId);
+    //     const parsed = data.parse();
+    //     return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+    // }
+
+
     //Other functions
     static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
@@ -445,14 +474,12 @@ export interface DiscordUser {
 }
 
 export class DiscordServer {
-    id: string;
-    serverName: string;
+    _id: string;
     primaryMode: string;
-    oppositeChannelIds: Array<string>;
+    oppositeChannelIds: Array<string>; //always the opposite than primaryMode
 
-    public constructor(id:string, serverName:string, primaryMode:string = "sd2", oppositeChannelIds = new Array<string>()){
-        this.id = id
-        this.serverName = serverName;
+    public constructor(id: string, primaryMode: string = "sd2", oppositeChannelIds = new Array<string>()) {
+        this._id = id;
         this.primaryMode = primaryMode;
         this.oppositeChannelIds = oppositeChannelIds;
     }

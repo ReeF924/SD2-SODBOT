@@ -4,6 +4,7 @@ import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
 import { DB } from "../general/db";
 import { Logs } from "../general/logs";
+import { AdminCommand } from "./admin";
 
 
 

@@ -10,7 +10,6 @@ export class API {
 
 
     start():void{
-
         this.express.get('/replay', async (req,res)=>{
             if(req.query.user){
                 const results = await DB.getServerLadder(req.query.server as string)
@@ -19,8 +18,7 @@ export class API {
                 const results = await DB.getGlobalLadder()
                 res.send(results);
             }
-        })
-
+        });
         this.express.get('/leaderboard', async (req,res)=>{
             if(req.query.server){
                 const results = await DB.getServerLadder(req.query.server as string)
@@ -29,7 +27,7 @@ export class API {
                 const results = await DB.getGlobalLadder()
                 res.send(results);
             }
-        })
+        });
         this.express.get('/divElo', async (req,res)=>{
             const results = await DB.getAllDivisionElo()
             res.send(results);
@@ -37,7 +35,7 @@ export class API {
         this.express.get('/', (req,res)=>{res.send(200)})
         this.express.listen(this.port, ()=>{
             Logs.log("HTTP server started on " + this.port);
-        })
+        });
 
     }
 }
