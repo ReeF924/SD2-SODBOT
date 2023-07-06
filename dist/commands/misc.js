@@ -1,13 +1,31 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MiscCommand = void 0;
 var discord_js_1 = require("discord.js");
 var common_1 = require("../general/common");
 var discordBot_1 = require("../general/discordBot");
 var deckParser_1 = require("sd2-utilities/lib/parser/deckParser");
-var MiscCommand = /** @class */ (function () {
-    function MiscCommand() {
-        this.sodbotReplies = [
+var Command_1 = require("./Command");
+var MiscCommand = /** @class */ (function (_super) {
+    __extends(MiscCommand, _super);
+    function MiscCommand(database) {
+        var _this = _super.call(this, database) || this;
+        _this.sodbotReplies = [
             "Ping! Your shot bounced!",
             "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
             "Miss! Your shot couldn't hit the broad side of a barn!",
@@ -42,7 +60,7 @@ var MiscCommand = /** @class */ (function () {
             "Hit! Lets dance I will show you how to tango you hobo",
             "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
         ];
-        this.sodbotReplies2 = [
+        _this.sodbotReplies2 = [
             "Hit! Target destroyed!",
             "Miss! Mission failed. We'll get em next time!",
             "Miss! Damn it where's my .50 cal",
@@ -66,7 +84,7 @@ var MiscCommand = /** @class */ (function () {
             "Hit!, sneaky sneaky you little ptrd squad",
             "Hit!, hi ho hi ho a transport sniping we go"
         ];
-        this.sodbotReplies3 = [
+        _this.sodbotReplies3 = [
             "Hit! Target destroyed!",
             "Hit! We blew him away",
             "Hit! They drew first blood!",
@@ -85,6 +103,7 @@ var MiscCommand = /** @class */ (function () {
             "Hit!  I eat Green Berets for breakfast. And right now, I'm very hungry!",
             "Hit! A strange game, the only winning move is to not play"
         ];
+        return _this;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     MiscCommand.prototype.flip = function (message, input) {
@@ -251,6 +270,6 @@ var MiscCommand = /** @class */ (function () {
         bot.registerCommand("info", this.info);
     };
     return MiscCommand;
-}());
+}(Command_1.CommandDB));
 exports.MiscCommand = MiscCommand;
 //# sourceMappingURL=misc.js.map

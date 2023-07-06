@@ -44,16 +44,18 @@ var replays_1 = require("../results/replays");
 var permissions_1 = require("./permissions");
 var db_1 = require("./db");
 var DiscordBot = /** @class */ (function () {
-    function DiscordBot() {
+    function DiscordBot(database) {
         var _this = this;
         this.commands = new Map();
         //this.loadBlacklist();
+        this.database = database;
+        this.perms = new permissions_1.Permissions(database);
         DiscordBot.bot = new discord_js_1.Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
         DiscordBot.bot.on("ready", function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, db_1.DB.saveNewServers(DiscordBot.bot)];
+                    case 0: return [4 /*yield*/, database.saveNewServers(DiscordBot.bot)];
                     case 1:
                         _a.sent();
                         return [4 /*yield*/, this.onReady()];
@@ -116,7 +118,7 @@ var DiscordBot = /** @class */ (function () {
                         if (message.guild)
                             guild = message.guild.id;
                         if (!message.content.startsWith(common_1.CommonUtil.config("prefix"))) return [3 /*break*/, 3];
-                        perms = permissions_1.Permissions.getPermissions(channel, guild);
+                        perms = this.perms.getPermissions(channel, guild);
                         return [4 /*yield*/, perms];
                     case 1:
                         if (!!(_f.sent()).areCommandsBlocked) return [3 /*break*/, 3];
@@ -137,7 +139,7 @@ var DiscordBot = /** @class */ (function () {
                         _f.label = 3;
                     case 3:
                         if (!message.attachments.first()) return [3 /*break*/, 6];
-                        perms = permissions_1.Permissions.getPermissions(channel, guild);
+                        perms = this.perms.getPermissions(channel, guild);
                         return [4 /*yield*/, perms];
                     case 4:
                         if (!!(_f.sent()).areReplaysBlocked) return [3 /*break*/, 6];
@@ -147,7 +149,7 @@ var DiscordBot = /** @class */ (function () {
                         _e = [message];
                         return [4 /*yield*/, perms];
                     case 5:
-                        _d.apply(_c, _e.concat([(_f.sent())]));
+                        _d.apply(_c, _e.concat([(_f.sent()), this.database]));
                         _f.label = 6;
                     case 6: return [2 /*return*/];
                 }

@@ -37,11 +37,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PermissionsSet = exports.Permissions = void 0;
-var db_1 = require("./db");
 var Permissions = /** @class */ (function () {
-    function Permissions() {
+    function Permissions(database) {
+        this.database = database;
     }
-    Permissions.getPermissions = function (channel, server) {
+    Permissions.prototype.getPermissions = function (channel, server) {
         return __awaiter(this, void 0, void 0, function () {
             var perms, serverPerms, channelPerms, _a, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -50,10 +50,10 @@ var Permissions = /** @class */ (function () {
                         perms = new PermissionsSet();
                         console.log(server);
                         if (server)
-                            serverPerms = db_1.DB.getServerPermissions(server);
+                            serverPerms = this.database.getServerPermissions(server);
                         console.log(channel);
                         if (channel)
-                            channelPerms = db_1.DB.getChannelPermissions(channel);
+                            channelPerms = this.database.getChannelPermissions(channel);
                         return [4 /*yield*/, serverPerms];
                     case 1:
                         if (!_e.sent()) return [3 /*break*/, 3];

@@ -10,14 +10,17 @@ import { DeckData } from 'sd2-utilities/lib/parser/deckParser';
 
 
 export class RatingEngine {
-
-  static k_value = 32;
+  private database:DB;
+  constructor(database:DB){
+    this.database = database;
+  }
+  private k_value = 32;
     
-  static rateMatch(p1:Elos, p2:Elos, victor:number ): {p1:ElosDelta,p2:ElosDelta} {
+  public rateMatch(p1:Elos, p2:Elos, victor:number ): {p1:ElosDelta,p2:ElosDelta} {
     console.log("Have arrived in rateMatch")
-    const global = RatingEngine.generateElo(p1.globalElo,p2.globalElo,victor)
-    const server = RatingEngine.generateElo(p1.serverElo,p2.serverElo,victor)
-    const channel = RatingEngine.generateElo(p1.channelElo,p2.channelElo,victor)
+    const global = this.generateElo(p1.globalElo,p2.globalElo,victor)
+    const server = this.generateElo(p1.serverElo,p2.serverElo,victor)
+    const channel = this.generateElo(p1.channelElo,p2.channelElo,victor)
     const p1x = p1 as ElosDelta;
     const p2x = p2 as ElosDelta;
     p1x.globalElo = global.p1Elo
@@ -39,17 +42,17 @@ export class RatingEngine {
   /**
   /@param gameState: 0 for p1 loss, 1 for p1 win, .5 for draw...
   **/
-  static generateElo(p1Elo:number, p2Elo:number,gameState:number):{p1Elo:number,p1EloDelta:number,p2Elo:number,p2EloDelta:number}{
+  public generateElo(p1Elo:number, p2Elo:number,gameState:number):{p1Elo:number,p1EloDelta:number,p2Elo:number,p2EloDelta:number}{
     const newP1Elo =
-       RatingEngine.k_value * (gameState - RatingEngine.getChanceToWin(p1Elo, p2Elo));
+       this.k_value * (gameState - this.getChanceToWin(p1Elo, p2Elo));
     const newP2Elo =
-       RatingEngine.k_value * ((1-gameState) - RatingEngine.getChanceToWin(p2Elo, p1Elo));
+       this.k_value * ((1-gameState) - this.getChanceToWin(p2Elo, p1Elo));
     return {p1Elo:(p1Elo + newP1Elo), p1EloDelta: newP1Elo,p2Elo:(p2Elo + newP2Elo), p2EloDelta:newP2Elo}
   }
 
-  static async doDivisionElo(deck1:DeckData,deck2:DeckData,victoryState:number){
-      let div1 = DB.getDivisionElo(Number(deck1.raw.division));
-      let div2 = DB.getDivisionElo(Number(deck2.raw.division));
+  public async doDivisionElo(deck1:DeckData,deck2:DeckData,victoryState:number){
+      let div1 = this.database.getDivisionElo(Number(deck1.raw.division));
+      let div2 = this.database.getDivisionElo(Number(deck2.raw.division));
       let elo, e1, e2;
       if(!(await div1)) e1 = 1500; else e1 = (await div1).elo;
       if(!(await div2)) e2 = 1500; else e2 = (await div1).elo;
@@ -62,23 +65,23 @@ export class RatingEngine {
       }
       console.log(`div 1: ${deck1.division} div2: ${deck2.division}`)
       console.log(elo)
-      await DB.setDivisionElo({id:Number(deck1.raw.division),divName:deck1.division,elo:elo.p1Elo})
-      await DB.setDivisionElo({id:Number(deck2.raw.division),divName:deck2.division,elo:elo.p2Elo})
+      await this.database.setDivisionElo({id:Number(deck1.raw.division),divName:deck1.division,elo:elo.p1Elo})
+      await this.database.setDivisionElo({id:Number(deck2.raw.division),divName:deck2.division,elo:elo.p2Elo})
   }
 
 
 
-  static getChanceToWin(a:number, b:number): number {
+  public getChanceToWin(a:number, b:number): number {
     const c = (1 / (1 + Math.pow(10, (b - a) / 400)));
     return c;    
   }
 
-  static async getPlayerElo(discordId:string,message:Message):Promise<Elos>{
-    return DB.getDiscordElos(discordId,message.channel.id,message.guild.id)
+  public async getPlayerElo(discordId:string,message:Message):Promise<Elos>{
+    return this.database.getDiscordElos(discordId,message.channel.id,message.guild.id)
   }
 
-  static async createLadder(){
-    return await DB.getGlobalLadder();
+  public async createLadder(){
+    return await this.database.getGlobalLadder();
   }
 }
 

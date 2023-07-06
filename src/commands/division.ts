@@ -5,12 +5,14 @@ import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
+import { CommandDB } from "./Command";
+
 
 //@todo clean up array mess in this file created by addition of divsion alias names.
-export class DivisionCommand {
-    static bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
+export class DivisionCommand{
+    private bans:Map<string,Map<number,boolean>> = new Map<string,Map<number,boolean>>() ; // 2d array of playerIds to banned divisions.
 
-    static randomDiv(message:Message,input:string[]):void {
+    private randomDiv(message:Message,input:string[]):void {
         let divs:DivisionStruct[];
         Logs.log("command Random Division with Inputs "+JSON.stringify(input));
         if(input.length == 0){
@@ -26,8 +28,8 @@ export class DivisionCommand {
             if(side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
         }
         //check for bans
-        if(DivisionCommand.bans[message.member.id]){
-            for (const key of Object.keys(DivisionCommand.bans[message.member.id])){
+        if(this.bans[message.member.id]){
+            for (const key of Object.keys(this.bans[message.member.id])){
                 divs = divs.filter((x)=>{
                     return x.id != Number(key);
                 })
@@ -44,7 +46,7 @@ export class DivisionCommand {
             
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static allDivs(message:Message,input:string[]):void {        
+    private allDivs(message:Message,input:string[]):void {        
         let allieddivs = "";
         let axisdivs = "";
         for(let i = 0; i < divisions.divisionsAllies.length; i++){
@@ -67,14 +69,14 @@ export class DivisionCommand {
 
     }
 
-    static unbanDivision(message:Message,input:string[]):void{
+    private unbanDivision(message:Message,input:string[]):void{
         if(input.length == 0) {
             MsgHelper.reply(message,`I don't know what that division is, please use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
             return;
         }
         if(input[0].toLocaleLowerCase() == "all")
         {
-            DivisionCommand.bans[message.author.id] = null;
+            this.bans[message.author.id] = null;
             Logs.log(message.author.id + " has unbanned all" );
             MsgHelper.reply(message,'unbanned all divisions');
             return;     
@@ -101,20 +103,20 @@ export class DivisionCommand {
                   );
                 return;
             }else{
-                DivisionCommand.bans[message.author.id][target[0].id]=null;
+                this.bans[message.author.id][target[0].id]=null;
                 Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]) )
                 MsgHelper.reply(message,target[0].name + " has been unbanned.")
                 let all = false;
-                for(const z of DivisionCommand.bans[message.author.id]){
+                for(const z of this.bans[message.author.id]){
                     all = z || all;
                 }
                 console.log(all);
-                if(!all) DivisionCommand.bans[message.author.id] = null;
+                if(!all) this.bans[message.author.id] = null;
             }
         }
     }
 
-    static banDivision(message:Message,input:string[]):void{
+    private banDivision(message:Message,input:string[]):void{
         if(input.length == 0) {
             MsgHelper.reply(message,`Please specify a division to ban. Use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
             return;
@@ -144,10 +146,10 @@ export class DivisionCommand {
                   console.log(JSON.stringify(divs.map(x=>{return x["name"]})));
                 return;
             }else{
-                if(!DivisionCommand.bans[message.author.id]){
-                    DivisionCommand.bans[message.author.id] = new Map();
+                if(!this.bans[message.author.id]){
+                    this.bans[message.author.id] = new Map();
                 }
-                DivisionCommand.bans[message.author.id][target[0].id]=true;
+                this.bans[message.author.id][target[0].id]=true;
                 Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]) )
                 MsgHelper.reply(message,target[0].name + " has been banned.")
             }
@@ -155,13 +157,13 @@ export class DivisionCommand {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static unbanDivisionAll(message:Message,input:string[]):void{
-        DivisionCommand.unbanDivision(message,["all"]);
+    private unbanDivisionAll(message:Message,input:string[]):void{
+        this.unbanDivision(message,["all"]);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static bannedDivisions(message:Message,input:string[]):void{
-        const bannedDivs:Map<number,boolean> = DivisionCommand.bans[message.author.id];
+    private bannedDivisions(message:Message,input:string[]):void{
+        const bannedDivs:Map<number,boolean> = this.bans[message.author.id];
         if(!bannedDivs){
             MsgHelper.reply(message,"You have no banned Divisions");
             return;
@@ -185,15 +187,13 @@ export class DivisionCommand {
             
         }
     }
-}
-export class DivisionCommandHelper {
-    static addCommands(bot:DiscordBot):void{
-        bot.registerCommand("rdiv",DivisionCommand.randomDiv);
-        bot.registerCommand("alldivs",DivisionCommand.allDivs);
-        bot.registerCommand("divs",DivisionCommand.allDivs);
-        bot.registerCommand("unbandiv",DivisionCommand.unbanDivision);
-        bot.registerCommand("resetdivs",DivisionCommand.unbanDivisionAll);
-        bot.registerCommand("bandiv",DivisionCommand.banDivision);
-        bot.registerCommand("banneddivs",DivisionCommand.bannedDivisions);
+    public addCommands(bot:DiscordBot):void{
+        bot.registerCommand("rdiv",this.randomDiv);
+        bot.registerCommand("alldivs",this.allDivs);
+        bot.registerCommand("divs",this.allDivs);
+        bot.registerCommand("unbandiv",this.unbanDivision);
+        bot.registerCommand("resetdivs",this.unbanDivisionAll);
+        bot.registerCommand("bandiv",this.banDivision);
+        bot.registerCommand("banneddivs",this.bannedDivisions);
     }
 }

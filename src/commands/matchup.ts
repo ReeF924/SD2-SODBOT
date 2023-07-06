@@ -27,7 +27,7 @@ function createMatchup(divs) {
 export class MatchupCommand {
 
 
-    static randomMatchup(message: Message, input: string[]): void {
+    private randomMatchup(message: Message, input: string[]): void {
         let divs: DivisionStruct[] = [];
 
         let [side = "sd2", count = 1] = input[0].toLowerCase().split(" ")
@@ -60,12 +60,8 @@ export class MatchupCommand {
         message.channel.send(embed);
 
     }
-
-}
-
-export class MatchupCommandHelper {
-    static addCommands(bot: DiscordBot): void {
-        bot.registerCommand("matchup", MatchupCommand.randomMatchup);
-
+    public addCommands(bot: DiscordBot): void {
+        bot.registerCommand("matchup", this.randomMatchup);
+    
     }
 }

@@ -9,7 +9,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MapCommandHelper = exports.MapCommand = void 0;
+exports.MapCommand = void 0;
 var discordBot_1 = require("../general/discordBot");
 var Data = require("sd2-data");
 var common_1 = require("../general/common");
@@ -17,9 +17,51 @@ var logs_1 = require("../general/logs");
 var discord_js_1 = require("discord.js");
 var MapCommand = /** @class */ (function () {
     function MapCommand() {
+        this.bans = new Map(); // 2d array of playerIds to banned divisions.
+        this.warnoMaps = [
+            "Mount River",
+            "Geisa",
+            "Death Row",
+            "Two Lakes",
+            "Vertigo",
+            "Two Ways",
+            "Black Forest",
+            "Ripple",
+            "Chemical",
+            "Loop"
+        ];
+        this.warnoMaps3v3 = [
+            "Two Ways 3v3",
+            "Danger Hills 3v3",
+            "Mount River 3v3",
+            "Volcano 3v3",
+            "Triple Strike 3v3",
+            "Rift 3v3",
+            "Cyrus 3v3",
+            "Rocks 3v3",
+            "Twin Cities 3v3"
+        ];
+        this.warnoMaps4v4 = [
+            "Chemical 4v4",
+            "Dark Stream 4v4",
+            "Iron Waters 10",
+            "Loop 10",
+            "Crown 10",
+            "Geisa 10"
+        ];
+        this.warnoMapsWaryes2v2 = [
+            "Two Lakes",
+            "Two Ways 2v2",
+            "Vertigo",
+            "Chemical 2v2",
+            "Ripple",
+            "Mount River 3v3",
+            "Cyrus 3v3",
+            "Loop"
+        ];
     }
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
-    MapCommand.randomMap = function (message, input) {
+    MapCommand.prototype.randomMap = function (message, input) {
         function getRandomMaps(mapList, count) {
             if (count === void 0) { count = 1; }
             var availableMaps = __spreadArray([], mapList, true);
@@ -84,22 +126,22 @@ var MapCommand = /** @class */ (function () {
                     maplist = importedMapData.mapData.byPlayerSize[8];
                     break;
                 case "warno":
-                    maplist = MapCommand.warnoMaps;
+                    maplist = this.warnoMaps;
                     break;
                 case "warno 1v1":
-                    maplist = MapCommand.warnoMaps;
+                    maplist = this.warnoMaps;
                     break;
                 case "warno 2v2":
-                    maplist = MapCommand.warnoMaps;
+                    maplist = this.warnoMaps;
                     break;
                 case "warno 3v3":
-                    maplist = MapCommand.warnoMaps3v3;
+                    maplist = this.warnoMaps3v3;
                     break;
                 case "warno 4v4":
-                    maplist = MapCommand.warnoMaps4v4;
+                    maplist = this.warnoMaps4v4;
                     break;
                 case "warno waryes 2v2":
-                    maplist = MapCommand.warnoMapsWaryes2v2;
+                    maplist = this.warnoMapsWaryes2v2;
                     break;
                 default:
                     discordBot_1.MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
@@ -107,8 +149,8 @@ var MapCommand = /** @class */ (function () {
             }
         }
         /*         //check for bans
-                if (MapCommand.bans[message.member.id]) {
-                    for (const key of Object.keys(MapCommand.bans[message.member.id])) {
+                if (this.bans[message.member.id]) {
+                    for (const key of Object.keys(this.bans[message.member.id])) {
                         maplist = maplist.filter((x) => {
                             return x != key;
                         })
@@ -144,10 +186,10 @@ var MapCommand = /** @class */ (function () {
         }
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MapCommand.allMaps = function (message, input) {
+    MapCommand.prototype.allMaps = function (message, input) {
         var importedMapData = Data.maps;
         // console.log(JSON.stringify(importedMapData));
-        var bannedMaps = MapCommand.bans[message.author.id];
+        var bannedMaps = this.bans[message.author.id];
         var legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
         var embed = new discord_js_1.MessageEmbed().setTitle(message.author.username + '\'s Maps');
@@ -196,13 +238,13 @@ var MapCommand = /** @class */ (function () {
         embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)");
         message.channel.send(embed);
     };
-    MapCommand.unbanMap = function (message, input) {
+    MapCommand.prototype.unbanMap = function (message, input) {
         if (input.length == 0) {
             discordBot_1.MsgHelper.reply(message, "I don't know what that map is, please use ".concat(common_1.CommonUtil.config("prefix"), "maps, to get the list of all maps."));
             return;
         }
         if (input[0].toLocaleLowerCase() == "all") {
-            MapCommand.bans[message.author.id] = null;
+            this.bans[message.author.id] = null;
             logs_1.Logs.log(message.author.id + " has unbanned all maps");
             discordBot_1.MsgHelper.reply(message, 'unbanned all maps');
             return;
@@ -217,19 +259,20 @@ var MapCommand = /** @class */ (function () {
                 return { value: void 0 };
             }
             else {
-                MapCommand.bans[message.author.id][target[0]] = null;
+                this_1.bans[message.author.id][target[0]] = null;
                 logs_1.Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, line + " has been unbanned.");
                 var all = false;
-                for (var _a = 0, _b = Object.values(MapCommand.bans[message.author.id]); _a < _b.length; _a++) {
+                for (var _a = 0, _b = Object.values(this_1.bans[message.author.id]); _a < _b.length; _a++) {
                     var z = _b[_a];
                     console.log(z);
                     all = !!z || all;
                 }
                 if (!all)
-                    MapCommand.bans[message.author.id] = null;
+                    this_1.bans[message.author.id] = null;
             }
         };
+        var this_1 = this;
         for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
             var line = input_1[_i];
             var state_2 = _loop_3(line);
@@ -237,7 +280,7 @@ var MapCommand = /** @class */ (function () {
                 return state_2.value;
         }
     };
-    MapCommand.banMap = function (message, input) {
+    MapCommand.prototype.banMap = function (message, input) {
         if (input.length == 0) {
             discordBot_1.MsgHelper.reply(message, "Please specify a map to ban. Use ".concat(common_1.CommonUtil.config("prefix"), "maps, to get the list of all maps."));
             return;
@@ -252,84 +295,37 @@ var MapCommand = /** @class */ (function () {
                 return { value: void 0 };
             }
             else {
-                if (!MapCommand.bans[message.author.id]) {
-                    MapCommand.bans[message.author.id] = new Map();
+                if (!this_2.bans[message.author.id]) {
+                    this_2.bans[message.author.id] = new Map();
                 }
-                MapCommand.bans[message.author.id][target[0]] = true;
+                this_2.bans[message.author.id][target[0]] = true;
                 logs_1.Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, line + " has been banned.");
             }
         };
+        var this_2 = this;
         for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
             var line = input_2[_i];
             var state_3 = _loop_4(line);
             if (typeof state_3 === "object")
                 return state_3.value;
         }
-        MapCommand.allMaps(message, input);
+        this.allMaps(message, input);
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MapCommand.unbanMapAll = function (message, input) {
-        MapCommand.unbanMap(message, ["all"]);
+    MapCommand.prototype.unbanMapAll = function (message, input) {
+        this.unbanMap(message, ["all"]);
     };
-    MapCommand.bans = new Map(); // 2d array of playerIds to banned divisions.
-    MapCommand.warnoMaps = [
-        "Mount River",
-        "Geisa",
-        "Death Row",
-        "Two Lakes",
-        "Vertigo",
-        "Two Ways",
-        "Black Forest",
-        "Ripple",
-        "Chemical",
-        "Loop"
-    ];
-    MapCommand.warnoMaps3v3 = [
-        "Two Ways 3v3",
-        "Danger Hills 3v3",
-        "Mount River 3v3",
-        "Volcano 3v3",
-        "Triple Strike 3v3",
-        "Rift 3v3",
-        "Cyrus 3v3",
-        "Rocks 3v3",
-        "Twin Cities 3v3"
-    ];
-    MapCommand.warnoMaps4v4 = [
-        "Chemical 4v4",
-        "Dark Stream 4v4",
-        "Iron Waters 10",
-        "Loop 10",
-        "Crown 10",
-        "Geisa 10"
-    ];
-    MapCommand.warnoMapsWaryes2v2 = [
-        "Two Lakes",
-        "Two Ways 2v2",
-        "Vertigo",
-        "Chemical 2v2",
-        "Ripple",
-        "Mount River 3v3",
-        "Cyrus 3v3",
-        "Loop"
-    ];
+    MapCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("rmap", this.randomMap);
+        bot.registerCommand("allmaps", this.allMaps);
+        bot.registerCommand("maps", this.allMaps);
+        bot.registerCommand("unbanmap", this.unbanMap);
+        bot.registerCommand("resetmaps", this.unbanMapAll);
+        bot.registerCommand("banmap", this.banMap);
+        //bot.registerCommand("defaultMapPool",this.defaultMapPool); @todo
+    };
     return MapCommand;
 }());
 exports.MapCommand = MapCommand;
-var MapCommandHelper = /** @class */ (function () {
-    function MapCommandHelper() {
-    }
-    MapCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("rmap", MapCommand.randomMap);
-        bot.registerCommand("allmaps", MapCommand.allMaps);
-        bot.registerCommand("maps", MapCommand.allMaps);
-        bot.registerCommand("unbanmap", MapCommand.unbanMap);
-        bot.registerCommand("resetmaps", MapCommand.unbanMapAll);
-        bot.registerCommand("banmap", MapCommand.banMap);
-        //bot.registerCommand("defaultMapPool",MapCommand.defaultMapPool); @todo
-    };
-    return MapCommandHelper;
-}());
-exports.MapCommandHelper = MapCommandHelper;
 //# sourceMappingURL=map.js.map

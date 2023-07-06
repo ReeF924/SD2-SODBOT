@@ -4,26 +4,26 @@ import { MessageEmbed } from "discord.js";
 
 export class HelpCommand {
 
-    static help(message:Message,input:string[]):void {
+    private help(message:Message,input:string[]):void {
         switch (input[0]) {
             case "maps":
-                HelpCommand.helpMaps(message)
+                this.helpMaps(message)
                 break;
 
             case "divs":
-                HelpCommand.helpDivs(message)
+                this.helpDivs(message)
                 break;
 
             case "misc":
-                HelpCommand.helpMisc(message)
+                this.helpMisc(message)
                 break;
 
             case "player":
-                HelpCommand.helpPlayer(message)
+                this.helpPlayer(message)
                 break;
             
             case "replays":
-                HelpCommand.helpReplays(message)
+                this.helpReplays(message)
                 break;
 
             default:
@@ -61,7 +61,7 @@ export class HelpCommand {
             
 
 
-    static helpMaps(message:Message){
+    private helpMaps(message:Message){
         const embed = new MessageEmbed()
         .setTitle("Help - Maps Commands")
         .addFields([
@@ -93,7 +93,7 @@ export class HelpCommand {
     }
 
 
-    static helpDivs(message:Message){
+    private helpDivs(message:Message){
         const embed = new MessageEmbed()
         .setTitle("Help - Division Commands")
         .addFields([
@@ -124,7 +124,7 @@ export class HelpCommand {
     }
 
 
-    static helpMisc(message:Message){
+    private helpMisc(message:Message){
         const embed = new MessageEmbed()
         .setTitle("Help - Misc Commands")
         .addFields([
@@ -151,7 +151,7 @@ export class HelpCommand {
     }
 
 
-    static helpPlayer(message:Message){
+    private helpPlayer(message:Message){
         const embed = new MessageEmbed()
         .setTitle("Help - Player Commands")
         .addFields([
@@ -170,7 +170,7 @@ export class HelpCommand {
     }
 
 
-    static helpReplays(message:Message){
+    private helpReplays(message:Message){
         const embed = new MessageEmbed()
         .setTitle("Help - Replays")
         .addFields([
@@ -195,22 +195,12 @@ export class HelpCommand {
         ])
         message.author.send(embed);
     }
-
-}
-
-
-
-
-
-
-
-export class HelpCommandHelper {
-    static addCommands(bot:DiscordBot):void{
-        bot.registerCommand("help",HelpCommand.help);
+    public addCommands(bot:DiscordBot):void{
+        bot.registerCommand("help",this.help);
     
     }
-}
 
+}
 
 
 

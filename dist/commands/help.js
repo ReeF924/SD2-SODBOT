@@ -1,26 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HelpCommandHelper = exports.HelpCommand = void 0;
+exports.HelpCommand = void 0;
 var discord_js_1 = require("discord.js");
 var HelpCommand = /** @class */ (function () {
     function HelpCommand() {
     }
-    HelpCommand.help = function (message, input) {
+    HelpCommand.prototype.help = function (message, input) {
         switch (input[0]) {
             case "maps":
-                HelpCommand.helpMaps(message);
+                this.helpMaps(message);
                 break;
             case "divs":
-                HelpCommand.helpDivs(message);
+                this.helpDivs(message);
                 break;
             case "misc":
-                HelpCommand.helpMisc(message);
+                this.helpMisc(message);
                 break;
             case "player":
-                HelpCommand.helpPlayer(message);
+                this.helpPlayer(message);
                 break;
             case "replays":
-                HelpCommand.helpReplays(message);
+                this.helpReplays(message);
                 break;
             default:
                 var embed = new discord_js_1.MessageEmbed()
@@ -58,7 +58,7 @@ var HelpCommand = /** @class */ (function () {
                 message.author.send(embed);
         }
     };
-    HelpCommand.helpMaps = function (message) {
+    HelpCommand.prototype.helpMaps = function (message) {
         var embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Maps Commands")
             .addFields([
@@ -93,7 +93,7 @@ var HelpCommand = /** @class */ (function () {
         ]);
         message.author.send(embed);
     };
-    HelpCommand.helpDivs = function (message) {
+    HelpCommand.prototype.helpDivs = function (message) {
         var embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Division Commands")
             .addFields([
@@ -126,7 +126,7 @@ var HelpCommand = /** @class */ (function () {
         ]);
         message.author.send(embed);
     };
-    HelpCommand.helpMisc = function (message) {
+    HelpCommand.prototype.helpMisc = function (message) {
         var embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Misc Commands")
             .addFields([
@@ -154,7 +154,7 @@ var HelpCommand = /** @class */ (function () {
         ]);
         message.author.send(embed);
     };
-    HelpCommand.helpPlayer = function (message) {
+    HelpCommand.prototype.helpPlayer = function (message) {
         var embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Player Commands")
             .addFields([
@@ -172,7 +172,7 @@ var HelpCommand = /** @class */ (function () {
         ]);
         message.author.send(embed);
     };
-    HelpCommand.helpReplays = function (message) {
+    HelpCommand.prototype.helpReplays = function (message) {
         var embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Replays")
             .addFields([
@@ -197,16 +197,10 @@ var HelpCommand = /** @class */ (function () {
         ]);
         message.author.send(embed);
     };
+    HelpCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("help", this.help);
+    };
     return HelpCommand;
 }());
 exports.HelpCommand = HelpCommand;
-var HelpCommandHelper = /** @class */ (function () {
-    function HelpCommandHelper() {
-    }
-    HelpCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("help", HelpCommand.help);
-    };
-    return HelpCommandHelper;
-}());
-exports.HelpCommandHelper = HelpCommandHelper;
 //# sourceMappingURL=help.js.map

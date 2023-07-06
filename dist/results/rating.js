@@ -37,15 +37,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RatingEngine = void 0;
-var db_1 = require("../general/db");
 var RatingEngine = /** @class */ (function () {
-    function RatingEngine() {
+    function RatingEngine(database) {
+        this.k_value = 32;
+        this.database = database;
     }
-    RatingEngine.rateMatch = function (p1, p2, victor) {
+    RatingEngine.prototype.rateMatch = function (p1, p2, victor) {
         console.log("Have arrived in rateMatch");
-        var global = RatingEngine.generateElo(p1.globalElo, p2.globalElo, victor);
-        var server = RatingEngine.generateElo(p1.serverElo, p2.serverElo, victor);
-        var channel = RatingEngine.generateElo(p1.channelElo, p2.channelElo, victor);
+        var global = this.generateElo(p1.globalElo, p2.globalElo, victor);
+        var server = this.generateElo(p1.serverElo, p2.serverElo, victor);
+        var channel = this.generateElo(p1.channelElo, p2.channelElo, victor);
         var p1x = p1;
         var p2x = p2;
         p1x.globalElo = global.p1Elo;
@@ -65,19 +66,19 @@ var RatingEngine = /** @class */ (function () {
     /**
     /@param gameState: 0 for p1 loss, 1 for p1 win, .5 for draw...
     **/
-    RatingEngine.generateElo = function (p1Elo, p2Elo, gameState) {
-        var newP1Elo = RatingEngine.k_value * (gameState - RatingEngine.getChanceToWin(p1Elo, p2Elo));
-        var newP2Elo = RatingEngine.k_value * ((1 - gameState) - RatingEngine.getChanceToWin(p2Elo, p1Elo));
+    RatingEngine.prototype.generateElo = function (p1Elo, p2Elo, gameState) {
+        var newP1Elo = this.k_value * (gameState - this.getChanceToWin(p1Elo, p2Elo));
+        var newP2Elo = this.k_value * ((1 - gameState) - this.getChanceToWin(p2Elo, p1Elo));
         return { p1Elo: (p1Elo + newP1Elo), p1EloDelta: newP1Elo, p2Elo: (p2Elo + newP2Elo), p2EloDelta: newP2Elo };
     };
-    RatingEngine.doDivisionElo = function (deck1, deck2, victoryState) {
+    RatingEngine.prototype.doDivisionElo = function (deck1, deck2, victoryState) {
         return __awaiter(this, void 0, void 0, function () {
             var div1, div2, elo, e1, e2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        div1 = db_1.DB.getDivisionElo(Number(deck1.raw.division));
-                        div2 = db_1.DB.getDivisionElo(Number(deck2.raw.division));
+                        div1 = this.database.getDivisionElo(Number(deck1.raw.division));
+                        div2 = this.database.getDivisionElo(Number(deck2.raw.division));
                         return [4 /*yield*/, div1];
                     case 1:
                         if (!!(_a.sent())) return [3 /*break*/, 2];
@@ -108,10 +109,10 @@ var RatingEngine = /** @class */ (function () {
                         }
                         console.log("div 1: ".concat(deck1.division, " div2: ").concat(deck2.division));
                         console.log(elo);
-                        return [4 /*yield*/, db_1.DB.setDivisionElo({ id: Number(deck1.raw.division), divName: deck1.division, elo: elo.p1Elo })];
+                        return [4 /*yield*/, this.database.setDivisionElo({ id: Number(deck1.raw.division), divName: deck1.division, elo: elo.p1Elo })];
                     case 9:
                         _a.sent();
-                        return [4 /*yield*/, db_1.DB.setDivisionElo({ id: Number(deck2.raw.division), divName: deck2.division, elo: elo.p2Elo })];
+                        return [4 /*yield*/, this.database.setDivisionElo({ id: Number(deck2.raw.division), divName: deck2.division, elo: elo.p2Elo })];
                     case 10:
                         _a.sent();
                         return [2 /*return*/];
@@ -119,28 +120,27 @@ var RatingEngine = /** @class */ (function () {
             });
         });
     };
-    RatingEngine.getChanceToWin = function (a, b) {
+    RatingEngine.prototype.getChanceToWin = function (a, b) {
         var c = (1 / (1 + Math.pow(10, (b - a) / 400)));
         return c;
     };
-    RatingEngine.getPlayerElo = function (discordId, message) {
+    RatingEngine.prototype.getPlayerElo = function (discordId, message) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, db_1.DB.getDiscordElos(discordId, message.channel.id, message.guild.id)];
+                return [2 /*return*/, this.database.getDiscordElos(discordId, message.channel.id, message.guild.id)];
             });
         });
     };
-    RatingEngine.createLadder = function () {
+    RatingEngine.prototype.createLadder = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, db_1.DB.getGlobalLadder()];
+                    case 0: return [4 /*yield*/, this.database.getGlobalLadder()];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    RatingEngine.k_value = 32;
     return RatingEngine;
 }());
 exports.RatingEngine = RatingEngine;

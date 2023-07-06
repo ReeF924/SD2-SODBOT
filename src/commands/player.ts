@@ -8,10 +8,13 @@ import { Logs } from "../general/logs";
 import e = require("express");
 import { PermissionsSet } from "../general/permissions";
 import { CommonUtil } from "../general/common";
+import { CommandDB } from "./Command";
 
-export class PlayerCommand {
-    
-    static async getPlayer(message:Message,input:string[],perms:PermissionsSet){
+export class PlayerCommand extends CommandDB{
+    public constructor(database:DB){
+        super(database);
+    }
+    private async getPlayer(message:Message,input:string[],perms:PermissionsSet){
         const embed = new MessageEmbed();
         let player:string;
         let icon:string
@@ -27,7 +30,7 @@ export class PlayerCommand {
             MsgHelper.reply(message,`This command can only query 1 player at a time`)
             return;
         }
-        const Elos = await DB.getDiscordElos(player,message.channel.id,message.guild.id);
+        const Elos = await this.database.getDiscordElos(player,message.channel.id,message.guild.id);
         console.log(Elos)
         if(Elos == null ){
             if(input.length == 0)
@@ -53,7 +56,7 @@ export class PlayerCommand {
             embed.addField("\u200b", "\u200b",true)
         }    
         // Extract recent games
-        const xx = await DB.getReplaysByEugenId(Elos.eugenId)
+        const xx = await this.database.getReplaysByEugenId(Elos.eugenId)
         let uploadDate = "";
         let opponent = "";
         let playerDiv = "";
@@ -138,19 +141,19 @@ export class PlayerCommand {
     }
 
 
-    private static pad(num:number):string {
+    private pad(num:number):string {
         var rounded = Math.round(num*10)/10
         var fixed = rounded.toFixed(1)
         return fixed.padEnd(7);
     }
 
 
-    static async getLadder(message:Message, input:string[], perms:PermissionsSet){
+    private async getLadder(message:Message, input:string[], perms:PermissionsSet){
         let ladder:EloLadderElement[]
         if(perms.isGlobalEloShown)
-            ladder = await DB.getGlobalLadder();
+            ladder = await this.database.getGlobalLadder();
         else
-            ladder = await DB.getServerLadder(message.guild.id);
+            ladder = await this.database.getServerLadder(message.guild.id);
 
 
         const embed = new MessageEmbed();
@@ -165,14 +168,14 @@ export class PlayerCommand {
             if (yearAgoTime < ladder[x].lastActive ){
                 if( x < 15){
                     if(ladder[x].discordId != "null"){
-                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
                         if(ladder[x].discordId == message.author.id) playerFound = true;
                     }else{
-                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
+                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
                     }
                 }else{
                     if(ladder[x].discordId != "null" && ladder[x].discordId == message.author.id){
-                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
+                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
 
                     }
                 }
@@ -194,17 +197,17 @@ export class PlayerCommand {
 
     
         //Register a player to the bot
-        static register(message:Message, input:string[]):void{
+        private register(message:Message, input:string[]):void{
             if(input.length == 1 && Number(input[0])){
                 (async () => {
-                    let user = await DB.getDiscordUserFromEugenId(Number(input[0]))
+                    let user = await this.database.getDiscordUserFromEugenId(Number(input[0]))
                     if(user){
                         if(user.id = message.author.id){
                             MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
                             Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
                         }else{
                             user.id =(message.author.id)
-                            await DB.setDiscordUser(user);
+                            await this.database.setDiscordUser(user);
                             MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
                             Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
                         }
@@ -217,19 +220,16 @@ export class PlayerCommand {
                             globalAdmin: false,
                             impliedName: message.author.username
                         }
-                        await DB.setDiscordUser(user);
+                        await this.database.setDiscordUser(user);
                         MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
                         Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
                     }
                 })()
             }
         }
-}
-
-export class PlayerCommandHelper {
-    static addCommands(bot:DiscordBot):void{
-        bot.registerCommand("player",PlayerCommand.getPlayer);
-        bot.registerCommand("ladder",PlayerCommand.getLadder);
-        bot.registerCommand("register",PlayerCommand.register)
-    }
+        public addCommands(bot:DiscordBot):void{
+            bot.registerCommand("player",this.getPlayer);
+            bot.registerCommand("ladder",this.getLadder);
+            bot.registerCommand("register",this.register)
+        }
 }

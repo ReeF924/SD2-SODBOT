@@ -4,32 +4,35 @@ import { Logs } from '../general/logs'
 import { DB } from '../general/db'
 
 export class API {
-    
+    private database:DB;
     express:Application = express()
     public port = 8080
+    public constructor(database:DB){
+        this.database = database;
+    }
+    
 
-
-    start():void{
+    public start():void{
         this.express.get('/replay', async (req,res)=>{
             if(req.query.user){
-                const results = await DB.getServerLadder(req.query.server as string)
+                const results = await this.database.getServerLadder(req.query.server as string)
                 res.send(results);
             }else{
-                const results = await DB.getGlobalLadder()
+                const results = await this.database.getGlobalLadder()
                 res.send(results);
             }
         });
         this.express.get('/leaderboard', async (req,res)=>{
             if(req.query.server){
-                const results = await DB.getServerLadder(req.query.server as string)
+                const results = await this.database.getServerLadder(req.query.server as string)
                 res.send(results);
             }else{
-                const results = await DB.getGlobalLadder()
+                const results = await this.database.getGlobalLadder()
                 res.send(results);
             }
         });
         this.express.get('/divElo', async (req,res)=>{
-            const results = await DB.getAllDivisionElo()
+            const results = await this.database.getAllDivisionElo()
             res.send(results);
         })
         this.express.get('/', (req,res)=>{res.send(200)})

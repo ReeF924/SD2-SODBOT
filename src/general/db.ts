@@ -1,5 +1,5 @@
 const Datastore = require('nedb-promises')
-// const Redis = require("redis");
+const Redis = require("redis");
 
 class DatastoreWrapper {
     private db
@@ -37,7 +37,7 @@ let serverStore = new DatastoreWrapper('./data/server.db')
 let userStore = new DatastoreWrapper('./data/user.db')
 let replayStore = new DatastoreWrapper('./data/replay.db')
 let eloStore = new DatastoreWrapper('./data/user.db')
-// const redisClient = Redis.createClient();
+let redisClient = Redis.createClient();
 
 global["serverStore"] = serverStore
 global["replayStore"] = replayStore
@@ -82,8 +82,11 @@ import { Client } from 'discord.js';
 import { DiscordBot } from "./discordBot";
 
 export class DB {
+    public constructor(){
+        console.log("DB initialized");
+    }
     //players
-    static async setServer(server: DiscordServer): Promise<DBObject> {
+    public async setServer(server: DiscordServer): Promise<DBObject> {
         // const data = {
         //     _id: server.id,
         //     primaryMode: server.primaryMode,
@@ -91,22 +94,22 @@ export class DB {
         // };
         return serverStore.insert(server);
     }
-    static async getAllServers(): Promise<DiscordServer[]> {
+    public async getAllServers(): Promise<DiscordServer[]> {
         const servers = await serverStore.find({});
         return servers;
     }
-    static async getServer(serverId: string): Promise<DiscordServer> {
+    public async getServer(serverId: string): Promise<DiscordServer> {
         let server = await serverStore.findOne({ _id: serverId });
         
         return server;
     }
-    static async putServer(server: DiscordServer) {
+    public async putServer(server: DiscordServer) {
         await serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
         serverStore.loadDatabase();
-        // DB.setRedis(server);
+        // this.setRedis(server);
         console.log("succesful Put");
     }
-    static async setPlayer(player: Player): Promise<DBObject> {
+    public async setPlayer(player: Player): Promise<DBObject> {
         const data = {
             _id: player.id,
             id: player.id,
@@ -119,7 +122,7 @@ export class DB {
         return userStore.insert(data)
         // return await DB.exec(DB.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
     }
-    static async getPlayer(eugenId: number): Promise<Player> {
+    public async getPlayer(eugenId: number): Promise<Player> {
         const player = await userStore.find({ eugenId })
         if (!player) return null
         return {
@@ -131,7 +134,7 @@ export class DB {
         }
     }
     //elos
-    static async getElos(eugenId: number, channel: string, server: string): Promise<Elos> {
+    public async getElos(eugenId: number, channel: string, server: string): Promise<Elos> {
 
         const elo = await eloStore.find({ eugenId, channel, server })
 
@@ -160,7 +163,7 @@ export class DB {
             playerName: String(elo.playerName)
         }
     }
-    static async getDiscordElos(discordId: string, channel: string, server: string): Promise<Elos> {
+    public async getDiscordElos(discordId: string, channel: string, server: string): Promise<Elos> {
         const elo = await eloStore.find({ discordId, channel, server })
         // const xx = await DB.exec(DB.getElosDiscordSql, { playerId: discordId, channelId: channel, serverId: server }, { playerId: sql.VarChar, channelId: sql.VarChar, serverId: sql.VarChar })
         if (!elo) return null
@@ -175,12 +178,12 @@ export class DB {
             playerName: String(elo.playerName)
         }
     }
-    static async setElos(elos: Elos, info: EloInfo): Promise<DBObject> {
+    public async setElos(elos: Elos, info: EloInfo): Promise<DBObject> {
         const elosData = { _id: elos.eugenId, playerId: elos.eugenId, serverId: elos.serverId, channelId: elos.channelId, channelElo: elos.channelElo, serverElo: elos.serverElo, globalElo: elos.globalElo, pickBanGlobalElo: elos.pickBanGlobalElo, ...info }
         Logs.log("saving elos: " + JSON.stringify(elosData))
         return await eloStore.update({ _id: elos.eugenId }, elosData, { upsert: true })
     }
-    static async setDivisionElo(elo: DivElo): Promise<number> {
+    public async setDivisionElo(elo: DivElo): Promise<number> {
         console.log(elo)
         const data = {
             id: elo.id,
@@ -194,7 +197,7 @@ export class DB {
         console.log(i)
         return i
     }
-    static async getDivisionElo(id: number): Promise<DivElo> {
+    public async getDivisionElo(id: number): Promise<DivElo> {
         const elo = await eloStore.find({ _id: id })
         if (!elo) return null
         //const xx = await DB.exec("Select * from divisionElo where id = '" + id + "';")
@@ -204,7 +207,7 @@ export class DB {
             elo: Number(elo.elo),
         }
     }
-    static async getAllDivisionElo(): Promise<DivElo[]> {
+    public async getAllDivisionElo(): Promise<DivElo[]> {
         const elos = await eloStore.find({})
         const ret: DivElo[] = elos.map(elo => {
             ret.push({
@@ -217,7 +220,7 @@ export class DB {
         return ret;
     }
     //permissions
-    static async getServerPermissions(serverId: string): Promise<Blacklist> {
+    public async getServerPermissions(serverId: string): Promise<Blacklist> {
         const perms = await serverStore.find({ serverId, type: "perms" })
         if (!perms) return null
         return {
@@ -231,7 +234,7 @@ export class DB {
             blockGlobalElo: Number(perms.blockGlobalElo)
         }
     }
-    static async getChannelPermissions(channelId: string): Promise<Blacklist> {
+    public async getChannelPermissions(channelId: string): Promise<Blacklist> {
         const perms = await serverStore.find({ channelId, type: "perms-channel" })
         if (!perms) return null
         return {
@@ -245,7 +248,7 @@ export class DB {
             blockGlobalElo: Number(perms.blockGlobalElo)
         }
     }
-    static async setChannelPermissions(prem: Blacklist): Promise<DBObject> {
+    public async setChannelPermissions(prem: Blacklist): Promise<DBObject> {
 
         const data = {
             id: prem.id,
@@ -262,7 +265,7 @@ export class DB {
 
     }
     //discordUser
-    static async getDiscordUser(discordId: string): Promise<DiscordUser> {
+    public async getDiscordUser(discordId: string): Promise<DiscordUser> {
         const user = await userStore.findOne({ discordId })
         //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
         if (!user) return null
@@ -275,7 +278,7 @@ export class DB {
             impliedName: String(user.impliedName)
         }
     }
-    static async getDiscordUserFromEugenId(eugenId: number): Promise<DiscordUser> {
+    public async getDiscordUserFromEugenId(eugenId: number): Promise<DiscordUser> {
         const user = await userStore.findOne({ eugenId })
         //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
         if (!user) return null
@@ -287,7 +290,7 @@ export class DB {
             impliedName: String(user.impliedName)
         }
     }
-    static async setDiscordUser(user: DiscordUser): Promise<DBObject> {
+    public async setDiscordUser(user: DiscordUser): Promise<DBObject> {
         const data = {
             id: String(user.id),
             playerId: user.playerId,
@@ -300,22 +303,22 @@ export class DB {
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
     //Called on ready in discordBot.ts
-    static async saveNewServers(client: Client): Promise<void> {
-        const servers: DiscordServer[] = DB.getSodbotServers(client);
+    public async saveNewServers(client: Client): Promise<void> {
+        const servers: DiscordServer[] = this.getSodbotServers(client);
 
         // if(servers == null) return;
         for (const server of servers) {
-            const savedServer = await DB.getServer(server._id);
+            const savedServer = await this.getServer(server._id);
             console.log(server._id);
             console.log(savedServer);
             if (savedServer == null) {
                 console.log("new");
-                DB.setServer(server);
-                // DB.setRedis(server);
+                await this.setServer(server);
+                await this.setRedis(server);
             }
         }
     }
-    static getSodbotServers(client: Client): DiscordServer[] {
+    public getSodbotServers(client: Client): DiscordServer[] {
         // let servers: DiscordServer[];
         // client.guilds.cache.forEach(guild => {
         //    servers.push(new DiscordServer(guild.id, guild.name));
@@ -339,23 +342,26 @@ export class DB {
         //     console.log(Guilds);
         // });
     }
-    // static setRedis(server: DiscordServer): void {
-    //     // redisClient.set("servers", JSON.stringify(servers));
-    //     const data = {
-    //         primaryMode: server.primaryMode,
-    //         oppositeChannelIds: server.oppositeChannelIds
-    //     }
-    //     redisClient.set(server._id, JSON.stringify(data));
-    // }
-    // static getFromRedis(serverId: string): DiscordServer {
-    //     const data = redisClient.get(serverId);
-    //     const parsed = data.parse();
-    //     return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
-    // }
+    public async setRedis(server: DiscordServer): Promise<void> {
+        // redisClient.set("servers", JSON.stringify(servers));
+        const data = {
+            primaryMode: server.primaryMode,
+            oppositeChannelIds: server.oppositeChannelIds
+        }
+        redisClient.set(server._id, JSON.stringify(data));
+    }
+    public async getFromRedis(serverId: string): Promise<DiscordServer> {
+        redisClient = Redis.createClient();
+        const data = await redisClient.get(serverId);
+        // const parsed = JSON.parse(data);
+        // return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+        console.log(data);
+        return null;
+    }
 
 
     //Other functions
-    static async getGlobalLadder(): Promise<Array<EloLadderElement>> {
+    public async getGlobalLadder(): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
         const users = await eloStore.find({})
         // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
@@ -370,7 +376,7 @@ export class DB {
             }
         })
     }
-    static async getServerLadder(serverId: string): Promise<Array<EloLadderElement>> {
+    public async getServerLadder(serverId: string): Promise<Array<EloLadderElement>> {
         // TODO: this probably wont work out of the box.
         const users = await eloStore.find({ serverId })
         // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
@@ -386,7 +392,7 @@ export class DB {
         })
     }
     /*
-    static async getPlayerElo(eugenId:number): Promise<Player> {
+    public async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
       const xx = await DB.exec("Select * from players where id = '" + eugenId + "';");
       console.log("Back from sql")
@@ -416,7 +422,7 @@ export class DB {
     }
 
   
-    static async createPlayerElo(eugenId: number) {
+    public async createPlayerElo(eugenId: number) {
       const data = {
         playerId: eugenId
       }
@@ -424,14 +430,10 @@ export class DB {
         return 
     }
     */
-    static init(): void {
-        // this.saveNewServers(client);
 
-        console.log("DB initialized");
-    }
 
     // Returns 0 for new replay and 1 for existing replay
-    static async setReplay(message: Message, replay: RawGameData): Promise<number> {
+    public async setReplay(message: Message, replay: RawGameData): Promise<number> {
         let existing = await replayStore.find({ uuid: replay.uniqueSessionId })
         const replayData = {
             discordId: message.author.id,
@@ -449,11 +451,11 @@ export class DB {
 
     //This is expensive. And an unprepared statement. and it returns *....
     //it needs work. @todo
-    static async getReplaysByEugenId(eugenId: number): Promise<DBObject> {
+    public async getReplaysByEugenId(eugenId: number): Promise<DBObject> {
         return await replayStore.find({ eugenId })
         // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
     }
-    private static async exec(...dots: any): Promise<DBObject> {
+    private async exec(...dots: any): Promise<DBObject> {
         console.log("Not implemented");
 
         return { rowCount: 0, rows: [] }

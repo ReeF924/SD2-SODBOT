@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,17 +51,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlayerCommandHelper = exports.PlayerCommand = void 0;
+exports.PlayerCommand = void 0;
 var discordBot_1 = require("../general/discordBot");
 var discord_js_1 = require("discord.js");
-var db_1 = require("../general/db");
 var sd2_data_1 = require("sd2-data");
 var logs_1 = require("../general/logs");
 var common_1 = require("../general/common");
-var PlayerCommand = /** @class */ (function () {
-    function PlayerCommand() {
+var Command_1 = require("./Command");
+var PlayerCommand = /** @class */ (function (_super) {
+    __extends(PlayerCommand, _super);
+    function PlayerCommand(database) {
+        return _super.call(this, database) || this;
     }
-    PlayerCommand.getPlayer = function (message, input, perms) {
+    PlayerCommand.prototype.getPlayer = function (message, input, perms) {
         return __awaiter(this, void 0, void 0, function () {
             var embed, player, icon, usr, Elos, xx, uploadDate, opponent, playerDiv, opponentDiv, gameMap, gameResult, numGames, i, x, replayString, replayJson, _i, _a, player_1, _b, _c, player_2;
             return __generator(this, function (_d) {
@@ -67,7 +84,7 @@ var PlayerCommand = /** @class */ (function () {
                             discordBot_1.MsgHelper.reply(message, "This command can only query 1 player at a time");
                             return [2 /*return*/];
                         }
-                        return [4 /*yield*/, db_1.DB.getDiscordElos(player, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, this.database.getDiscordElos(player, message.channel.id, message.guild.id)];
                     case 1:
                         Elos = _d.sent();
                         console.log(Elos);
@@ -93,7 +110,7 @@ var PlayerCommand = /** @class */ (function () {
                             embed.addField("Global Rating", Math.round(Elos.globalElo), true);
                             embed.addField("\u200b", "\u200b", true);
                         }
-                        return [4 /*yield*/, db_1.DB.getReplaysByEugenId(Elos.eugenId)];
+                        return [4 /*yield*/, this.database.getReplaysByEugenId(Elos.eugenId)];
                     case 2:
                         xx = _d.sent();
                         uploadDate = "";
@@ -188,23 +205,23 @@ var PlayerCommand = /** @class */ (function () {
             });
         });
     };
-    PlayerCommand.pad = function (num) {
+    PlayerCommand.prototype.pad = function (num) {
         var rounded = Math.round(num * 10) / 10;
         var fixed = rounded.toFixed(1);
         return fixed.padEnd(7);
     };
-    PlayerCommand.getLadder = function (message, input, perms) {
+    PlayerCommand.prototype.getLadder = function (message, input, perms) {
         return __awaiter(this, void 0, void 0, function () {
             var ladder, embed, playerDetails, yearAgoTime, x, playerFound;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!perms.isGlobalEloShown) return [3 /*break*/, 2];
-                        return [4 /*yield*/, db_1.DB.getGlobalLadder()];
+                        return [4 /*yield*/, this.database.getGlobalLadder()];
                     case 1:
                         ladder = _a.sent();
                         return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, db_1.DB.getServerLadder(message.guild.id)];
+                    case 2: return [4 /*yield*/, this.database.getServerLadder(message.guild.id)];
                     case 3:
                         ladder = _a.sent();
                         _a.label = 4;
@@ -221,17 +238,17 @@ var PlayerCommand = /** @class */ (function () {
                             if (yearAgoTime < ladder[x].lastActive) {
                                 if (x < 15) {
                                     if (ladder[x].discordId != "null") {
-                                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n";
+                                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n";
                                         if (ladder[x].discordId == message.author.id)
                                             playerFound = true;
                                     }
                                     else {
-                                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n";
+                                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n";
                                     }
                                 }
                                 else {
                                     if (ladder[x].discordId != "null" && ladder[x].discordId == message.author.id) {
-                                        playerDetails += ladder[x].rank + ":    \u2003" + PlayerCommand.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n";
+                                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n";
                                     }
                                 }
                             }
@@ -252,14 +269,14 @@ var PlayerCommand = /** @class */ (function () {
         });
     };
     //Register a player to the bot
-    PlayerCommand.register = function (message, input) {
+    PlayerCommand.prototype.register = function (message, input) {
         var _this = this;
         if (input.length == 1 && Number(input[0])) {
             (function () { return __awaiter(_this, void 0, void 0, function () {
                 var user;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, db_1.DB.getDiscordUserFromEugenId(Number(input[0]))];
+                        case 0: return [4 /*yield*/, this.database.getDiscordUserFromEugenId(Number(input[0]))];
                         case 1:
                             user = _a.sent();
                             if (!user) return [3 /*break*/, 5];
@@ -269,7 +286,7 @@ var PlayerCommand = /** @class */ (function () {
                             return [3 /*break*/, 4];
                         case 2:
                             user.id = (message.author.id);
-                            return [4 /*yield*/, db_1.DB.setDiscordUser(user)];
+                            return [4 /*yield*/, this.database.setDiscordUser(user)];
                         case 3:
                             _a.sent();
                             discordBot_1.MsgHelper.reply(message, "Eugen account " + input[0] + " has been updated to your discord userid");
@@ -285,7 +302,7 @@ var PlayerCommand = /** @class */ (function () {
                                 globalAdmin: false,
                                 impliedName: message.author.username
                             };
-                            return [4 /*yield*/, db_1.DB.setDiscordUser(user)];
+                            return [4 /*yield*/, this.database.setDiscordUser(user)];
                         case 6:
                             _a.sent();
                             discordBot_1.MsgHelper.reply(message, "Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid");
@@ -297,18 +314,12 @@ var PlayerCommand = /** @class */ (function () {
             }); })();
         }
     };
-    return PlayerCommand;
-}());
-exports.PlayerCommand = PlayerCommand;
-var PlayerCommandHelper = /** @class */ (function () {
-    function PlayerCommandHelper() {
-    }
-    PlayerCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("player", PlayerCommand.getPlayer);
-        bot.registerCommand("ladder", PlayerCommand.getLadder);
-        bot.registerCommand("register", PlayerCommand.register);
+    PlayerCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("player", this.getPlayer);
+        bot.registerCommand("ladder", this.getLadder);
+        bot.registerCommand("register", this.register);
     };
-    return PlayerCommandHelper;
-}());
-exports.PlayerCommandHelper = PlayerCommandHelper;
+    return PlayerCommand;
+}(Command_1.CommandDB));
+exports.PlayerCommand = PlayerCommand;
 //# sourceMappingURL=player.js.map

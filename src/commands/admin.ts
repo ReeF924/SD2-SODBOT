@@ -5,10 +5,13 @@ import { DB } from "../general/db";
 import { DiscordServer } from "../general/db";
 import { serialize } from "v8";
 import { measureMemory } from "vm";
-// import {redis} from "redis";
-export class AdminCommand {
+import { CommandDB } from "./Command";
+export class AdminCommand extends CommandDB{
     //Only RoguishTiger or Kuriosly can set Admin rights 
     //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
+    public constructor(database:DB){
+        super(database);
+    }
     private admins: string[] = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
     private async setAdmin(message: Message, input: string[]) {
         if (this.admins.some(adminId => message.author.id == adminId)) {
@@ -16,13 +19,13 @@ export class AdminCommand {
             if (input.length == 1) {
                 (async () => {
                     //Get user from the DiscordUsers Table
-                    let user = await DB.getDiscordUser(input[0])
+                    let user = await this.database.getDiscordUser(input[0])
                     const discordUser = await DiscordBot.bot.users.fetch(String(input[0]))
                     //If user is already registered up their Admin permisson
                     if (user) {
                         if (user.globalAdmin == false) {
                             user.globalAdmin = (true)
-                            await DB.setDiscordUser(user);
+                            await this.database.setDiscordUser(user);
                             MsgHelper.reply(message, "Discord account " + discordUser.username + " has been updated with global admin access")
                             Logs.log("Changed globalAdmin access to user " + discordUser.username + " to true")
                             return
@@ -43,7 +46,7 @@ export class AdminCommand {
         }
     }
     private async adjustElo(message: Message, input: string[]) {
-        let user = await DB.getDiscordUser(message.author.id)
+        let user = await this.database.getDiscordUser(message.author.id)
         //Check if requestor has admin access
         if (user.globalAdmin == true) {
             //Check that the command is correctly formatted
@@ -56,7 +59,7 @@ export class AdminCommand {
                 let eugenId = input[0]
                 let newLeagueElo = input[1]
                 let newGlobalElo = input[2]
-                //await DB.setPlayer(eugenId, newLeagueElo, newGlobalElo);
+                //await this.database.setPlayer(eugenId, newLeagueElo, newGlobalElo);
                 //message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
                 return
             }
@@ -70,7 +73,7 @@ export class AdminCommand {
         }
     }
     private async setChannelPrems(message: Message, input: string[]) {
-        let user = await DB.getDiscordUser(message.author.id)
+        let user = await this.database.getDiscordUser(message.author.id)
         let prem = {
             id: "",
             name: "",
@@ -90,7 +93,7 @@ export class AdminCommand {
             }
             else if (input.length > 1) {
                 // Check if server is already in ChannelBlacklist table
-                prem = await DB.getChannelPermissions(input[0])
+                prem = await this.database.getChannelPermissions(input[0])
                 console.log(prem)
                 let channel = DiscordBot.bot.channels.cache.get(input[0])
                 // If it isn't create a default
@@ -141,7 +144,7 @@ export class AdminCommand {
                             message.reply("One of the permission settings is not a valid command");
                     }
                 }
-                await DB.setChannelPermissions(prem);
+                await this.database.setChannelPermissions(prem);
                 MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been updated ")
             }
             else {
@@ -168,7 +171,7 @@ export class AdminCommand {
                 blockServerElo: -1,
                 blockGlobalElo: -1
             }
-            await DB.setChannelPermissions(prem);
+            await this.database.setChannelPermissions(prem);
             MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been reset back to default settings.")
         }
         else {
@@ -182,14 +185,12 @@ export class AdminCommand {
         console.log(guild.id);
 
         //ReeF: No idea why it doesn't work, the below works for some reason so who cares
-        // let server:DiscordServer = await DB.getServer(serverId); 
-
-        let servers: DiscordServer[] = await DB.getAllServers();
-        let server = servers.find(server => server._id == guild.id);
+        // let server:DiscordServer = await this.database.getServer(serverId); 
+        let server :DiscordServer = await this.database.getFromRedis(guild.id);
 
         if (server == null) {
-            await DB.saveNewServers(DiscordBot.bot);
-            servers = await DB.getAllServers();
+            await this.database.saveNewServers(DiscordBot.bot);
+            let servers: DiscordServer[]= await this.database.getAllServers();
             server = servers.find(server => server._id == guild.id);
         }
 
@@ -239,7 +240,7 @@ export class AdminCommand {
                 message.reply("Invalid input, try sd2 or warno");
                 return;
         }
-        await DB.putServer(server);
+        await this.database.putServer(server);
         message.reply(`Primary mode changed to ${server.primaryMode}`);
     }
     private checkAccess(message: Message): boolean {
@@ -261,14 +262,14 @@ export class AdminCommand {
 
         const guild: Guild = message.guild;
         const channel: Channel = message.channel;
-        let server = await DB.getServer(guild.id);
+        let server = await this.database.getServer(guild.id);
 
         if (server == null) {
-            await DB.saveNewServers(DiscordBot.bot);
-            server = await DB.getServer(guild.id);
+            await this.database.saveNewServers(DiscordBot.bot);
+            server = await this.database.getServer(guild.id);
         }
         server.oppositeChannelIds.push(channel.id);
-        await DB.putServer(server);
+        await this.database.putServer(server);
     }
     public addCommands(bot: DiscordBot): void {
         bot.registerCommand("adjustelo", this.adjustElo);
