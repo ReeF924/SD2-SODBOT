@@ -55,11 +55,8 @@ var DiscordBot = /** @class */ (function () {
         DiscordBot.bot.on("ready", function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, database.saveNewServers(DiscordBot.bot)];
+                    case 0: return [4 /*yield*/, this.onReady(database)];
                     case 1:
-                        _a.sent();
-                        return [4 /*yield*/, this.onReady()];
-                    case 2:
                         _a.sent();
                         return [2 /*return*/];
                 }
@@ -156,14 +153,25 @@ var DiscordBot = /** @class */ (function () {
             });
         });
     };
-    DiscordBot.prototype.onReady = function () {
+    DiscordBot.prototype.onReady = function (database) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                logs_1.Logs.log("Bot Online!");
-                DiscordBot.bot.user.setActivity("Use " + common_1.CommonUtil.config("prefix") + "help to see commands!", {
-                    type: "LISTENING"
-                });
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, database.saveNewServers(DiscordBot.bot)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, database.redisClient.connect()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, database.redisSaveServers(null)];
+                    case 3:
+                        _a.sent();
+                        logs_1.Logs.log("Bot Online!");
+                        DiscordBot.bot.user.setActivity("Use " + common_1.CommonUtil.config("prefix") + "help to see commands!", {
+                            type: "LISTENING"
+                        });
+                        return [2 /*return*/];
+                }
             });
         });
     };

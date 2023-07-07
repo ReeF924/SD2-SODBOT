@@ -16,7 +16,7 @@ export class AdminCommand extends CommandDB{
     private async setAdmin(message: Message, input: string[]) {
         if (this.admins.some(adminId => message.author.id == adminId)) {
             //Check for argument
-            if (input.length == 1) {
+            if (input.length === 1) {
                 (async () => {
                     //Get user from the DiscordUsers Table
                     let user = await this.database.getDiscordUser(input[0])
@@ -48,14 +48,14 @@ export class AdminCommand extends CommandDB{
     private async adjustElo(message: Message, input: string[]) {
         let user = await this.database.getDiscordUser(message.author.id)
         //Check if requestor has admin access
-        if (user.globalAdmin == true) {
+        if (user.globalAdmin === true) {
             //Check that the command is correctly formatted
             if (input.length < 3) {
                 console.log("Not enough arguments")
                 message.reply("This command requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
                 return
             }
-            else if (input.length == 3) {
+            else if (input.length === 3) {
                 let eugenId = input[0]
                 let newLeagueElo = input[1]
                 let newGlobalElo = input[2]
@@ -160,7 +160,7 @@ export class AdminCommand extends CommandDB{
     }
     private async resetChannelPrems(message: Message, input: string[]) {
         let channel = DiscordBot.bot.channels.cache.get(input[0])
-        if (input.length == 1) {
+        if (input.length === 1) {
             let prem = {
                 id: input[0],
                 name: (channel as GuildChannel).name,
@@ -179,22 +179,20 @@ export class AdminCommand extends CommandDB{
         }
     }
     private async primaryMode(message: Message, input: string[]) {
-        console.log("starting");
-
         const guild: Guild = message.guild;
-        console.log(guild.id);
 
         //ReeF: No idea why it doesn't work, the below works for some reason so who cares
         // let server:DiscordServer = await this.database.getServer(serverId); 
-        let server :DiscordServer = await this.database.getFromRedis(guild.id);
 
-        if (server == null) {
+        let server :DiscordServer = await this.database.getFromRedis(guild.id);
+        console.log(`redisServer: ${server}`);
+        if (server === undefined || server === null) {
             await this.database.saveNewServers(DiscordBot.bot);
             let servers: DiscordServer[]= await this.database.getAllServers();
             server = servers.find(server => server._id == guild.id);
         }
 
-        if (input.length == 0) {
+        if (input.length === 0) {
             // const reply: string = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
             // message.reply(`Server's primary mode is ${server.primaryMode}, ${reply}`);
 
@@ -244,7 +242,7 @@ export class AdminCommand extends CommandDB{
         message.reply(`Primary mode changed to ${server.primaryMode}`);
     }
     private checkAccess(message: Message): boolean {
-        return (message.member instanceof GuildMember) || this.admins.some(adminID => message.member.id == adminID)
+        return (message.member instanceof GuildMember) || this.admins.some(adminID => message.member.id === adminID)
     }
     private async addOppositeChannel(message: Message, input: string[]) {
         if (!checkAccess(message, this.admins)) {
@@ -264,7 +262,7 @@ export class AdminCommand extends CommandDB{
         const channel: Channel = message.channel;
         let server = await this.database.getServer(guild.id);
 
-        if (server == null) {
+        if (server === null) {
             await this.database.saveNewServers(DiscordBot.bot);
             server = await this.database.getServer(guild.id);
         }

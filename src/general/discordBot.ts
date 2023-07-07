@@ -23,8 +23,7 @@ export class DiscordBot {
         DiscordBot.bot = new Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
         DiscordBot.bot.on("ready", async () => {
-            await database.saveNewServers(DiscordBot.bot);
-            await this.onReady();
+            await this.onReady(database);
         });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
@@ -107,7 +106,10 @@ export class DiscordBot {
 
     }
 
-    private async onReady() {
+    private async onReady(database:DB) {
+        await database.saveNewServers(DiscordBot.bot);
+        await database.redisClient.connect();
+        await database.redisSaveServers(null);
         Logs.log("Bot Online!");
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"

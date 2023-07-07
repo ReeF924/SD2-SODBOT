@@ -1,3 +1,4 @@
+
 const Datastore = require('nedb-promises')
 const Redis = require("redis");
 
@@ -37,7 +38,6 @@ let serverStore = new DatastoreWrapper('./data/server.db')
 let userStore = new DatastoreWrapper('./data/user.db')
 let replayStore = new DatastoreWrapper('./data/replay.db')
 let eloStore = new DatastoreWrapper('./data/user.db')
-let redisClient = Redis.createClient();
 
 global["serverStore"] = serverStore
 global["replayStore"] = replayStore
@@ -82,10 +82,18 @@ import { Client } from 'discord.js';
 import { DiscordBot } from "./discordBot";
 
 export class DB {
-    public constructor(){
+    public redisClient = Redis.createClient();
+    public  constructor() {
+        console.log("start");
+        let redisClient = Redis.createClient();
+
+        // redisClient.connect().then() => {
+        //     console.log("connected");
+        //     this.redisSaveServers(null);
+
         console.log("DB initialized");
     }
-    //players
+
     public async setServer(server: DiscordServer): Promise<DBObject> {
         // const data = {
         //     _id: server.id,
@@ -100,7 +108,7 @@ export class DB {
     }
     public async getServer(serverId: string): Promise<DiscordServer> {
         let server = await serverStore.findOne({ _id: serverId });
-        
+
         return server;
     }
     public async putServer(server: DiscordServer) {
@@ -109,6 +117,65 @@ export class DB {
         // this.setRedis(server);
         console.log("succesful Put");
     }
+    //Called on ready in discordBot.ts
+    public async saveNewServers(client: Client): Promise<void> {
+        const servers: DiscordServer[] = this.getSodbotServers(client);
+
+        // if(servers == null) return;
+        for (const server of servers) {
+            const savedServer = await this.getServer(server._id);
+            console.log(server._id);
+            console.log(savedServer);
+            if (savedServer == null) {
+                console.log("new");
+                await this.setServer(server);
+                await this.setRedis(server);
+            }
+        }
+    }
+    public getSodbotServers(client: Client): DiscordServer[] {
+        const servers: DiscordServer[] = new Array<DiscordServer>();
+        let guildIds = client.guilds.cache.map(guild => guild.id);
+        guildIds.forEach(guild => servers.push(new DiscordServer(guild)));
+
+
+        if (servers == null || servers.length == 0) {
+            console.log("empty");
+        }
+        return servers;
+    }
+    public async setRedis(server: DiscordServer): Promise<void> {
+        // redisClient.set("servers", JSON.stringify(servers));
+        const data = {
+            primaryMode: server.primaryMode,
+            oppositeChannelIds: server.oppositeChannelIds
+        }
+        await this.redisClient.set(server._id, JSON.stringify(data));
+    }
+    public async getFromRedis(serverId: string): Promise<DiscordServer> {
+        console.log("ts1");
+        const data = await this.redisClient.get(serverId);
+        console.log("ts2");
+        const parsed = JSON.parse(data);
+        console.log("ts3");
+        console.log(data);
+        console.log("ts4");
+        return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+        // return new DiscordServer("111222");
+        // return await this.getServer(serverId);
+    }
+    public async redisSaveServers(servers:DiscordServer[]): Promise<void>{
+        console.log("in redisSave");
+        if(servers == null){
+            servers = await this.getAllServers();
+        }
+        servers.forEach(async server => {
+            await this.setRedis(server);
+            console.log(`saved: ${server._id}`);
+        });
+    }
+    //players
+
     public async setPlayer(player: Player): Promise<DBObject> {
         const data = {
             _id: player.id,
@@ -302,62 +369,7 @@ export class DB {
         return await userStore.update({ _id: data.id }, data, { upsert: true })
         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
     }
-    //Called on ready in discordBot.ts
-    public async saveNewServers(client: Client): Promise<void> {
-        const servers: DiscordServer[] = this.getSodbotServers(client);
 
-        // if(servers == null) return;
-        for (const server of servers) {
-            const savedServer = await this.getServer(server._id);
-            console.log(server._id);
-            console.log(savedServer);
-            if (savedServer == null) {
-                console.log("new");
-                await this.setServer(server);
-                await this.setRedis(server);
-            }
-        }
-    }
-    public getSodbotServers(client: Client): DiscordServer[] {
-        // let servers: DiscordServer[];
-        // client.guilds.cache.forEach(guild => {
-        //    servers.push(new DiscordServer(guild.id, guild.name));
-        // });
-        // let servers :DiscordServer[]
-        //  client.guilds.cache.map(guild => {
-        //     new DiscordServer(guild.id);
-        // }, servers);
-        const servers: DiscordServer[] = new Array<DiscordServer>();
-        let guildIds = client.guilds.cache.map(guild => guild.id);
-        guildIds.forEach(guild => servers.push(new DiscordServer(guild)));
-
-
-        if (servers == null || servers.length == 0) {
-            console.log("empty");
-        }
-        return servers;
-
-        // client.on("ready", () => {
-        //     const Guilds = client.guilds.cache.map(guild => guild.id);
-        //     console.log(Guilds);
-        // });
-    }
-    public async setRedis(server: DiscordServer): Promise<void> {
-        // redisClient.set("servers", JSON.stringify(servers));
-        const data = {
-            primaryMode: server.primaryMode,
-            oppositeChannelIds: server.oppositeChannelIds
-        }
-        redisClient.set(server._id, JSON.stringify(data));
-    }
-    public async getFromRedis(serverId: string): Promise<DiscordServer> {
-        redisClient = Redis.createClient();
-        const data = await redisClient.get(serverId);
-        // const parsed = JSON.parse(data);
-        // return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
-        console.log(data);
-        return null;
-    }
 
 
     //Other functions

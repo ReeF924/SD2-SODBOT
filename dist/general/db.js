@@ -140,7 +140,6 @@ var serverStore = new DatastoreWrapper('./data/server.db');
 var userStore = new DatastoreWrapper('./data/user.db');
 var replayStore = new DatastoreWrapper('./data/replay.db');
 var eloStore = new DatastoreWrapper('./data/user.db');
-var redisClient = Redis.createClient();
 global["serverStore"] = serverStore;
 global["replayStore"] = replayStore;
 /* Tanner: This is a shitty database, but it works "ok" at low scale and with the freedom to use backups :D */
@@ -177,9 +176,14 @@ async function findSorted(page, perPage = 10) {
 var logs_1 = require("./logs");
 var DB = /** @class */ (function () {
     function DB() {
+        this.redisClient = Redis.createClient();
+        console.log("start");
+        var redisClient = Redis.createClient();
+        // redisClient.connect().then() => {
+        //     console.log("connected");
+        //     this.redisSaveServers(null);
         console.log("DB initialized");
     }
-    //players
     DB.prototype.setServer = function (server) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -233,6 +237,118 @@ var DB = /** @class */ (function () {
             });
         });
     };
+    //Called on ready in discordBot.ts
+    DB.prototype.saveNewServers = function (client) {
+        return __awaiter(this, void 0, void 0, function () {
+            var servers, _i, servers_1, server, savedServer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        servers = this.getSodbotServers(client);
+                        _i = 0, servers_1 = servers;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < servers_1.length)) return [3 /*break*/, 6];
+                        server = servers_1[_i];
+                        return [4 /*yield*/, this.getServer(server._id)];
+                    case 2:
+                        savedServer = _a.sent();
+                        console.log(server._id);
+                        console.log(savedServer);
+                        if (!(savedServer == null)) return [3 /*break*/, 5];
+                        console.log("new");
+                        return [4 /*yield*/, this.setServer(server)];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.setRedis(server)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DB.prototype.getSodbotServers = function (client) {
+        var servers = new Array();
+        var guildIds = client.guilds.cache.map(function (guild) { return guild.id; });
+        guildIds.forEach(function (guild) { return servers.push(new DiscordServer(guild)); });
+        if (servers == null || servers.length == 0) {
+            console.log("empty");
+        }
+        return servers;
+    };
+    DB.prototype.setRedis = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = {
+                            primaryMode: server.primaryMode,
+                            oppositeChannelIds: server.oppositeChannelIds
+                        };
+                        return [4 /*yield*/, this.redisClient.set(server._id, JSON.stringify(data))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DB.prototype.getFromRedis = function (serverId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data, parsed;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("ts1");
+                        return [4 /*yield*/, this.redisClient.get(serverId)];
+                    case 1:
+                        data = _a.sent();
+                        console.log("ts2");
+                        parsed = JSON.parse(data);
+                        console.log("ts3");
+                        console.log(data);
+                        console.log("ts4");
+                        return [2 /*return*/, new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds)];
+                }
+            });
+        });
+    };
+    DB.prototype.redisSaveServers = function (servers) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("in redisSave");
+                        if (!(servers == null)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.getAllServers()];
+                    case 1:
+                        servers = _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        servers.forEach(function (server) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.setRedis(server)];
+                                    case 1:
+                                        _a.sent();
+                                        console.log("saved: ".concat(server._id));
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    //players
     DB.prototype.setPlayer = function (player) {
         return __awaiter(this, void 0, void 0, function () {
             var data;
@@ -561,93 +677,6 @@ var DB = /** @class */ (function () {
                     case 1: return [2 /*return*/, _a.sent()
                         // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
                     ];
-                }
-            });
-        });
-    };
-    //Called on ready in discordBot.ts
-    DB.prototype.saveNewServers = function (client) {
-        return __awaiter(this, void 0, void 0, function () {
-            var servers, _i, servers_1, server, savedServer;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        servers = this.getSodbotServers(client);
-                        _i = 0, servers_1 = servers;
-                        _a.label = 1;
-                    case 1:
-                        if (!(_i < servers_1.length)) return [3 /*break*/, 6];
-                        server = servers_1[_i];
-                        return [4 /*yield*/, this.getServer(server._id)];
-                    case 2:
-                        savedServer = _a.sent();
-                        console.log(server._id);
-                        console.log(savedServer);
-                        if (!(savedServer == null)) return [3 /*break*/, 5];
-                        console.log("new");
-                        return [4 /*yield*/, this.setServer(server)];
-                    case 3:
-                        _a.sent();
-                        return [4 /*yield*/, this.setRedis(server)];
-                    case 4:
-                        _a.sent();
-                        _a.label = 5;
-                    case 5:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    DB.prototype.getSodbotServers = function (client) {
-        // let servers: DiscordServer[];
-        // client.guilds.cache.forEach(guild => {
-        //    servers.push(new DiscordServer(guild.id, guild.name));
-        // });
-        // let servers :DiscordServer[]
-        //  client.guilds.cache.map(guild => {
-        //     new DiscordServer(guild.id);
-        // }, servers);
-        var servers = new Array();
-        var guildIds = client.guilds.cache.map(function (guild) { return guild.id; });
-        guildIds.forEach(function (guild) { return servers.push(new DiscordServer(guild)); });
-        if (servers == null || servers.length == 0) {
-            console.log("empty");
-        }
-        return servers;
-        // client.on("ready", () => {
-        //     const Guilds = client.guilds.cache.map(guild => guild.id);
-        //     console.log(Guilds);
-        // });
-    };
-    DB.prototype.setRedis = function (server) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                data = {
-                    primaryMode: server.primaryMode,
-                    oppositeChannelIds: server.oppositeChannelIds
-                };
-                redisClient.set(server._id, JSON.stringify(data));
-                return [2 /*return*/];
-            });
-        });
-    };
-    DB.prototype.getFromRedis = function (serverId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        redisClient = Redis.createClient();
-                        return [4 /*yield*/, redisClient.get(serverId)];
-                    case 1:
-                        data = _a.sent();
-                        // const parsed = JSON.parse(data);
-                        // return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
-                        console.log(data);
-                        return [2 /*return*/, null];
                 }
             });
         });

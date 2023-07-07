@@ -71,7 +71,7 @@ var AdminCommand = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 if (this.admins.some(function (adminId) { return message.author.id == adminId; })) {
                     //Check for argument
-                    if (input.length == 1) {
+                    if (input.length === 1) {
                         (function () { return __awaiter(_this, void 0, void 0, function () {
                             var user, discordUser;
                             return __generator(this, function (_a) {
@@ -125,14 +125,14 @@ var AdminCommand = /** @class */ (function (_super) {
                     case 1:
                         user = _a.sent();
                         //Check if requestor has admin access
-                        if (user.globalAdmin == true) {
+                        if (user.globalAdmin === true) {
                             //Check that the command is correctly formatted
                             if (input.length < 3) {
                                 console.log("Not enough arguments");
                                 message.reply("This command requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas");
                                 return [2 /*return*/];
                             }
-                            else if (input.length == 3) {
+                            else if (input.length === 3) {
                                 eugenId = input[0];
                                 newLeagueElo = input[1];
                                 newGlobalElo = input[2];
@@ -254,7 +254,7 @@ var AdminCommand = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         channel = discordBot_1.DiscordBot.bot.channels.cache.get(input[0]);
-                        if (!(input.length == 1)) return [3 /*break*/, 2];
+                        if (!(input.length === 1)) return [3 /*break*/, 2];
                         prem = {
                             id: input[0],
                             name: channel.name,
@@ -285,13 +285,12 @@ var AdminCommand = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("starting");
                         guild = message.guild;
-                        console.log(guild.id);
                         return [4 /*yield*/, this.database.getFromRedis(guild.id)];
                     case 1:
                         server = _a.sent();
-                        if (!(server == null)) return [3 /*break*/, 4];
+                        console.log("redisServer: ".concat(server));
+                        if (!(server === undefined || server === null)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
                     case 2:
                         _a.sent();
@@ -301,7 +300,7 @@ var AdminCommand = /** @class */ (function (_super) {
                         server = servers.find(function (server) { return server._id == guild.id; });
                         _a.label = 4;
                     case 4:
-                        if (input.length == 0) {
+                        if (input.length === 0) {
                             reply = void 0;
                             if (server.oppositeChannelIds.length == 0)
                                 reply = "server has no oppositeChannels";
@@ -352,7 +351,7 @@ var AdminCommand = /** @class */ (function (_super) {
         });
     };
     AdminCommand.prototype.checkAccess = function (message) {
-        return (message.member instanceof discord_js_1.GuildMember) || this.admins.some(function (adminID) { return message.member.id == adminID; });
+        return (message.member instanceof discord_js_1.GuildMember) || this.admins.some(function (adminID) { return message.member.id === adminID; });
     };
     AdminCommand.prototype.addOppositeChannel = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
@@ -377,7 +376,7 @@ var AdminCommand = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.database.getServer(guild.id)];
                     case 1:
                         server = _a.sent();
-                        if (!(server == null)) return [3 /*break*/, 4];
+                        if (!(server === null)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
                     case 2:
                         _a.sent();
