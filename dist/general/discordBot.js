@@ -42,7 +42,6 @@ var discord_js_1 = require("discord.js");
 var logs_1 = require("./logs");
 var replays_1 = require("../results/replays");
 var permissions_1 = require("./permissions");
-var db_1 = require("./db");
 var DiscordBot = /** @class */ (function () {
     function DiscordBot(database) {
         var _this = this;
@@ -73,13 +72,6 @@ var DiscordBot = /** @class */ (function () {
     };
     DiscordBot.prototype.removeCommand = function (command) {
         this.commands.delete(command);
-    };
-    DiscordBot.prototype.getSodbotServers = function () {
-        var servers;
-        DiscordBot.bot.guilds.cache.forEach(function (guild) {
-            servers.push(new db_1.DiscordServer(guild.id, guild.name));
-        });
-        return servers;
     };
     DiscordBot.prototype.onError = function (message) {
         logs_1.Logs.error(message);

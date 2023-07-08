@@ -114,7 +114,7 @@ export class DB {
     public async putServer(server: DiscordServer) {
         await serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
         serverStore.loadDatabase();
-        // this.setRedis(server);
+        this.setRedis(server);
         console.log("succesful Put");
     }
     //Called on ready in discordBot.ts
@@ -153,16 +153,12 @@ export class DB {
         await this.redisClient.set(server._id, JSON.stringify(data));
     }
     public async getFromRedis(serverId: string): Promise<DiscordServer> {
-        console.log("ts1");
         const data = await this.redisClient.get(serverId);
-        console.log("ts2");
+        if(data === null){
+            return null;
+        }
         const parsed = JSON.parse(data);
-        console.log("ts3");
-        console.log(data);
-        console.log("ts4");
         return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
-        // return new DiscordServer("111222");
-        // return await this.getServer(serverId);
     }
     public async redisSaveServers(servers:DiscordServer[]): Promise<void>{
         console.log("in redisSave");

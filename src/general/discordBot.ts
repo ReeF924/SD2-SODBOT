@@ -40,14 +40,6 @@ export class DiscordBot {
     removeCommand(command: string): void {
         this.commands.delete(command);
     }
-    public getSodbotServers() :DiscordServer[]{
-        let servers: DiscordServer[];
-         DiscordBot.bot.guilds.cache.forEach(guild => {
-            servers.push(new DiscordServer(guild.id, guild.name));
-         });
-         return servers;
-    }
-
     private onError(message: unknown) {
         Logs.error(message)
     }

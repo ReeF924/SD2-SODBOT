@@ -280,8 +280,7 @@ var AdminCommand = /** @class */ (function (_super) {
     };
     AdminCommand.prototype.primaryMode = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
-            var guild, server, servers, reply, names_1;
-            var _this = this;
+            var guild, server, servers, reply;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -289,8 +288,7 @@ var AdminCommand = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.database.getFromRedis(guild.id)];
                     case 1:
                         server = _a.sent();
-                        console.log("redisServer: ".concat(server));
-                        if (!(server === undefined || server === null)) return [3 /*break*/, 4];
+                        if (!(server === null)) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
                     case 2:
                         _a.sent();
@@ -301,19 +299,7 @@ var AdminCommand = /** @class */ (function (_super) {
                         _a.label = 4;
                     case 4:
                         if (input.length === 0) {
-                            reply = void 0;
-                            if (server.oppositeChannelIds.length == 0)
-                                reply = "server has no oppositeChannels";
-                            else {
-                                names_1 = [];
-                                server.oppositeChannelIds.forEach(function (channelId) { return __awaiter(_this, void 0, void 0, function () {
-                                    return __generator(this, function (_a) {
-                                        names_1.push(guild.channels.cache.find(function (channel) { return channel.id == channelId; }).name);
-                                        return [2 /*return*/];
-                                    });
-                                }); });
-                                reply = "opposite channels are: ".concat(names_1.join(','));
-                            }
+                            reply = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
                             message.reply("Server's primary mode is ".concat(server.primaryMode, ", ").concat(reply));
                             return [2 /*return*/];
                         }
@@ -334,7 +320,7 @@ var AdminCommand = /** @class */ (function (_super) {
                                 server.primaryMode = "sd2";
                                 break;
                             case "warno":
-                            case "objectivelyWorseEugenGame":
+                            case "objectivelyworseeugengame":
                                 server.primaryMode = "warno";
                                 break;
                             default:
@@ -350,26 +336,15 @@ var AdminCommand = /** @class */ (function (_super) {
             });
         });
     };
-    AdminCommand.prototype.checkAccess = function (message) {
-        return (message.member instanceof discord_js_1.GuildMember) || this.admins.some(function (adminID) { return message.member.id === adminID; });
-    };
     AdminCommand.prototype.addOppositeChannel = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
-            var guild, channel, server;
+            var guild, channel, server, channelName;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!checkAccess(message, this.admins)) {
-                            message.reply("Only server admin can add new oppositeChannels");
-                            return [2 /*return*/];
-                        }
-                        // if(input.length > 1 || (input.length == 1 && input[0].split(' ').length > 1)){
-                        //     message.reply("Invalid input. Try $addchannel");
-                        //     return;
-                        // }
-                        if (input.length > 0) {
-                            message.reply("Invalid input. Try $addchannel");
-                            return [2 /*return*/];
+                        if (!this.checkAccess(message)) {
+                            message.reply("Only server admin can change oppositeChannels");
+                            return [2 /*return*/, false];
                         }
                         guild = message.guild;
                         channel = message.channel;
@@ -385,58 +360,135 @@ var AdminCommand = /** @class */ (function (_super) {
                         server = _a.sent();
                         _a.label = 4;
                     case 4:
-                        server.oppositeChannelIds.push(channel.id);
+                        if (!(input.length > 0)) return [3 /*break*/, 8];
+                        if (!guild.channels.cache.some(function (channel) { return channel.id === input[0]; })) return [3 /*break*/, 7];
+                        server.oppositeChannelIds.push(input[0]);
                         return [4 /*yield*/, this.database.putServer(server)];
                     case 5:
                         _a.sent();
+                        return [4 /*yield*/, guild.channels.cache.find(function (channel) { return channel.id === input[0]; }).name];
+                    case 6:
+                        channelName = _a.sent();
+                        message.reply("Channel \"".concat(channelName, "\" has been added to the list of opposite channels"));
+                        return [2 /*return*/];
+                    case 7:
+                        message.reply("Invalid arguments.");
+                        return [2 /*return*/];
+                    case 8:
+                        if (server.oppositeChannelIds.some(function (channelId) { return channel.id === channelId; })) {
+                            message.reply("This channel is already in the opposite channels, if you wish to delete it, use $removechannel");
+                            return [2 /*return*/];
+                        }
+                        server.oppositeChannelIds.push(channel.id);
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 9:
+                        _a.sent();
+                        message.reply("Channel has been added to the list of opposite channels");
                         return [2 /*return*/];
                 }
             });
         });
+    };
+    AdminCommand.prototype.removeChannel = function (message, input) {
+        return __awaiter(this, void 0, void 0, function () {
+            var guild, channel, server;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.checkAccess(message)) {
+                            message.reply("Only server admin can remove oppositeChannels");
+                            return [2 /*return*/, false];
+                        }
+                        guild = message.guild;
+                        channel = message.channel;
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 1:
+                        server = _a.sent();
+                        if (!(server === null)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 3:
+                        server = _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!(input.length > 0)) return [3 /*break*/, 8];
+                        if (!(input[0] === "all")) return [3 /*break*/, 6];
+                        server.oppositeChannelIds = [];
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 5:
+                        _a.sent();
+                        message.reply("The list of opposite channels has been cleared.");
+                        return [2 /*return*/];
+                    case 6: return [4 /*yield*/, this.filterChannel(server, input[0], message)];
+                    case 7:
+                        if (_a.sent()) {
+                            return [2 /*return*/];
+                        }
+                        message.reply("Invalid arguments, did you mean \"all\"?");
+                        return [2 /*return*/];
+                    case 8: return [4 /*yield*/, this.filterChannel(server, channel.id, message)];
+                    case 9:
+                        if (_a.sent()) {
+                            return [2 /*return*/];
+                        }
+                        message.reply("This channel isn't in the opposite channels list, if you wish to add it, use $removechannel");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.filterChannel = function (server, channelId, message) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!server.oppositeChannelIds.some(function (channelId) { return channelId === channelId; })) return [3 /*break*/, 2];
+                        server.oppositeChannelIds = server.oppositeChannelIds.filter(function (id) { return id !== channelId; });
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 1:
+                        _a.sent();
+                        message.reply("Channel has been removed from the list of opposite channels.");
+                        return [2 /*return*/, true];
+                    case 2: return [2 /*return*/, false];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.checkAccess = function (message) {
+        return (message.member instanceof discord_js_1.GuildMember) || this.admins.some(function (adminID) { return message.member.id === adminID; });
+    };
+    AdminCommand.prototype.getOppositeChannelsReply = function (guild, channelIds) {
+        console.log("inOppositeMethod");
+        console.log(channelIds);
+        if (channelIds.length === 0) {
+            return "server has no opposite channels";
+        }
+        var names = this.getChannelNamesFromIds(guild, channelIds);
+        return "opposite channels are: ".concat(names.join(", "));
+    };
+    AdminCommand.prototype.getChannelNamesFromIds = function (guild, channelIds) {
+        var _this = this;
+        var names = [];
+        channelIds.forEach(function (channelId) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                names.push(guild.channels.cache.find(function (channel) { return channel.id === channelId; }).name);
+                return [2 /*return*/];
+            });
+        }); });
+        return names;
     };
     AdminCommand.prototype.addCommands = function (bot) {
         bot.registerCommand("adjustelo", this.adjustElo);
         bot.registerCommand("setadmin", this.setAdmin);
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
-        bot.registerCommand("primarymode", this.primaryMode);
-        bot.registerCommand("addchannel", this.addOppositeChannel);
-    };
-    AdminCommand.prototype.getOppositeChannelsReply = function (guild, channelIds) {
-        var _this = this;
-        console.log("inOppositeMethod");
-        if (channelIds.length == 0)
-            return "server has no oppositeChannels";
-        var names = [];
-        channelIds.forEach(function (channelId) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                names.push(guild.channels.cache.find(function (channel) { return channel.id == channelId; }).name);
-                return [2 /*return*/];
-            });
-        }); });
-        return "opposite channels are: ".concat(names.join(','));
+        bot.registerCommand("primarymode", this.primaryMode.bind(this));
+        bot.registerCommand("addchannel", this.addOppositeChannel.bind(this));
+        bot.registerCommand("removechannel", this.removeChannel.bind(this));
     };
     return AdminCommand;
 }(Command_1.CommandDB));
 exports.AdminCommand = AdminCommand;
-function checkAccess(message, admins) {
-    // return (message.member instanceof GuildMember) || admins.some(adminID => message.member.id == adminID)
-    console.log("hello");
-    console.log(admins);
-    return true;
-}
-function getOppositeChannelsReply(guild, channelIds) {
-    var _this = this;
-    console.log("inOppositeMethod");
-    if (channelIds.length == 0)
-        return "server has no oppositeChannels";
-    var names = [];
-    channelIds.forEach(function (channelId) { return __awaiter(_this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            names.push(guild.channels.cache.find(function (channel) { return channel.id == channelId; }).name);
-            return [2 /*return*/];
-        });
-    }); });
-    return "opposite channels are: ".concat(names.join(','));
-}
 //# sourceMappingURL=admin.js.map

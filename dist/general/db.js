@@ -230,7 +230,7 @@ var DB = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         serverStore.loadDatabase();
-                        // this.setRedis(server);
+                        this.setRedis(server);
                         console.log("succesful Put");
                         return [2 /*return*/];
                 }
@@ -304,16 +304,13 @@ var DB = /** @class */ (function () {
             var data, parsed;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log("ts1");
-                        return [4 /*yield*/, this.redisClient.get(serverId)];
+                    case 0: return [4 /*yield*/, this.redisClient.get(serverId)];
                     case 1:
                         data = _a.sent();
-                        console.log("ts2");
+                        if (data === null) {
+                            return [2 /*return*/, null];
+                        }
                         parsed = JSON.parse(data);
-                        console.log("ts3");
-                        console.log(data);
-                        console.log("ts4");
                         return [2 /*return*/, new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds)];
                 }
             });
