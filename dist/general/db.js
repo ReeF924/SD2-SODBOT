@@ -47,8 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DB = void 0;
+exports.DiscordServer = exports.DB = void 0;
 var Datastore = require('nedb-promises');
+var Redis = require("redis");
 var DatastoreWrapper = /** @class */ (function () {
     function DatastoreWrapper(filename) {
         this.db = Datastore.create(filename);
@@ -125,6 +126,14 @@ var DatastoreWrapper = /** @class */ (function () {
             });
         });
     };
+    DatastoreWrapper.prototype.loadDatabase = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.db.loadDatabase();
+                return [2 /*return*/];
+            });
+        });
+    };
     return DatastoreWrapper;
 }());
 var serverStore = new DatastoreWrapper('./data/server.db');
@@ -167,9 +176,177 @@ async function findSorted(page, perPage = 10) {
 var logs_1 = require("./logs");
 var DB = /** @class */ (function () {
     function DB() {
+        this.redisClient = Redis.createClient();
+        console.log("start");
+        var redisClient = Redis.createClient();
+        // redisClient.connect().then() => {
+        //     console.log("connected");
+        //     this.redisSaveServers(null);
+        console.log("DB initialized");
     }
+    DB.prototype.setServer = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                // const data = {
+                //     _id: server.id,
+                //     primaryMode: server.primaryMode,
+                //     oppositeChannelIds: server.oppositeChannelIds
+                // };
+                return [2 /*return*/, serverStore.insert(server)];
+            });
+        });
+    };
+    DB.prototype.getAllServers = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var servers;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, serverStore.find({})];
+                    case 1:
+                        servers = _a.sent();
+                        return [2 /*return*/, servers];
+                }
+            });
+        });
+    };
+    DB.prototype.getServer = function (serverId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var server;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, serverStore.findOne({ _id: serverId })];
+                    case 1:
+                        server = _a.sent();
+                        return [2 /*return*/, server];
+                }
+            });
+        });
+    };
+    DB.prototype.putServer = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } })];
+                    case 1:
+                        _a.sent();
+                        serverStore.loadDatabase();
+                        this.setRedis(server);
+                        console.log("succesful Put");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    //Called on ready in discordBot.ts
+    DB.prototype.saveNewServers = function (client) {
+        return __awaiter(this, void 0, void 0, function () {
+            var servers, _i, servers_1, server, savedServer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        servers = this.getSodbotServers(client);
+                        _i = 0, servers_1 = servers;
+                        _a.label = 1;
+                    case 1:
+                        if (!(_i < servers_1.length)) return [3 /*break*/, 6];
+                        server = servers_1[_i];
+                        return [4 /*yield*/, this.getServer(server._id)];
+                    case 2:
+                        savedServer = _a.sent();
+                        console.log(server._id);
+                        console.log(savedServer);
+                        if (!(savedServer == null)) return [3 /*break*/, 5];
+                        console.log("new");
+                        return [4 /*yield*/, this.setServer(server)];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this.setRedis(server)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DB.prototype.getSodbotServers = function (client) {
+        var servers = new Array();
+        var guildIds = client.guilds.cache.map(function (guild) { return guild.id; });
+        guildIds.forEach(function (guild) { return servers.push(new DiscordServer(guild)); });
+        if (servers == null || servers.length == 0) {
+            console.log("empty");
+        }
+        return servers;
+    };
+    DB.prototype.setRedis = function (server) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = {
+                            primaryMode: server.primaryMode,
+                            oppositeChannelIds: server.oppositeChannelIds
+                        };
+                        return [4 /*yield*/, this.redisClient.set(server._id, JSON.stringify(data))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DB.prototype.getFromRedis = function (serverId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data, parsed;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.redisClient.get(serverId)];
+                    case 1:
+                        data = _a.sent();
+                        if (data === null) {
+                            return [2 /*return*/, null];
+                        }
+                        parsed = JSON.parse(data);
+                        return [2 /*return*/, new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds)];
+                }
+            });
+        });
+    };
+    DB.prototype.redisSaveServers = function (servers) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("in redisSave");
+                        if (!(servers == null)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.getAllServers()];
+                    case 1:
+                        servers = _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        servers.forEach(function (server) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.setRedis(server)];
+                                    case 1:
+                                        _a.sent();
+                                        console.log("saved: ".concat(server._id));
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     //players
-    DB.setPlayer = function (player) {
+    DB.prototype.setPlayer = function (player) {
         return __awaiter(this, void 0, void 0, function () {
             var data;
             return __generator(this, function (_a) {
@@ -187,7 +364,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getPlayer = function (eugenId) {
+    DB.prototype.getPlayer = function (eugenId) {
         return __awaiter(this, void 0, void 0, function () {
             var player;
             return __generator(this, function (_a) {
@@ -209,7 +386,7 @@ var DB = /** @class */ (function () {
         });
     };
     //elos
-    DB.getElos = function (eugenId, channel, server) {
+    DB.prototype.getElos = function (eugenId, channel, server) {
         return __awaiter(this, void 0, void 0, function () {
             var elo;
             return __generator(this, function (_a) {
@@ -244,7 +421,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getDiscordElos = function (discordId, channel, server) {
+    DB.prototype.getDiscordElos = function (discordId, channel, server) {
         return __awaiter(this, void 0, void 0, function () {
             var elo;
             return __generator(this, function (_a) {
@@ -271,7 +448,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.setElos = function (elos, info) {
+    DB.prototype.setElos = function (elos, info) {
         return __awaiter(this, void 0, void 0, function () {
             var elosData;
             return __generator(this, function (_a) {
@@ -285,7 +462,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.setDivisionElo = function (elo) {
+    DB.prototype.setDivisionElo = function (elo) {
         return __awaiter(this, void 0, void 0, function () {
             var data, i;
             return __generator(this, function (_a) {
@@ -311,7 +488,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getDivisionElo = function (id) {
+    DB.prototype.getDivisionElo = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var elo;
             return __generator(this, function (_a) {
@@ -333,7 +510,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getAllDivisionElo = function () {
+    DB.prototype.getAllDivisionElo = function () {
         return __awaiter(this, void 0, void 0, function () {
             var elos, ret;
             return __generator(this, function (_a) {
@@ -354,7 +531,7 @@ var DB = /** @class */ (function () {
         });
     };
     //permissions
-    DB.getServerPermissions = function (serverId) {
+    DB.prototype.getServerPermissions = function (serverId) {
         return __awaiter(this, void 0, void 0, function () {
             var perms;
             return __generator(this, function (_a) {
@@ -378,7 +555,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getChannelPermissions = function (channelId) {
+    DB.prototype.getChannelPermissions = function (channelId) {
         return __awaiter(this, void 0, void 0, function () {
             var perms;
             return __generator(this, function (_a) {
@@ -402,7 +579,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.setChannelPermissions = function (prem) {
+    DB.prototype.setChannelPermissions = function (prem) {
         return __awaiter(this, void 0, void 0, function () {
             var data;
             return __generator(this, function (_a) {
@@ -429,7 +606,7 @@ var DB = /** @class */ (function () {
         });
     };
     //discordUser
-    DB.getDiscordUser = function (discordId) {
+    DB.prototype.getDiscordUser = function (discordId) {
         return __awaiter(this, void 0, void 0, function () {
             var user;
             return __generator(this, function (_a) {
@@ -453,7 +630,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getDiscordUserFromEugenId = function (eugenId) {
+    DB.prototype.getDiscordUserFromEugenId = function (eugenId) {
         return __awaiter(this, void 0, void 0, function () {
             var user;
             return __generator(this, function (_a) {
@@ -477,7 +654,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.setDiscordUser = function (user) {
+    DB.prototype.setDiscordUser = function (user) {
         return __awaiter(this, void 0, void 0, function () {
             var data;
             return __generator(this, function (_a) {
@@ -502,7 +679,7 @@ var DB = /** @class */ (function () {
         });
     };
     //Other functions
-    DB.getGlobalLadder = function () {
+    DB.prototype.getGlobalLadder = function () {
         return __awaiter(this, void 0, void 0, function () {
             var users;
             return __generator(this, function (_a) {
@@ -528,7 +705,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.getServerLadder = function (serverId) {
+    DB.prototype.getServerLadder = function (serverId) {
         return __awaiter(this, void 0, void 0, function () {
             var users;
             return __generator(this, function (_a) {
@@ -555,7 +732,7 @@ var DB = /** @class */ (function () {
         });
     };
     /*
-    static async getPlayerElo(eugenId:number): Promise<Player> {
+    public async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
       const xx = await DB.exec("Select * from players where id = '" + eugenId + "';");
       console.log("Back from sql")
@@ -583,8 +760,9 @@ var DB = /** @class */ (function () {
       }
       return null
     }
+
   
-    static async createPlayerElo(eugenId: number) {
+    public async createPlayerElo(eugenId: number) {
       const data = {
         playerId: eugenId
       }
@@ -592,11 +770,8 @@ var DB = /** @class */ (function () {
         return
     }
     */
-    DB.init = function () {
-        console.log("DB initialized");
-    };
     // Returns 0 for new replay and 1 for existing replay
-    DB.setReplay = function (message, replay) {
+    DB.prototype.setReplay = function (message, replay) {
         return __awaiter(this, void 0, void 0, function () {
             var existing, replayData;
             return __generator(this, function (_a) {
@@ -624,7 +799,7 @@ var DB = /** @class */ (function () {
     };
     //This is expensive. And an unprepared statement. and it returns *....
     //it needs work. @todo
-    DB.getReplaysByEugenId = function (eugenId) {
+    DB.prototype.getReplaysByEugenId = function (eugenId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -638,7 +813,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.exec = function () {
+    DB.prototype.exec = function () {
         var dots = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             dots[_i] = arguments[_i];
@@ -653,5 +828,16 @@ var DB = /** @class */ (function () {
     return DB;
 }());
 exports.DB = DB;
+var DiscordServer = /** @class */ (function () {
+    function DiscordServer(id, primaryMode, oppositeChannelIds) {
+        if (primaryMode === void 0) { primaryMode = "sd2"; }
+        if (oppositeChannelIds === void 0) { oppositeChannelIds = new Array(); }
+        this._id = id;
+        this.primaryMode = primaryMode;
+        this.oppositeChannelIds = oppositeChannelIds;
+    }
+    return DiscordServer;
+}());
+exports.DiscordServer = DiscordServer;
 exports.default = DB;
 //# sourceMappingURL=db.js.map

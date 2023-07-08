@@ -9,7 +9,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DivisionCommandHelper = exports.DivisionCommand = void 0;
+exports.DivisionCommand = void 0;
 var discordBot_1 = require("../general/discordBot");
 var sd2_data_1 = require("sd2-data");
 var common_1 = require("../general/common");
@@ -18,8 +18,9 @@ var discord_js_1 = require("discord.js");
 //@todo clean up array mess in this file created by addition of divsion alias names.
 var DivisionCommand = /** @class */ (function () {
     function DivisionCommand() {
+        this.bans = new Map(); // 2d array of playerIds to banned divisions.
     }
-    DivisionCommand.randomDiv = function (message, input) {
+    DivisionCommand.prototype.randomDiv = function (message, input) {
         var divs;
         logs_1.Logs.log("command Random Division with Inputs " + JSON.stringify(input));
         if (input.length == 0) {
@@ -39,13 +40,13 @@ var DivisionCommand = /** @class */ (function () {
                 divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsNato, true), sd2_data_1.divisions.divisionsPact, true);
         }
         //check for bans
-        if (DivisionCommand.bans[message.member.id]) {
+        if (this.bans[message.member.id]) {
             var _loop_1 = function (key) {
                 divs = divs.filter(function (x) {
                     return x.id != Number(key);
                 });
             };
-            for (var _i = 0, _a = Object.keys(DivisionCommand.bans[message.member.id]); _i < _a.length; _i++) {
+            for (var _i = 0, _a = Object.keys(this.bans[message.member.id]); _i < _a.length; _i++) {
                 var key = _a[_i];
                 _loop_1(key);
             }
@@ -60,7 +61,7 @@ var DivisionCommand = /** @class */ (function () {
         }
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.allDivs = function (message, input) {
+    DivisionCommand.prototype.allDivs = function (message, input) {
         var allieddivs = "";
         var axisdivs = "";
         for (var i = 0; i < sd2_data_1.divisions.divisionsAllies.length; i++) {
@@ -78,13 +79,13 @@ var DivisionCommand = /** @class */ (function () {
         axisembed = axisembed.addFields({ name: "Axis Divisions", value: axisdivs, inline: true });
         message.channel.send(axisembed);
     };
-    DivisionCommand.unbanDivision = function (message, input) {
+    DivisionCommand.prototype.unbanDivision = function (message, input) {
         if (input.length == 0) {
             discordBot_1.MsgHelper.reply(message, "I don't know what that division is, please use ".concat(common_1.CommonUtil.config("prefix"), "alldivs, to get the list of divisions."));
             return;
         }
         if (input[0].toLocaleLowerCase() == "all") {
-            DivisionCommand.bans[message.author.id] = null;
+            this.bans[message.author.id] = null;
             logs_1.Logs.log(message.author.id + " has unbanned all");
             discordBot_1.MsgHelper.reply(message, 'unbanned all divisions');
             return;
@@ -109,19 +110,20 @@ var DivisionCommand = /** @class */ (function () {
                 return { value: void 0 };
             }
             else {
-                DivisionCommand.bans[message.author.id][target[0].id] = null;
+                this_1.bans[message.author.id][target[0].id] = null;
                 logs_1.Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, target[0].name + " has been unbanned.");
                 var all = false;
-                for (var _a = 0, _b = DivisionCommand.bans[message.author.id]; _a < _b.length; _a++) {
+                for (var _a = 0, _b = this_1.bans[message.author.id]; _a < _b.length; _a++) {
                     var z = _b[_a];
                     all = z || all;
                 }
                 console.log(all);
                 if (!all)
-                    DivisionCommand.bans[message.author.id] = null;
+                    this_1.bans[message.author.id] = null;
             }
         };
+        var this_1 = this;
         for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
             var line = input_1[_i];
             var state_1 = _loop_2(line);
@@ -129,7 +131,7 @@ var DivisionCommand = /** @class */ (function () {
                 return state_1.value;
         }
     };
-    DivisionCommand.banDivision = function (message, input) {
+    DivisionCommand.prototype.banDivision = function (message, input) {
         if (input.length == 0) {
             discordBot_1.MsgHelper.reply(message, "Please specify a division to ban. Use ".concat(common_1.CommonUtil.config("prefix"), "alldivs, to get the list of divisions."));
             return;
@@ -155,14 +157,15 @@ var DivisionCommand = /** @class */ (function () {
                 return { value: void 0 };
             }
             else {
-                if (!DivisionCommand.bans[message.author.id]) {
-                    DivisionCommand.bans[message.author.id] = new Map();
+                if (!this_2.bans[message.author.id]) {
+                    this_2.bans[message.author.id] = new Map();
                 }
-                DivisionCommand.bans[message.author.id][target[0].id] = true;
+                this_2.bans[message.author.id][target[0].id] = true;
                 logs_1.Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, target[0].name + " has been banned.");
             }
         };
+        var this_2 = this;
         for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
             var line = input_2[_i];
             var state_2 = _loop_3(line);
@@ -171,12 +174,12 @@ var DivisionCommand = /** @class */ (function () {
         }
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.unbanDivisionAll = function (message, input) {
-        DivisionCommand.unbanDivision(message, ["all"]);
+    DivisionCommand.prototype.unbanDivisionAll = function (message, input) {
+        this.unbanDivision(message, ["all"]);
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.bannedDivisions = function (message, input) {
-        var bannedDivs = DivisionCommand.bans[message.author.id];
+    DivisionCommand.prototype.bannedDivisions = function (message, input) {
+        var bannedDivs = this.bans[message.author.id];
         if (!bannedDivs) {
             discordBot_1.MsgHelper.reply(message, "You have no banned Divisions");
             return;
@@ -204,23 +207,16 @@ var DivisionCommand = /** @class */ (function () {
             discordBot_1.MsgHelper.reply(message, ret);
         }
     };
-    DivisionCommand.bans = new Map(); // 2d array of playerIds to banned divisions.
+    DivisionCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("rdiv", this.randomDiv);
+        bot.registerCommand("alldivs", this.allDivs);
+        bot.registerCommand("divs", this.allDivs);
+        bot.registerCommand("unbandiv", this.unbanDivision);
+        bot.registerCommand("resetdivs", this.unbanDivisionAll);
+        bot.registerCommand("bandiv", this.banDivision);
+        bot.registerCommand("banneddivs", this.bannedDivisions);
+    };
     return DivisionCommand;
 }());
 exports.DivisionCommand = DivisionCommand;
-var DivisionCommandHelper = /** @class */ (function () {
-    function DivisionCommandHelper() {
-    }
-    DivisionCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("rdiv", DivisionCommand.randomDiv);
-        bot.registerCommand("alldivs", DivisionCommand.allDivs);
-        bot.registerCommand("divs", DivisionCommand.allDivs);
-        bot.registerCommand("unbandiv", DivisionCommand.unbanDivision);
-        bot.registerCommand("resetdivs", DivisionCommand.unbanDivisionAll);
-        bot.registerCommand("bandiv", DivisionCommand.banDivision);
-        bot.registerCommand("banneddivs", DivisionCommand.bannedDivisions);
-    };
-    return DivisionCommandHelper;
-}());
-exports.DivisionCommandHelper = DivisionCommandHelper;
 //# sourceMappingURL=division.js.map

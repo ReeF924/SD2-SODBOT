@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,26 +51,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminCommandHelper = exports.AdminCommand = void 0;
+exports.AdminCommand = void 0;
+var discord_js_1 = require("discord.js");
 var discordBot_1 = require("../general/discordBot");
 var logs_1 = require("../general/logs");
-var db_1 = require("../general/db");
-var AdminCommand = /** @class */ (function () {
-    function AdminCommand() {
+var Command_1 = require("./Command");
+var AdminCommand = /** @class */ (function (_super) {
+    __extends(AdminCommand, _super);
+    //Only RoguishTiger or Kuriosly can set Admin rights 
+    //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
+    function AdminCommand(database) {
+        var _this = _super.call(this, database) || this;
+        _this.admins = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
+        return _this;
     }
-    AdminCommand.setAdmin = function (message, input) {
+    AdminCommand.prototype.setAdmin = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                //Only RoguishTiger or Kuriosly can set Admin rights
-                if (message.author.id == "687898043005272096" || message.author.id == "271792666910392325") {
+                if (this.admins.some(function (adminId) { return message.author.id == adminId; })) {
                     //Check for argument
-                    if (input.length == 1) {
+                    if (input.length === 1) {
                         (function () { return __awaiter(_this, void 0, void 0, function () {
                             var user, discordUser;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, db_1.DB.getDiscordUser(input[0])];
+                                    case 0: return [4 /*yield*/, this.database.getDiscordUser(input[0])];
                                     case 1:
                                         user = _a.sent();
                                         return [4 /*yield*/, discordBot_1.DiscordBot.bot.users.fetch(String(input[0]))
@@ -66,7 +87,7 @@ var AdminCommand = /** @class */ (function () {
                                         if (!user) return [3 /*break*/, 6];
                                         if (!(user.globalAdmin == false)) return [3 /*break*/, 4];
                                         user.globalAdmin = (true);
-                                        return [4 /*yield*/, db_1.DB.setDiscordUser(user)];
+                                        return [4 /*yield*/, this.database.setDiscordUser(user)];
                                     case 3:
                                         _a.sent();
                                         discordBot_1.MsgHelper.reply(message, "Discord account " + discordUser.username + " has been updated with global admin access");
@@ -93,29 +114,29 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.adjustElo = function (message, input) {
+    AdminCommand.prototype.adjustElo = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var user, eugenId, newLeagueElo, newGlobalElo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, db_1.DB.getDiscordUser(message.author.id)
+                    case 0: return [4 /*yield*/, this.database.getDiscordUser(message.author.id)
                         //Check if requestor has admin access
                     ];
                     case 1:
                         user = _a.sent();
                         //Check if requestor has admin access
-                        if (user.globalAdmin == true) {
+                        if (user.globalAdmin === true) {
                             //Check that the command is correctly formatted
                             if (input.length < 3) {
                                 console.log("Not enough arguments");
                                 message.reply("This command requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas");
                                 return [2 /*return*/];
                             }
-                            else if (input.length == 3) {
+                            else if (input.length === 3) {
                                 eugenId = input[0];
                                 newLeagueElo = input[1];
                                 newGlobalElo = input[2];
-                                //await DB.setPlayer(eugenId, newLeagueElo, newGlobalElo);
+                                //await this.database.setPlayer(eugenId, newLeagueElo, newGlobalElo);
                                 //message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
                                 return [2 /*return*/];
                             }
@@ -131,12 +152,12 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.setChannelPrems = function (message, input) {
+    AdminCommand.prototype.setChannelPrems = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var user, prem, channel, x, command;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, db_1.DB.getDiscordUser(message.author.id)];
+                    case 0: return [4 /*yield*/, this.database.getDiscordUser(message.author.id)];
                     case 1:
                         user = _a.sent();
                         prem = {
@@ -155,7 +176,7 @@ var AdminCommand = /** @class */ (function () {
                         return [2 /*return*/];
                     case 2:
                         if (!(input.length > 1)) return [3 /*break*/, 5];
-                        return [4 /*yield*/, db_1.DB.getChannelPermissions(input[0])];
+                        return [4 /*yield*/, this.database.getChannelPermissions(input[0])];
                     case 3:
                         // Check if server is already in ChannelBlacklist table
                         prem = _a.sent();
@@ -209,7 +230,7 @@ var AdminCommand = /** @class */ (function () {
                                     message.reply("One of the permission settings is not a valid command");
                             }
                         }
-                        return [4 /*yield*/, db_1.DB.setChannelPermissions(prem)];
+                        return [4 /*yield*/, this.database.setChannelPermissions(prem)];
                     case 4:
                         _a.sent();
                         discordBot_1.MsgHelper.reply(message, "The permission settings of Discord channel " + channel.name + " has been updated ");
@@ -226,14 +247,14 @@ var AdminCommand = /** @class */ (function () {
             });
         });
     };
-    AdminCommand.resetChannelPrems = function (message, input) {
+    AdminCommand.prototype.resetChannelPrems = function (message, input) {
         return __awaiter(this, void 0, void 0, function () {
             var channel, prem;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         channel = discordBot_1.DiscordBot.bot.channels.cache.get(input[0]);
-                        if (!(input.length == 1)) return [3 /*break*/, 2];
+                        if (!(input.length === 1)) return [3 /*break*/, 2];
                         prem = {
                             id: input[0],
                             name: channel.name,
@@ -244,32 +265,230 @@ var AdminCommand = /** @class */ (function () {
                             blockServerElo: -1,
                             blockGlobalElo: -1
                         };
-                        return [4 /*yield*/, db_1.DB.setChannelPermissions(prem)];
+                        return [4 /*yield*/, this.database.setChannelPermissions(prem)];
                     case 1:
                         _a.sent();
                         discordBot_1.MsgHelper.reply(message, "The permission settings of Discord channel " + channel.name + " has been reset back to default settings.");
                         return [3 /*break*/, 3];
                     case 2:
-                        discordBot_1.MsgHelper.reply(message, "Command not formatted corrctly, this command just takes a channel id only as its argument");
+                        discordBot_1.MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument");
                         _a.label = 3;
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    return AdminCommand;
-}());
-exports.AdminCommand = AdminCommand;
-var AdminCommandHelper = /** @class */ (function () {
-    function AdminCommandHelper() {
-    }
-    AdminCommandHelper.addCommands = function (bot) {
-        bot.registerCommand("adjustelo", AdminCommand.adjustElo);
-        bot.registerCommand("setadmin", AdminCommand.setAdmin);
-        bot.registerCommand("setchannel", AdminCommand.setChannelPrems);
-        bot.registerCommand("resetchannel", AdminCommand.resetChannelPrems);
+    AdminCommand.prototype.primaryMode = function (message, input) {
+        return __awaiter(this, void 0, void 0, function () {
+            var guild, server, servers, reply;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        guild = message.guild;
+                        return [4 /*yield*/, this.database.getFromRedis(guild.id)];
+                    case 1:
+                        server = _a.sent();
+                        if (!(server === null)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.database.getAllServers()];
+                    case 3:
+                        servers = _a.sent();
+                        server = servers.find(function (server) { return server._id == guild.id; });
+                        _a.label = 4;
+                    case 4:
+                        if (input.length === 0) {
+                            reply = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
+                            message.reply("Server's primary mode is ".concat(server.primaryMode, ", ").concat(reply));
+                            return [2 /*return*/];
+                        }
+                        if (input[0].split(' ').length > 1) {
+                            message.reply("Invalid arguments for the command.");
+                            return [2 /*return*/];
+                        }
+                        //Check if the user has rights to change the primary mode (the commments implemented user.db but it's not used appereantly)
+                        if (!this.checkAccess(message)) {
+                            message.reply("Only server admin can change the primary mode");
+                            return [2 /*return*/];
+                        }
+                        switch (input[0].toLocaleLowerCase()) {
+                            case "steeldivision":
+                            case "steeldivision2":
+                            case "sd":
+                            case "sd2":
+                                server.primaryMode = "sd2";
+                                break;
+                            case "warno":
+                            case "objectivelyworseeugengame":
+                                server.primaryMode = "warno";
+                                break;
+                            default:
+                                message.reply("Invalid input, try sd2 or warno");
+                                return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 5:
+                        _a.sent();
+                        message.reply("Primary mode changed to ".concat(server.primaryMode));
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
-    return AdminCommandHelper;
-}());
-exports.AdminCommandHelper = AdminCommandHelper;
+    AdminCommand.prototype.addOppositeChannel = function (message, input) {
+        return __awaiter(this, void 0, void 0, function () {
+            var guild, channel, server, channelName;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.checkAccess(message)) {
+                            message.reply("Only server admin can change oppositeChannels");
+                            return [2 /*return*/, false];
+                        }
+                        guild = message.guild;
+                        channel = message.channel;
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 1:
+                        server = _a.sent();
+                        if (!(server === null)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 3:
+                        server = _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!(input.length > 0)) return [3 /*break*/, 8];
+                        if (!guild.channels.cache.some(function (channel) { return channel.id === input[0]; })) return [3 /*break*/, 7];
+                        server.oppositeChannelIds.push(input[0]);
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 5:
+                        _a.sent();
+                        return [4 /*yield*/, guild.channels.cache.find(function (channel) { return channel.id === input[0]; }).name];
+                    case 6:
+                        channelName = _a.sent();
+                        message.reply("Channel \"".concat(channelName, "\" has been added to the list of opposite channels"));
+                        return [2 /*return*/];
+                    case 7:
+                        message.reply("Invalid arguments.");
+                        return [2 /*return*/];
+                    case 8:
+                        if (server.oppositeChannelIds.some(function (channelId) { return channel.id === channelId; })) {
+                            message.reply("This channel is already in the opposite channels, if you wish to delete it, use $removechannel");
+                            return [2 /*return*/];
+                        }
+                        server.oppositeChannelIds.push(channel.id);
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 9:
+                        _a.sent();
+                        message.reply("Channel has been added to the list of opposite channels");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.removeChannel = function (message, input) {
+        return __awaiter(this, void 0, void 0, function () {
+            var guild, channel, server;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.checkAccess(message)) {
+                            message.reply("Only server admin can remove oppositeChannels");
+                            return [2 /*return*/, false];
+                        }
+                        guild = message.guild;
+                        channel = message.channel;
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 1:
+                        server = _a.sent();
+                        if (!(server === null)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.database.saveNewServers(discordBot_1.DiscordBot.bot)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.database.getServer(guild.id)];
+                    case 3:
+                        server = _a.sent();
+                        _a.label = 4;
+                    case 4:
+                        if (!(input.length > 0)) return [3 /*break*/, 8];
+                        if (!(input[0] === "all")) return [3 /*break*/, 6];
+                        server.oppositeChannelIds = [];
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 5:
+                        _a.sent();
+                        message.reply("The list of opposite channels has been cleared.");
+                        return [2 /*return*/];
+                    case 6: return [4 /*yield*/, this.filterChannel(server, input[0], message)];
+                    case 7:
+                        if (_a.sent()) {
+                            return [2 /*return*/];
+                        }
+                        message.reply("Invalid arguments, did you mean \"all\"?");
+                        return [2 /*return*/];
+                    case 8: return [4 /*yield*/, this.filterChannel(server, channel.id, message)];
+                    case 9:
+                        if (_a.sent()) {
+                            return [2 /*return*/];
+                        }
+                        message.reply("This channel isn't in the opposite channels list, if you wish to add it, use $removechannel");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.filterChannel = function (server, channelId, message) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!server.oppositeChannelIds.some(function (channelId) { return channelId === channelId; })) return [3 /*break*/, 2];
+                        server.oppositeChannelIds = server.oppositeChannelIds.filter(function (id) { return id !== channelId; });
+                        return [4 /*yield*/, this.database.putServer(server)];
+                    case 1:
+                        _a.sent();
+                        message.reply("Channel has been removed from the list of opposite channels.");
+                        return [2 /*return*/, true];
+                    case 2: return [2 /*return*/, false];
+                }
+            });
+        });
+    };
+    AdminCommand.prototype.checkAccess = function (message) {
+        return (message.member instanceof discord_js_1.GuildMember) || this.admins.some(function (adminID) { return message.member.id === adminID; });
+    };
+    AdminCommand.prototype.getOppositeChannelsReply = function (guild, channelIds) {
+        console.log("inOppositeMethod");
+        console.log(channelIds);
+        if (channelIds.length === 0) {
+            return "server has no opposite channels";
+        }
+        var names = this.getChannelNamesFromIds(guild, channelIds);
+        return "opposite channels are: ".concat(names.join(", "));
+    };
+    AdminCommand.prototype.getChannelNamesFromIds = function (guild, channelIds) {
+        var _this = this;
+        var names = [];
+        channelIds.forEach(function (channelId) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                names.push(guild.channels.cache.find(function (channel) { return channel.id === channelId; }).name);
+                return [2 /*return*/];
+            });
+        }); });
+        return names;
+    };
+    AdminCommand.prototype.addCommands = function (bot) {
+        bot.registerCommand("adjustelo", this.adjustElo);
+        bot.registerCommand("setadmin", this.setAdmin);
+        bot.registerCommand("setchannel", this.setChannelPrems);
+        bot.registerCommand("resetchannel", this.resetChannelPrems);
+        bot.registerCommand("primarymode", this.primaryMode.bind(this));
+        bot.registerCommand("addchannel", this.addOppositeChannel.bind(this));
+        bot.registerCommand("removechannel", this.removeChannel.bind(this));
+    };
+    return AdminCommand;
+}(Command_1.CommandDB));
+exports.AdminCommand = AdminCommand;
 //# sourceMappingURL=admin.js.map

@@ -43,12 +43,24 @@ var logs_1 = require("./logs");
 var replays_1 = require("../results/replays");
 var permissions_1 = require("./permissions");
 var DiscordBot = /** @class */ (function () {
-    function DiscordBot() {
+    function DiscordBot(database) {
+        var _this = this;
         this.commands = new Map();
         //this.loadBlacklist();
+        this.database = database;
+        this.perms = new permissions_1.Permissions(database);
         DiscordBot.bot = new discord_js_1.Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", this.onReady.bind(this));
+        DiscordBot.bot.on("ready", function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.onReady(database)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        }); });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
     }
@@ -95,7 +107,7 @@ var DiscordBot = /** @class */ (function () {
                         if (message.guild)
                             guild = message.guild.id;
                         if (!message.content.startsWith(common_1.CommonUtil.config("prefix"))) return [3 /*break*/, 3];
-                        perms = permissions_1.Permissions.getPermissions(channel, guild);
+                        perms = this.perms.getPermissions(channel, guild);
                         return [4 /*yield*/, perms];
                     case 1:
                         if (!!(_f.sent()).areCommandsBlocked) return [3 /*break*/, 3];
@@ -116,7 +128,7 @@ var DiscordBot = /** @class */ (function () {
                         _f.label = 3;
                     case 3:
                         if (!message.attachments.first()) return [3 /*break*/, 6];
-                        perms = permissions_1.Permissions.getPermissions(channel, guild);
+                        perms = this.perms.getPermissions(channel, guild);
                         return [4 /*yield*/, perms];
                     case 4:
                         if (!!(_f.sent()).areReplaysBlocked) return [3 /*break*/, 6];
@@ -126,21 +138,32 @@ var DiscordBot = /** @class */ (function () {
                         _e = [message];
                         return [4 /*yield*/, perms];
                     case 5:
-                        _d.apply(_c, _e.concat([(_f.sent())]));
+                        _d.apply(_c, _e.concat([(_f.sent()), this.database]));
                         _f.label = 6;
                     case 6: return [2 /*return*/];
                 }
             });
         });
     };
-    DiscordBot.prototype.onReady = function () {
+    DiscordBot.prototype.onReady = function (database) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                logs_1.Logs.log("Bot Online!");
-                DiscordBot.bot.user.setActivity("Use " + common_1.CommonUtil.config("prefix") + "help to see commands!", {
-                    type: "LISTENING"
-                });
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, database.saveNewServers(DiscordBot.bot)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, database.redisClient.connect()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, database.redisSaveServers(null)];
+                    case 3:
+                        _a.sent();
+                        logs_1.Logs.log("Bot Online!");
+                        DiscordBot.bot.user.setActivity("Use " + common_1.CommonUtil.config("prefix") + "help to see commands!", {
+                            type: "LISTENING"
+                        });
+                        return [2 /*return*/];
+                }
             });
         });
     };

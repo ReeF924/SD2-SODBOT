@@ -39,11 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.API = void 0;
 var express = require("express");
 var logs_1 = require("../general/logs");
-var db_1 = require("../general/db");
 var API = /** @class */ (function () {
-    function API() {
+    function API(database) {
         this.express = express();
         this.port = 8080;
+        this.database = database;
     }
     API.prototype.start = function () {
         var _this = this;
@@ -53,12 +53,12 @@ var API = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!req.query.user) return [3 /*break*/, 2];
-                        return [4 /*yield*/, db_1.DB.getServerLadder(req.query.server)];
+                        return [4 /*yield*/, this.database.getServerLadder(req.query.server)];
                     case 1:
                         results = _a.sent();
                         res.send(results);
                         return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, db_1.DB.getGlobalLadder()];
+                    case 2: return [4 /*yield*/, this.database.getGlobalLadder()];
                     case 3:
                         results = _a.sent();
                         res.send(results);
@@ -73,12 +73,12 @@ var API = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!req.query.server) return [3 /*break*/, 2];
-                        return [4 /*yield*/, db_1.DB.getServerLadder(req.query.server)];
+                        return [4 /*yield*/, this.database.getServerLadder(req.query.server)];
                     case 1:
                         results = _a.sent();
                         res.send(results);
                         return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, db_1.DB.getGlobalLadder()];
+                    case 2: return [4 /*yield*/, this.database.getGlobalLadder()];
                     case 3:
                         results = _a.sent();
                         res.send(results);
@@ -91,7 +91,7 @@ var API = /** @class */ (function () {
             var results;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, db_1.DB.getAllDivisionElo()];
+                    case 0: return [4 /*yield*/, this.database.getAllDivisionElo()];
                     case 1:
                         results = _a.sent();
                         res.send(results);

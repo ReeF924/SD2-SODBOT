@@ -41,16 +41,16 @@ var discord_js_1 = require("discord.js");
 var gameParser_1 = require("sd2-utilities/lib/parser/gameParser");
 var sd2_data_1 = require("sd2-data");
 var axios = require("axios");
-var db_1 = require("../general/db");
 var discordBot_1 = require("../general/discordBot");
 var rating_1 = require("./rating");
 var ax = axios.default;
 var Replays = /** @class */ (function () {
     function Replays() {
     }
-    Replays.extractReplayInfo = function (message, perms) {
+    Replays.extractReplayInfo = function (message, perms, database) {
         var _this = this;
         var url = message.attachments.first().url;
+        var ratingEng = new rating_1.RatingEngine(database);
         ax.get(url).then(function (res) { return __awaiter(_this, void 0, void 0, function () {
             var g, replayPlayer, updatedDocumentCount, winners, loosers, winnerList, looserList, ratings, channel, _i, _a, player, playerid, replayPlayer_1, replayPlayer_2, replayPlayer_3, p1Elo, p2Elo, _b, _c, player, playerid, replayPlayer_4, replayPlayer_5, replayPlayer_6, p1Elo, p2Elo, p1Elo, p2Elo, winnersLength, losersLength, i, i, embed, _d, _e, player, playerid, playerElo, discordId, discordUser, user, raitingsString, counter, _f, _g, player, playerid, playerElo, discordId, discordUser, user;
             return __generator(this, function (_h) {
@@ -58,7 +58,7 @@ var Replays = /** @class */ (function () {
                     case 0:
                         g = gameParser_1.GameParser.parseRaw(res.data);
                         replayPlayer = g.players[g.ingamePlayerId];
-                        return [4 /*yield*/, db_1.DB.setReplay(message, g)];
+                        return [4 /*yield*/, database.setReplay(message, g)];
                     case 1:
                         updatedDocumentCount = _h.sent();
                         message.channel.send("Results Submitted");
@@ -143,20 +143,20 @@ var Replays = /** @class */ (function () {
                             }
                         }
                         if (!(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345)) return [3 /*break*/, 7];
-                        return [4 /*yield*/, db_1.DB.getElos(winnerList[0].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(winnerList[0].id, message.channel.id, message.guild.id)];
                     case 3:
                         p1Elo = _h.sent();
-                        return [4 /*yield*/, db_1.DB.getElos(looserList[0].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(looserList[0].id, message.channel.id, message.guild.id)];
                     case 4:
                         p2Elo = _h.sent();
-                        ratings = rating_1.RatingEngine.rateMatch(p1Elo, p2Elo, 1);
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p1, { impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name })];
+                        ratings = ratingEng.rateMatch(p1Elo, p2Elo, 1);
+                        return [4 /*yield*/, database.setElos(ratings.p1, { impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name })];
                     case 5:
                         _h.sent();
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p2, { impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name })];
+                        return [4 /*yield*/, database.setElos(ratings.p2, { impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name })];
                     case 6:
                         _h.sent();
-                        rating_1.RatingEngine.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5);
+                        ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5);
                         _h.label = 7;
                     case 7: return [3 /*break*/, 19];
                     case 8:
@@ -218,40 +218,40 @@ var Replays = /** @class */ (function () {
                             }
                         }
                         if (!(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345)) return [3 /*break*/, 13];
-                        return [4 /*yield*/, db_1.DB.getElos(winnerList[0].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(winnerList[0].id, message.channel.id, message.guild.id)];
                     case 9:
                         p1Elo = _h.sent();
-                        return [4 /*yield*/, db_1.DB.getElos(looserList[0].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(looserList[0].id, message.channel.id, message.guild.id)];
                     case 10:
                         p2Elo = _h.sent();
-                        ratings = rating_1.RatingEngine.rateMatch(p1Elo, p2Elo, 1);
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p1, { impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name })];
+                        ratings = ratingEng.rateMatch(p1Elo, p2Elo, 1);
+                        return [4 /*yield*/, database.setElos(ratings.p1, { impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name })];
                     case 11:
                         _h.sent();
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p2, { impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name })];
+                        return [4 /*yield*/, database.setElos(ratings.p2, { impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name })];
                     case 12:
                         _h.sent();
-                        rating_1.RatingEngine.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5);
+                        ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5);
                         _h.label = 13;
                     case 13: return [3 /*break*/, 19];
                     case 14:
                         winners = "no one";
                         loosers = "everyone";
                         if (!(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345)) return [3 /*break*/, 19];
-                        return [4 /*yield*/, db_1.DB.getElos(g.players[0].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(g.players[0].id, message.channel.id, message.guild.id)];
                     case 15:
                         p1Elo = _h.sent();
-                        return [4 /*yield*/, db_1.DB.getElos(g.players[1].id, message.channel.id, message.guild.id)];
+                        return [4 /*yield*/, database.getElos(g.players[1].id, message.channel.id, message.guild.id)];
                     case 16:
                         p2Elo = _h.sent();
-                        ratings = rating_1.RatingEngine.rateMatch(p1Elo, p2Elo, .5);
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p1, { impliedName: g.players[0].name, serverName: message.guild.name, channelName: channel.name })];
+                        ratings = ratingEng.rateMatch(p1Elo, p2Elo, .5);
+                        return [4 /*yield*/, database.setElos(ratings.p1, { impliedName: g.players[0].name, serverName: message.guild.name, channelName: channel.name })];
                     case 17:
                         _h.sent();
-                        return [4 /*yield*/, db_1.DB.setElos(ratings.p2, { impliedName: g.players[1].name, serverName: message.guild.name, channelName: channel.name })];
+                        return [4 /*yield*/, database.setElos(ratings.p2, { impliedName: g.players[1].name, serverName: message.guild.name, channelName: channel.name })];
                     case 18:
                         _h.sent();
-                        rating_1.RatingEngine.doDivisionElo(winnerList[0].deck, looserList[0].deck, 3);
+                        ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 3);
                         _h.label = 19;
                     case 19:
                         // For 1v1 Adjust Winner & Losers Fields to be same length
@@ -298,7 +298,7 @@ var Replays = /** @class */ (function () {
                         playerid = player.name;
                         playerElo = player.elo;
                         discordId = "";
-                        return [4 /*yield*/, db_1.DB.getDiscordUserFromEugenId(player.id)];
+                        return [4 /*yield*/, database.getDiscordUserFromEugenId(player.id)];
                     case 21:
                         discordUser = _h.sent();
                         if (discordUser)
@@ -383,7 +383,7 @@ var Replays = /** @class */ (function () {
                         playerid = player.name;
                         playerElo = player.elo;
                         discordId = "";
-                        return [4 /*yield*/, db_1.DB.getDiscordUserFromEugenId(player.id)];
+                        return [4 /*yield*/, database.getDiscordUserFromEugenId(player.id)];
                     case 28:
                         discordUser = _h.sent();
                         if (discordUser)
