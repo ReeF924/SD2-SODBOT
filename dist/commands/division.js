@@ -30,15 +30,7 @@ class DivisionCommand {
             if (side == "warno")
                 divs = [...sd2_data_1.divisions.divisionsNato, ...sd2_data_1.divisions.divisionsPact];
         }
-        //check for bans
-        if (this.bans[message.member.id]) {
-            for (const key of Object.keys(this.bans[message.member.id])) {
-                divs = divs.filter((x) => {
-                    return x.id != Number(key);
-                });
-            }
-        }
-        if (divs.length == 0)
+        if ((divs === null || divs === void 0 ? void 0 : divs.length) == 0)
             discordBot_1.MsgHelper.reply(message, "all divisions have been banned. Please unban some divisions");
         else {
             const pick = Math.floor(Math.random() * divs.length);
@@ -92,7 +84,9 @@ class DivisionCommand {
                 });
             }
             if (target.length == 0) {
-                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => { return x["name"]; }))}*** instead of ***${line}***... It has not been unbanned.`);
+                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => {
+                    return x["name"];
+                }))}*** instead of ***${line}***... It has not been unbanned.`);
                 return;
             }
             else {
@@ -129,8 +123,12 @@ class DivisionCommand {
                 });
             }
             if (target.length == 0) {
-                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => { return x["name"]; }))}*** instead of ***${line}***... It has not been banned.`);
-                console.log(JSON.stringify(divs.map(x => { return x["name"]; })));
+                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => {
+                    return x["name"];
+                }))}*** instead of ***${line}***... It has not been banned.`);
+                console.log(JSON.stringify(divs.map(x => {
+                    return x["name"];
+                })));
                 return;
             }
             else {

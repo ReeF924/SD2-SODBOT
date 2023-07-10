@@ -289,7 +289,7 @@ class MapCommand {
                 discordBot_1.MsgHelper.reply(message, line + " has been unbanned.");
                 let all = false;
                 for (const z of Object.values(this.bans[message.author.id])) {
-                    console.log(z);
+                    //console.log(z);
                     all = !!z || all;
                 }
                 if (!all)

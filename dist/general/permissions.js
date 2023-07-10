@@ -18,18 +18,15 @@ class Permissions {
         return __awaiter(this, void 0, void 0, function* () {
             const perms = new PermissionsSet();
             let serverPerms;
-            console.log(server);
             if (server)
                 serverPerms = this.database.getServerPermissions(server);
             let channelPerms;
-            console.log(channel);
             if (channel)
                 channelPerms = this.database.getChannelPermissions(channel);
             if (yield serverPerms)
-                perms.apply(yield serverPerms);
+                yield perms.apply(yield serverPerms);
             if (yield channelPerms)
-                perms.apply(yield channelPerms);
-            console.log(perms);
+                yield perms.apply(yield channelPerms);
             return perms;
         });
     }
@@ -47,7 +44,7 @@ class PermissionsSet {
     }
     apply(perms) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(" apply " + perms);
+            // console.log(" apply " + perms)
             if (perms.blockReplay > 0)
                 this.areReplaysBlocked = true;
             if (perms.blockReplay < 0)

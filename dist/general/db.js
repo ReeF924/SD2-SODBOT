@@ -87,8 +87,7 @@ const logs_1 = require("./logs");
 const discordBot_1 = require("./discordBot");
 class DB {
     constructor() {
-        this.redisClient = Redis.createClient();
-        let redisClient = Redis.createClient();
+        this.redisClient = Redis.createClient({ url: process.env.REDIS_URL });
     }
     setServer(server) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -118,7 +117,12 @@ class DB {
     }
     putServer(server) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
+            yield serverStore.update({ _id: server._id }, {
+                $set: {
+                    primaryMode: server.primaryMode,
+                    oppositeChannelIds: server.oppositeChannelIds
+                }
+            });
             serverStore.loadDatabase();
             this.setRedis(server);
         });
@@ -255,7 +259,7 @@ class DB {
     }
     setDivisionElo(elo) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(elo);
+            //console.log(elo)
             const data = {
                 id: elo.id,
                 elo: elo.elo,
@@ -264,7 +268,7 @@ class DB {
             const i = yield eloStore.update({ _id: elo.id }, data, { upsert: true });
             // const i = await (await DB.exec(DB.updateDivEloSql, data, { id: sql.Int, elo: sql.Float, divName: sql.VarChar })).rowCount
             // TODO: TEST 
-            console.log(i);
+            //console.log(i)
             return i;
         });
     }
@@ -385,7 +389,7 @@ class DB {
                 globalAdmin: user.globalAdmin,
                 impliedName: user.impliedName
             };
-            console.log(data);
+            //console.log(data)
             return yield userStore.update({ _id: data.id }, data, { upsert: true });
             // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
         });

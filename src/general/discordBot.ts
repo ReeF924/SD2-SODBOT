@@ -99,7 +99,7 @@ export class DiscordBot {
     }
     private async onReady(database:DB) {
         await database.redisClient.connect();
-        await database.redisSaveServers(null);
+       // await database.redisSaveServers(null);
         await database.saveNewServers(DiscordBot.bot);
         Logs.log("Bot Online!");
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
@@ -127,7 +127,7 @@ export class MsgHelper {
         if (typeof content as any != String) {
             opts["embed"] = "rich";
         }
-        Logs.log(content);
+        //Logs.log(content);
         message.channel.send(content);
     }
 

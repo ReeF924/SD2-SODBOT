@@ -99,7 +99,7 @@ class DiscordBot {
     onReady(database) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database.redisClient.connect();
-            yield database.redisSaveServers(null);
+            // await database.redisSaveServers(null);
             yield database.saveNewServers(DiscordBot.bot);
             logs_1.Logs.log("Bot Online!");
             DiscordBot.bot.user.setActivity("Use " + common_1.CommonUtil.config("prefix") + "help to see commands!", {
@@ -126,7 +126,7 @@ class MsgHelper {
         if (typeof content != String) {
             opts["embed"] = "rich";
         }
-        logs_1.Logs.log(content);
+        //Logs.log(content);
         message.channel.send(content);
     }
     static dmUser(message, content) {

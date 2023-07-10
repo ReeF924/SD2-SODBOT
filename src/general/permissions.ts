@@ -10,16 +10,13 @@ export class Permissions {
     public async getPermissions(channel:string,server:string):Promise<PermissionsSet>{
         const perms = new PermissionsSet();
         let serverPerms
-        console.log(server)
         if(server) serverPerms = this.database.getServerPermissions(server);
         let channelPerms 
-        console.log(channel)
         if(channel) channelPerms = this.database.getChannelPermissions(channel);
         if(await serverPerms)
-            perms.apply(await serverPerms)
+            await perms.apply(await serverPerms)
         if(await channelPerms)
-            perms.apply(await channelPerms)
-        console.log(perms)
+            await perms.apply(await channelPerms)
         return perms;
     }
     
@@ -35,7 +32,7 @@ export class PermissionsSet {
     isChannelEloShown = false;
 
     async apply(perms:Blacklist){
-        console.log(" apply " + perms)
+        // console.log(" apply " + perms)
         if(perms.blockReplay > 0) this.areReplaysBlocked = true
         if(perms.blockReplay < 0) this.areReplaysBlocked = false
         if(perms.blockCommands > 0) this.areCommandsBlocked = true
