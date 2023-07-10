@@ -30,6 +30,7 @@ src/resultsDB.db
 src/config.json
 dist
 dist/
+data/
 
 coverage/
 config.json
