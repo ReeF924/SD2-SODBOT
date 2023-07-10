@@ -5,6 +5,7 @@ import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "disc
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
+import {DiscordServer , DB} from "./db";
 
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
@@ -12,13 +13,18 @@ export type BotCommand = (message: Message, input: string[], perm?: PermissionsS
 export class DiscordBot {
 
     static bot: Client;
-    commands: Map<string, BotCommand> = new Map<string, BotCommand>();
-
-    constructor() {
+    private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
+    private database:DB;
+    private perms: Permissions;
+    constructor(database:DB) {
         //this.loadBlacklist();
+        this.database = database;
+        this.perms = new Permissions(database);
         DiscordBot.bot = new Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", this.onReady.bind(this));
+        DiscordBot.bot.on("ready", async () => {
+            await this.onReady(database);
+        });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
     }
@@ -34,7 +40,6 @@ export class DiscordBot {
     removeCommand(command: string): void {
         this.commands.delete(command);
     }
-
     private onError(message: unknown) {
         Logs.error(message)
     }
@@ -64,7 +69,7 @@ export class DiscordBot {
         if (message.channel) channel = message.channel.id;
         if (message.guild) guild = message.guild.id;
         if (message.content.startsWith(CommonUtil.config("prefix"))) {
-            const perms = Permissions.getPermissions(channel, guild)
+            const perms = this.perms.getPermissions(channel, guild)
             if (!(await perms).areCommandsBlocked) {
                 const inputList = message.content
                     .substr(1, message.content.length)
@@ -81,23 +86,26 @@ export class DiscordBot {
         }
 
         if (message.attachments.first()) {
-            const perms = Permissions.getPermissions(channel, guild)
+            const perms = this.perms.getPermissions(channel, guild)
             if (!(await perms).areReplaysBlocked) {
                 if (message.attachments.first().url.endsWith(".rpl3")) {
                     if (message.channel.type !== "dm") {
-                        Replays.extractReplayInfo(message, (await perms));
+                        Replays.extractReplayInfo(message, (await perms), this.database);
                     }
                 }
             }
         }
 
     }
-
-    private async onReady() {
+    private async onReady(database:DB) {
+        await database.redisClient.connect();
+        await database.redisSaveServers(null);
+        await database.saveNewServers(DiscordBot.bot);
         Logs.log("Bot Online!");
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"
         });
+        // DB.saveNewServers(DiscordBot.bot);
     }
 }
 

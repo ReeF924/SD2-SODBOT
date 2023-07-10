@@ -1,13 +1,26 @@
 import { Logs } from "./logs";
 import * as fs from 'fs';
 import * as Levenshtein from  'levenshtein';
-
+import {DB, DiscordServer} from "./db";
+import { DiscordBot } from "./discordBot";
+import { Message } from "discord.js";
 
 export class CommonUtil {
 
     static configData:Map<string,unknown> = new Map<string,unknown>();
-
-    static init():void{
+    static database: DB;
+    static async getPrimaryGame(message:Message):Promise<string>{
+        const serverId = message.guild.id;
+        let server:DiscordServer = await CommonUtil.database.getFromRedis(serverId);
+        
+        if(server.oppositeChannelIds.some(channelId => channelId === message.channel.id)){
+            if(server.primaryMode === "sd2") return "warno";
+            return "sd2";
+        }
+        return server.primaryMode;
+    }
+    static init(database:DB):void{
+        CommonUtil.database = database;
         //load config file;
         const load = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
         for(const key of Object.keys(load)){

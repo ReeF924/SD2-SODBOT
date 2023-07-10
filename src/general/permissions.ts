@@ -2,16 +2,19 @@ import { Channel, Guild } from "discord.js";
 import { Blacklist, DB} from "./db";
 
 export class Permissions {
+    private database:DB;
+    public constructor(database:DB){
+        this.database = database;
+    }
 
-
-    public static async getPermissions(channel:string,server:string):Promise<PermissionsSet>{
+    public async getPermissions(channel:string,server:string):Promise<PermissionsSet>{
         const perms = new PermissionsSet();
         let serverPerms
         console.log(server)
-        if(server) serverPerms = DB.getServerPermissions(server);
+        if(server) serverPerms = this.database.getServerPermissions(server);
         let channelPerms 
         console.log(channel)
-        if(channel) channelPerms = DB.getChannelPermissions(channel);
+        if(channel) channelPerms = this.database.getChannelPermissions(channel);
         if(await serverPerms)
             perms.apply(await serverPerms)
         if(await channelPerms)
