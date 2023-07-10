@@ -20,8 +20,8 @@ import { match } from 'assert';
 
 const p = require("../package.json")
 
-CommonUtil.init();
 const database:DB = new DB(); 
+CommonUtil.init(database);
 Logs.init();
 
 smp.install();

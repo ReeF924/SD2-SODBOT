@@ -97,11 +97,10 @@ export class DiscordBot {
         }
 
     }
-
     private async onReady(database:DB) {
-        await database.saveNewServers(DiscordBot.bot);
         await database.redisClient.connect();
         await database.redisSaveServers(null);
+        await database.saveNewServers(DiscordBot.bot);
         Logs.log("Bot Online!");
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"

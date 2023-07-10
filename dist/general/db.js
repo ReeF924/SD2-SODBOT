@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,127 +8,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscordServer = exports.DB = void 0;
-var Datastore = require('nedb-promises');
-var Redis = require("redis");
-var DatastoreWrapper = /** @class */ (function () {
-    function DatastoreWrapper(filename) {
+const Datastore = require('nedb-promises');
+const Redis = require("redis");
+class DatastoreWrapper {
+    constructor(filename) {
         this.db = Datastore.create(filename);
     }
-    DatastoreWrapper.prototype.find = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, (_a = this.db).find.apply(_a, args)];
-                    case 1:
-                        res = _b.sent();
-                        return [2 /*return*/, res];
-                }
-            });
+    find(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.db.find(...args);
+            return res;
         });
-    };
-    DatastoreWrapper.prototype.insert = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, (_a = this.db).insert.apply(_a, args)];
-                    case 1:
-                        res = _b.sent();
-                        return [2 /*return*/, { rowCount: res.length, rows: res }];
-                }
-            });
+    }
+    insert(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.db.insert(...args);
+            return { rowCount: res.length, rows: res };
         });
-    };
-    DatastoreWrapper.prototype.update = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, (_a = this.db).update.apply(_a, args)];
-                    case 1:
-                        res = _b.sent();
-                        return [2 /*return*/, res];
-                }
-            });
+    }
+    update(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.db.update(...args);
+            return res;
         });
-    };
-    DatastoreWrapper.prototype.findOne = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, (_a = this.db).findOne.apply(_a, args)];
-                    case 1:
-                        res = _b.sent();
-                        return [2 /*return*/, res];
-                }
-            });
+    }
+    findOne(...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.db.findOne(...args);
+            return res;
         });
-    };
-    DatastoreWrapper.prototype.loadDatabase = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.db.loadDatabase();
-                return [2 /*return*/];
-            });
+    }
+    loadDatabase() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.db.loadDatabase();
         });
-    };
-    return DatastoreWrapper;
-}());
-var serverStore = new DatastoreWrapper('./data/server.db');
-var userStore = new DatastoreWrapper('./data/user.db');
-var replayStore = new DatastoreWrapper('./data/replay.db');
-var eloStore = new DatastoreWrapper('./data/user.db');
+    }
+}
+let serverStore = new DatastoreWrapper('./data/server.db');
+let userStore = new DatastoreWrapper('./data/user.db');
+let replayStore = new DatastoreWrapper('./data/replay.db');
+let eloStore = new DatastoreWrapper('./data/user.db');
 global["serverStore"] = serverStore;
 global["replayStore"] = replayStore;
 /* Tanner: This is a shitty database, but it works "ok" at low scale and with the freedom to use backups :D */
@@ -173,564 +83,348 @@ async function findSorted(page, perPage = 10) {
         .limit(perPage)
         .skip(page * perPage)
 } */
-var logs_1 = require("./logs");
-var DB = /** @class */ (function () {
-    function DB() {
+const logs_1 = require("./logs");
+const discordBot_1 = require("./discordBot");
+class DB {
+    constructor() {
         this.redisClient = Redis.createClient();
-        console.log("start");
-        var redisClient = Redis.createClient();
-        // redisClient.connect().then() => {
-        //     console.log("connected");
-        //     this.redisSaveServers(null);
-        console.log("DB initialized");
+        let redisClient = Redis.createClient();
     }
-    DB.prototype.setServer = function (server) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                // const data = {
-                //     _id: server.id,
-                //     primaryMode: server.primaryMode,
-                //     oppositeChannelIds: server.oppositeChannelIds
-                // };
-                return [2 /*return*/, serverStore.insert(server)];
-            });
+    setServer(server) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // const data = {
+            //     _id: server.id,
+            //     primaryMode: server.primaryMode,
+            //     oppositeChannelIds: server.oppositeChannelIds
+            // };
+            return serverStore.insert(server);
         });
-    };
-    DB.prototype.getAllServers = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var servers;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.find({})];
-                    case 1:
-                        servers = _a.sent();
-                        return [2 /*return*/, servers];
-                }
-            });
+    }
+    getAllServers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let servers = yield serverStore.find({});
+            return servers;
         });
-    };
-    DB.prototype.getServer = function (serverId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var server;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.findOne({ _id: serverId })];
-                    case 1:
-                        server = _a.sent();
-                        return [2 /*return*/, server];
-                }
-            });
+    }
+    getServer(serverId, saveNew = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let server = yield serverStore.findOne({ _id: serverId });
+            if (server === null && saveNew) {
+                yield this.saveNewServers(discordBot_1.DiscordBot.bot);
+                server = yield serverStore.findOne({ _id: serverId });
+            }
+            return server;
         });
-    };
-    DB.prototype.putServer = function (server) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } })];
-                    case 1:
-                        _a.sent();
-                        serverStore.loadDatabase();
-                        this.setRedis(server);
-                        console.log("succesful Put");
-                        return [2 /*return*/];
-                }
-            });
+    }
+    putServer(server) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
+            serverStore.loadDatabase();
+            this.setRedis(server);
         });
-    };
+    }
     //Called on ready in discordBot.ts
-    DB.prototype.saveNewServers = function (client) {
-        return __awaiter(this, void 0, void 0, function () {
-            var servers, _i, servers_1, server, savedServer;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        servers = this.getSodbotServers(client);
-                        _i = 0, servers_1 = servers;
-                        _a.label = 1;
-                    case 1:
-                        if (!(_i < servers_1.length)) return [3 /*break*/, 6];
-                        server = servers_1[_i];
-                        return [4 /*yield*/, this.getServer(server._id)];
-                    case 2:
-                        savedServer = _a.sent();
-                        console.log(server._id);
-                        console.log(savedServer);
-                        if (!(savedServer == null)) return [3 /*break*/, 5];
-                        console.log("new");
-                        return [4 /*yield*/, this.setServer(server)];
-                    case 3:
-                        _a.sent();
-                        return [4 /*yield*/, this.setRedis(server)];
-                    case 4:
-                        _a.sent();
-                        _a.label = 5;
-                    case 5:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
+    saveNewServers(client) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const guildServers = this.getSodbotServers(client);
+            for (const server of guildServers) {
+                const savedServer = yield this.getFromRedis(server._id, false);
+                if (savedServer === null) {
+                    yield this.setServer(server);
+                    yield this.setRedis(server);
                 }
-            });
+            }
         });
-    };
-    DB.prototype.getSodbotServers = function (client) {
-        var servers = new Array();
-        var guildIds = client.guilds.cache.map(function (guild) { return guild.id; });
-        guildIds.forEach(function (guild) { return servers.push(new DiscordServer(guild)); });
-        if (servers == null || servers.length == 0) {
-            console.log("empty");
-        }
+    }
+    getSodbotServers(client) {
+        const servers = client.guilds.cache.map(guild => new DiscordServer(guild.id));
         return servers;
-    };
-    DB.prototype.setRedis = function (server) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        data = {
-                            primaryMode: server.primaryMode,
-                            oppositeChannelIds: server.oppositeChannelIds
-                        };
-                        return [4 /*yield*/, this.redisClient.set(server._id, JSON.stringify(data))];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
+    }
+    setRedis(server) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // redisClient.set("servers", JSON.stringify(servers));
+            const data = {
+                primaryMode: server.primaryMode,
+                oppositeChannelIds: server.oppositeChannelIds
+            };
+            yield this.redisClient.set(server._id, JSON.stringify(data));
         });
-    };
-    DB.prototype.getFromRedis = function (serverId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data, parsed;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.redisClient.get(serverId)];
-                    case 1:
-                        data = _a.sent();
-                        if (data === null) {
-                            return [2 /*return*/, null];
-                        }
-                        parsed = JSON.parse(data);
-                        return [2 /*return*/, new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds)];
-                }
-            });
+    }
+    getFromRedis(serverId, saveNew = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = yield this.redisClient.get(serverId);
+            if (data === null) {
+                return yield this.getServer(serverId, saveNew);
+            }
+            const parsed = JSON.parse(data);
+            return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
         });
-    };
-    DB.prototype.redisSaveServers = function (servers) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        console.log("in redisSave");
-                        if (!(servers == null)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.getAllServers()];
-                    case 1:
-                        servers = _a.sent();
-                        _a.label = 2;
-                    case 2:
-                        servers.forEach(function (server) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4 /*yield*/, this.setRedis(server)];
-                                    case 1:
-                                        _a.sent();
-                                        console.log("saved: ".concat(server._id));
-                                        return [2 /*return*/];
-                                }
-                            });
-                        }); });
-                        return [2 /*return*/];
-                }
-            });
+    }
+    redisSaveServers(servers) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (servers == null) {
+                servers = yield this.getAllServers();
+            }
+            servers.forEach((server) => __awaiter(this, void 0, void 0, function* () {
+                yield this.setRedis(server);
+            }));
         });
-    };
+    }
     //players
-    DB.prototype.setPlayer = function (player) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                data = {
-                    _id: player.id,
-                    id: player.id,
-                    elo: player.elo,
-                    pickBanElo: player.pickBanElo,
-                    impliedName: player.impliedName,
-                    lastPlayed: player.lastPlayed
-                };
-                return [2 /*return*/, userStore.insert(data)
-                    // return await DB.exec(DB.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
-                ];
-            });
+    setPlayer(player) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                _id: player.id,
+                id: player.id,
+                elo: player.elo,
+                pickBanElo: player.pickBanElo,
+                impliedName: player.impliedName,
+                lastPlayed: player.lastPlayed
+            };
+            return userStore.insert(data);
+            // return await DB.exec(DB.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
         });
-    };
-    DB.prototype.getPlayer = function (eugenId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var player;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, userStore.find({ eugenId: eugenId })];
-                    case 1:
-                        player = _a.sent();
-                        if (!player)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                id: Number(player.id),
-                                elo: Number(player.elo),
-                                pickBanElo: Number(player.pickBanElo),
-                                impliedName: player.impliedName != null ? String(player.impliedName) : null,
-                                lastPlayed: player.lastPlayed != null ? new Date(player.lastPlayed) : null
-                            }];
-                }
-            });
+    }
+    getPlayer(eugenId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const player = yield userStore.find({ eugenId });
+            if (!player)
+                return null;
+            return {
+                id: Number(player.id),
+                elo: Number(player.elo),
+                pickBanElo: Number(player.pickBanElo),
+                impliedName: player.impliedName != null ? String(player.impliedName) : null,
+                lastPlayed: player.lastPlayed != null ? new Date(player.lastPlayed) : null
+            };
         });
-    };
+    }
     //elos
-    DB.prototype.getElos = function (eugenId, channel, server) {
-        return __awaiter(this, void 0, void 0, function () {
-            var elo;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({ eugenId: eugenId, channel: channel, server: server })];
-                    case 1:
-                        elo = _a.sent();
-                        if (!elo) {
-                            return [2 /*return*/, {
-                                    eugenId: eugenId,
-                                    serverId: server,
-                                    channelId: channel,
-                                    channelElo: 1500,
-                                    serverElo: 1500,
-                                    globalElo: 1500,
-                                    pickBanGlobalElo: 1500,
-                                    playerName: ""
-                                }];
-                        }
-                        logs_1.Logs.log("getElos Fetched: " + JSON.stringify(elo));
-                        return [2 /*return*/, {
-                                eugenId: Number(elo.eugenId),
-                                serverId: String(elo.serverId),
-                                channelId: String(elo.channelId),
-                                channelElo: elo.channelElo ? Number(elo.channelElo) : 1500,
-                                serverElo: elo.serverElo ? Number(elo.serverElo) : 1500,
-                                globalElo: Number(elo.globalElo),
-                                pickBanGlobalElo: Number(elo.pickBanGlobalElo),
-                                playerName: String(elo.playerName)
-                            }];
-                }
-            });
+    getElos(eugenId, channel, server) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elo = yield eloStore.find({ eugenId, channel, server });
+            if (!elo) {
+                return {
+                    eugenId: eugenId,
+                    serverId: server,
+                    channelId: channel,
+                    channelElo: 1500,
+                    serverElo: 1500,
+                    globalElo: 1500,
+                    pickBanGlobalElo: 1500,
+                    playerName: ""
+                };
+            }
+            logs_1.Logs.log("getElos Fetched: " + JSON.stringify(elo));
+            return {
+                eugenId: Number(elo.eugenId),
+                serverId: String(elo.serverId),
+                channelId: String(elo.channelId),
+                channelElo: elo.channelElo ? Number(elo.channelElo) : 1500,
+                serverElo: elo.serverElo ? Number(elo.serverElo) : 1500,
+                globalElo: Number(elo.globalElo),
+                pickBanGlobalElo: Number(elo.pickBanGlobalElo),
+                playerName: String(elo.playerName)
+            };
         });
-    };
-    DB.prototype.getDiscordElos = function (discordId, channel, server) {
-        return __awaiter(this, void 0, void 0, function () {
-            var elo;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({ discordId: discordId, channel: channel, server: server })
-                        // const xx = await DB.exec(DB.getElosDiscordSql, { playerId: discordId, channelId: channel, serverId: server }, { playerId: sql.VarChar, channelId: sql.VarChar, serverId: sql.VarChar })
-                    ];
-                    case 1:
-                        elo = _a.sent();
-                        // const xx = await DB.exec(DB.getElosDiscordSql, { playerId: discordId, channelId: channel, serverId: server }, { playerId: sql.VarChar, channelId: sql.VarChar, serverId: sql.VarChar })
-                        if (!elo)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                eugenId: Number(elo.eugenId),
-                                serverId: String(elo.serverId),
-                                channelId: String(elo.channelId),
-                                channelElo: elo.channelElo ? Number(elo.channelElo) : 1500,
-                                serverElo: elo.serverElo ? Number(elo.serverElo) : 1500,
-                                globalElo: Number(elo.globalElo),
-                                pickBanGlobalElo: Number(elo.pickBanGlobalElo),
-                                playerName: String(elo.playerName)
-                            }];
-                }
-            });
+    }
+    getDiscordElos(discordId, channel, server) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elo = yield eloStore.find({ discordId, channel, server });
+            // const xx = await DB.exec(DB.getElosDiscordSql, { playerId: discordId, channelId: channel, serverId: server }, { playerId: sql.VarChar, channelId: sql.VarChar, serverId: sql.VarChar })
+            if (!elo)
+                return null;
+            return {
+                eugenId: Number(elo.eugenId),
+                serverId: String(elo.serverId),
+                channelId: String(elo.channelId),
+                channelElo: elo.channelElo ? Number(elo.channelElo) : 1500,
+                serverElo: elo.serverElo ? Number(elo.serverElo) : 1500,
+                globalElo: Number(elo.globalElo),
+                pickBanGlobalElo: Number(elo.pickBanGlobalElo),
+                playerName: String(elo.playerName)
+            };
         });
-    };
-    DB.prototype.setElos = function (elos, info) {
-        return __awaiter(this, void 0, void 0, function () {
-            var elosData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        elosData = __assign({ _id: elos.eugenId, playerId: elos.eugenId, serverId: elos.serverId, channelId: elos.channelId, channelElo: elos.channelElo, serverElo: elos.serverElo, globalElo: elos.globalElo, pickBanGlobalElo: elos.pickBanGlobalElo }, info);
-                        logs_1.Logs.log("saving elos: " + JSON.stringify(elosData));
-                        return [4 /*yield*/, eloStore.update({ _id: elos.eugenId }, elosData, { upsert: true })];
-                    case 1: return [2 /*return*/, _a.sent()];
-                }
-            });
+    }
+    setElos(elos, info) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elosData = Object.assign({ _id: elos.eugenId, playerId: elos.eugenId, serverId: elos.serverId, channelId: elos.channelId, channelElo: elos.channelElo, serverElo: elos.serverElo, globalElo: elos.globalElo, pickBanGlobalElo: elos.pickBanGlobalElo }, info);
+            logs_1.Logs.log("saving elos: " + JSON.stringify(elosData));
+            return yield eloStore.update({ _id: elos.eugenId }, elosData, { upsert: true });
         });
-    };
-    DB.prototype.setDivisionElo = function (elo) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data, i;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        console.log(elo);
-                        data = {
-                            id: elo.id,
-                            elo: elo.elo,
-                            divName: elo.divName
-                        };
-                        return [4 /*yield*/, eloStore.update({ _id: elo.id }, data, { upsert: true })
-                            // const i = await (await DB.exec(DB.updateDivEloSql, data, { id: sql.Int, elo: sql.Float, divName: sql.VarChar })).rowCount
-                            // TODO: TEST 
-                        ];
-                    case 1:
-                        i = _a.sent();
-                        // const i = await (await DB.exec(DB.updateDivEloSql, data, { id: sql.Int, elo: sql.Float, divName: sql.VarChar })).rowCount
-                        // TODO: TEST 
-                        console.log(i);
-                        return [2 /*return*/, i];
-                }
-            });
+    }
+    setDivisionElo(elo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(elo);
+            const data = {
+                id: elo.id,
+                elo: elo.elo,
+                divName: elo.divName
+            };
+            const i = yield eloStore.update({ _id: elo.id }, data, { upsert: true });
+            // const i = await (await DB.exec(DB.updateDivEloSql, data, { id: sql.Int, elo: sql.Float, divName: sql.VarChar })).rowCount
+            // TODO: TEST 
+            console.log(i);
+            return i;
         });
-    };
-    DB.prototype.getDivisionElo = function (id) {
-        return __awaiter(this, void 0, void 0, function () {
-            var elo;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({ _id: id })];
-                    case 1:
-                        elo = _a.sent();
-                        if (!elo)
-                            return [2 /*return*/, null
-                                //const xx = await DB.exec("Select * from divisionElo where id = '" + id + "';")
-                            ];
-                        //const xx = await DB.exec("Select * from divisionElo where id = '" + id + "';")
-                        return [2 /*return*/, {
-                                id: Number(elo.id),
-                                divName: String(elo.divName),
-                                elo: Number(elo.elo),
-                            }];
-                }
-            });
+    }
+    getDivisionElo(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elo = yield eloStore.find({ _id: id });
+            if (!elo)
+                return null;
+            //const xx = await DB.exec("Select * from divisionElo where id = '" + id + "';")
+            return {
+                id: Number(elo.id),
+                divName: String(elo.divName),
+                elo: Number(elo.elo),
+            };
         });
-    };
-    DB.prototype.getAllDivisionElo = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var elos, ret;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({})];
-                    case 1:
-                        elos = _a.sent();
-                        ret = elos.map(function (elo) {
-                            ret.push({
-                                id: Number(elo.id),
-                                divName: String(elo.divName),
-                                elo: Number(elo.elo),
-                            });
-                        });
-                        return [2 /*return*/, ret];
-                }
+    }
+    getAllDivisionElo() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elos = yield eloStore.find({});
+            const ret = elos.map(elo => {
+                ret.push({
+                    id: Number(elo.id),
+                    divName: String(elo.divName),
+                    elo: Number(elo.elo),
+                });
             });
+            return ret;
         });
-    };
+    }
     //permissions
-    DB.prototype.getServerPermissions = function (serverId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var perms;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.find({ serverId: serverId, type: "perms" })];
-                    case 1:
-                        perms = _a.sent();
-                        if (!perms)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                id: String(perms.id),
-                                name: String(perms.serverName),
-                                blockElo: Number(perms.blockElo),
-                                blockCommands: Number(perms.blockCommands),
-                                blockReplay: Number(perms.blockReplay),
-                                blockChannelElo: Number(perms.blockChannelElo),
-                                blockServerElo: Number(perms.blockServerElo),
-                                blockGlobalElo: Number(perms.blockGlobalElo)
-                            }];
-                }
-            });
+    getServerPermissions(serverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const perms = yield serverStore.find({ serverId, type: "perms" });
+            if (!perms)
+                return null;
+            return {
+                id: String(perms.id),
+                name: String(perms.serverName),
+                blockElo: Number(perms.blockElo),
+                blockCommands: Number(perms.blockCommands),
+                blockReplay: Number(perms.blockReplay),
+                blockChannelElo: Number(perms.blockChannelElo),
+                blockServerElo: Number(perms.blockServerElo),
+                blockGlobalElo: Number(perms.blockGlobalElo)
+            };
         });
-    };
-    DB.prototype.getChannelPermissions = function (channelId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var perms;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, serverStore.find({ channelId: channelId, type: "perms-channel" })];
-                    case 1:
-                        perms = _a.sent();
-                        if (!perms)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                id: String(perms.id),
-                                name: String(perms.channelName),
-                                blockElo: Number(perms.blockElo),
-                                blockCommands: Number(perms.blockCommands),
-                                blockReplay: Number(perms.blockReplay),
-                                blockChannelElo: Number(perms.blockChannelElo),
-                                blockServerElo: Number(perms.blockServerElo),
-                                blockGlobalElo: Number(perms.blockGlobalElo)
-                            }];
-                }
-            });
+    }
+    getChannelPermissions(channelId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const perms = yield serverStore.find({ channelId, type: "perms-channel" });
+            if (!perms)
+                return null;
+            return {
+                id: String(perms.id),
+                name: String(perms.channelName),
+                blockElo: Number(perms.blockElo),
+                blockCommands: Number(perms.blockCommands),
+                blockReplay: Number(perms.blockReplay),
+                blockChannelElo: Number(perms.blockChannelElo),
+                blockServerElo: Number(perms.blockServerElo),
+                blockGlobalElo: Number(perms.blockGlobalElo)
+            };
         });
-    };
-    DB.prototype.setChannelPermissions = function (prem) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        data = {
-                            id: prem.id,
-                            name: prem.name,
-                            blockElo: prem.blockElo,
-                            blockCommands: prem.blockCommands,
-                            blockReplay: prem.blockReplay,
-                            blockChannelElo: prem.blockChannelElo,
-                            blockServerElo: prem.blockServerElo,
-                            blockGlobalElo: prem.blockGlobalElo
-                        };
-                        return [4 /*yield*/, serverStore.update({ _id: prem.id }, data, { upsert: true })
-                            // return await DB.exec(DB.setChannelPermissionsSql, data, { id: sql.VarChar, name: sql.VarChar, blockElo: sql.Int, blockCommands: sql.Int, blockReplay: sql.Int, blockChannelElo: sql.Int, blockServerElo: sql.Int, blockGlobalElo: sql.Int })
-                        ];
-                    case 1: return [2 /*return*/, _a.sent()
-                        // return await DB.exec(DB.setChannelPermissionsSql, data, { id: sql.VarChar, name: sql.VarChar, blockElo: sql.Int, blockCommands: sql.Int, blockReplay: sql.Int, blockChannelElo: sql.Int, blockServerElo: sql.Int, blockGlobalElo: sql.Int })
-                    ];
-                }
-            });
+    }
+    setChannelPermissions(prem) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                id: prem.id,
+                name: prem.name,
+                blockElo: prem.blockElo,
+                blockCommands: prem.blockCommands,
+                blockReplay: prem.blockReplay,
+                blockChannelElo: prem.blockChannelElo,
+                blockServerElo: prem.blockServerElo,
+                blockGlobalElo: prem.blockGlobalElo
+            };
+            return yield serverStore.update({ _id: prem.id }, data, { upsert: true });
+            // return await DB.exec(DB.setChannelPermissionsSql, data, { id: sql.VarChar, name: sql.VarChar, blockElo: sql.Int, blockCommands: sql.Int, blockReplay: sql.Int, blockChannelElo: sql.Int, blockServerElo: sql.Int, blockGlobalElo: sql.Int })
         });
-    };
+    }
     //discordUser
-    DB.prototype.getDiscordUser = function (discordId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var user;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, userStore.findOne({ discordId: discordId })
-                        //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
-                    ];
-                    case 1:
-                        user = _a.sent();
-                        //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
-                        if (!user)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                id: String(user.id),
-                                playerId: user.playerId,
-                                serverAdmin: JSON.parse(user.serverAdmin),
-                                globalAdmin: Boolean(user.globalAdmin),
-                                impliedName: String(user.impliedName)
-                            }];
-                }
-            });
+    getDiscordUser(discordId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield userStore.findOne({ discordId });
+            //const xx = await DB.exec("Select * from discordUsers where id = '" + discordId + "';")
+            if (!user)
+                return null;
+            return {
+                id: String(user.id),
+                playerId: user.playerId,
+                serverAdmin: JSON.parse(user.serverAdmin),
+                globalAdmin: Boolean(user.globalAdmin),
+                impliedName: String(user.impliedName)
+            };
         });
-    };
-    DB.prototype.getDiscordUserFromEugenId = function (eugenId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var user;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, userStore.findOne({ eugenId: eugenId })
-                        //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
-                    ];
-                    case 1:
-                        user = _a.sent();
-                        //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
-                        if (!user)
-                            return [2 /*return*/, null];
-                        return [2 /*return*/, {
-                                id: String(user.id),
-                                playerId: user.playerId,
-                                serverAdmin: JSON.parse(user.serverAdmin),
-                                globalAdmin: Boolean(user.globalAdmin),
-                                impliedName: String(user.impliedName)
-                            }];
-                }
-            });
+    }
+    getDiscordUserFromEugenId(eugenId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield userStore.findOne({ eugenId });
+            //const xx = await DB.exec("Select * from discordUsers where playerId =  " + eugenId + ";")
+            if (!user)
+                return null;
+            return {
+                id: String(user.id),
+                playerId: user.playerId,
+                serverAdmin: JSON.parse(user.serverAdmin),
+                globalAdmin: Boolean(user.globalAdmin),
+                impliedName: String(user.impliedName)
+            };
         });
-    };
-    DB.prototype.setDiscordUser = function (user) {
-        return __awaiter(this, void 0, void 0, function () {
-            var data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        data = {
-                            id: String(user.id),
-                            playerId: user.playerId,
-                            serverAdmin: "" + JSON.stringify(user.serverAdmin),
-                            globalAdmin: user.globalAdmin,
-                            impliedName: user.impliedName
-                        };
-                        console.log(data);
-                        return [4 /*yield*/, userStore.update({ _id: data.id }, data, { upsert: true })
-                            // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
-                        ];
-                    case 1: return [2 /*return*/, _a.sent()
-                        // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
-                    ];
-                }
-            });
+    }
+    setDiscordUser(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = {
+                id: String(user.id),
+                playerId: user.playerId,
+                serverAdmin: "" + JSON.stringify(user.serverAdmin),
+                globalAdmin: user.globalAdmin,
+                impliedName: user.impliedName
+            };
+            console.log(data);
+            return yield userStore.update({ _id: data.id }, data, { upsert: true });
+            // return await DB.exec(DB.setDiscordUserSql, data, { id: sql.VarChar, playerId: sql.Int, globalAdmin: sql.Bit, serverAdmin: sql.Text, impliedName: sql.Text })
         });
-    };
+    }
     //Other functions
-    DB.prototype.getGlobalLadder = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var users;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({})
-                        // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
-                        //  const ret = new Array<EloLadderElement>();
-                    ];
-                    case 1:
-                        users = _a.sent();
-                        // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
-                        //  const ret = new Array<EloLadderElement>();
-                        return [2 /*return*/, users.map(function (elo, index) {
-                                return {
-                                    rank: index + 1,
-                                    elo: Number(elo.elo),
-                                    discordId: String(elo.discordId),
-                                    name: String(elo.eugenName),
-                                    lastActive: new Date(elo.lastActive)
-                                };
-                            })];
-                }
+    getGlobalLadder() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: this probably wont work out of the box.
+            const users = yield eloStore.find({});
+            // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
+            //  const ret = new Array<EloLadderElement>();
+            return users.map((elo, index) => {
+                return {
+                    rank: index + 1,
+                    elo: Number(elo.elo),
+                    discordId: String(elo.discordId),
+                    name: String(elo.eugenName),
+                    lastActive: new Date(elo.lastActive)
+                };
             });
         });
-    };
-    DB.prototype.getServerLadder = function (serverId) {
-        return __awaiter(this, void 0, void 0, function () {
-            var users;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, eloStore.find({ serverId: serverId })
-                        // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
-                        //  const ret = new Array<EloLadderElement>();
-                    ];
-                    case 1:
-                        users = _a.sent();
-                        // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
-                        //  const ret = new Array<EloLadderElement>();
-                        return [2 /*return*/, users.map(function (elo, index) {
-                                return {
-                                    rank: index + 1,
-                                    elo: Number(elo.elo),
-                                    discordId: String(elo.discordId),
-                                    name: String(elo.eugenName),
-                                    lastActive: new Date(elo.lastActive)
-                                };
-                            })];
-                }
+    }
+    getServerLadder(serverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: this probably wont work out of the box.
+            const users = yield eloStore.find({ serverId });
+            // const sql = "SELECT players.id as eugenid, pickBanElo, elo, discordUsers.id as discordId, discordUsers.impliedName as discordName, players.impliedName as eugenName, players.lastPlayed as lastActive FROM players LEFT JOIN discordUsers ON discordUsers.playerId = players.id ORDER BY players.elo DESC"
+            //  const ret = new Array<EloLadderElement>();
+            return users.map((elo, index) => {
+                return {
+                    rank: index + 1,
+                    elo: Number(elo.elo),
+                    discordId: String(elo.discordId),
+                    name: String(elo.eugenName),
+                    lastActive: new Date(elo.lastActive)
+                };
             });
         });
-    };
+    }
     /*
     public async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
@@ -771,73 +465,45 @@ var DB = /** @class */ (function () {
     }
     */
     // Returns 0 for new replay and 1 for existing replay
-    DB.prototype.setReplay = function (message, replay) {
-        return __awaiter(this, void 0, void 0, function () {
-            var existing, replayData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, replayStore.find({ uuid: replay.uniqueSessionId })];
-                    case 1:
-                        existing = _a.sent();
-                        replayData = {
-                            discordId: message.author.id,
-                            serverId: message.guild.id,
-                            channelId: message.channel.id,
-                            replay: JSON.stringify(replay),
-                            uuid: replay.uniqueSessionId
-                        };
-                        logs_1.Logs.log("Committing replay: " + replayData.uuid);
-                        return [4 /*yield*/, replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/, existing ? 1 : 0
-                            // return await DB.exec(DB.addReplaySql, dbRow, type)
-                        ];
-                }
-            });
+    setReplay(message, replay) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let existing = yield replayStore.find({ uuid: replay.uniqueSessionId });
+            const replayData = {
+                discordId: message.author.id,
+                serverId: message.guild.id,
+                channelId: message.channel.id,
+                replay: JSON.stringify(replay),
+                uuid: replay.uniqueSessionId
+            };
+            logs_1.Logs.log("Committing replay: " + replayData.uuid);
+            yield replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true });
+            return existing ? 1 : 0;
+            // return await DB.exec(DB.addReplaySql, dbRow, type)
         });
-    };
+    }
     //This is expensive. And an unprepared statement. and it returns *....
     //it needs work. @todo
-    DB.prototype.getReplaysByEugenId = function (eugenId) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, replayStore.find({ eugenId: eugenId })
-                        // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
-                    ];
-                    case 1: return [2 /*return*/, _a.sent()
-                        // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
-                    ];
-                }
-            });
+    getReplaysByEugenId(eugenId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield replayStore.find({ eugenId });
+            // return DB.exec("SELECT * FROM replays WHERE JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[0].id') LIKE '" + eugenId + "' OR JSON_VALUE(cast([replay] as nvarchar(max)), '$.players[1].id') LIKE '" + eugenId + "' ORDER BY uploadedAt DESC;")
         });
-    };
-    DB.prototype.exec = function () {
-        var dots = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            dots[_i] = arguments[_i];
-        }
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                console.log("Not implemented");
-                return [2 /*return*/, { rowCount: 0, rows: [] }];
-            });
+    }
+    exec(...dots) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log("Not implemented");
+            return { rowCount: 0, rows: [] };
         });
-    };
-    return DB;
-}());
+    }
+}
 exports.DB = DB;
-var DiscordServer = /** @class */ (function () {
-    function DiscordServer(id, primaryMode, oppositeChannelIds) {
-        if (primaryMode === void 0) { primaryMode = "sd2"; }
-        if (oppositeChannelIds === void 0) { oppositeChannelIds = new Array(); }
+class DiscordServer {
+    constructor(id, primaryMode = "sd2", oppositeChannelIds = new Array()) {
         this._id = id;
         this.primaryMode = primaryMode;
         this.oppositeChannelIds = oppositeChannelIds;
     }
-    return DiscordServer;
-}());
+}
 exports.DiscordServer = DiscordServer;
 exports.default = DB;
 //# sourceMappingURL=db.js.map

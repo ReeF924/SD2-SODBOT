@@ -1,12 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logs = void 0;
-var winston = require("winston");
-var common_1 = require("./common");
-var Logs = /** @class */ (function () {
-    function Logs() {
-    }
-    Logs.init = function () {
+const winston = require("winston");
+const common_1 = require("./common");
+class Logs {
+    static init() {
         Logs.logger = winston.createLogger({
             level: common_1.CommonUtil.config("logLevel", "verbose"),
             transports: [
@@ -14,16 +12,15 @@ var Logs = /** @class */ (function () {
                 new winston.transports.File({ filename: "app.log", maxsize: 20000000, maxFiles: 3 })
             ]
         });
-    };
-    Logs.log = function (message) {
+    }
+    static log(message) {
         if (message)
             Logs.logger.log("info", message);
-    };
-    Logs.error = function (message) {
+    }
+    static error(message) {
         if (message)
             Logs.logger.log("error", message);
-    };
-    return Logs;
-}());
+    }
+}
 exports.Logs = Logs;
 //# sourceMappingURL=logs.js.map

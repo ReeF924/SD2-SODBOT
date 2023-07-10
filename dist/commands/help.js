@@ -1,11 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HelpCommand = void 0;
-var discord_js_1 = require("discord.js");
-var HelpCommand = /** @class */ (function () {
-    function HelpCommand() {
-    }
-    HelpCommand.prototype.help = function (message, input) {
+const discord_js_1 = require("discord.js");
+class HelpCommand {
+    help(message, input) {
         switch (input[0]) {
             case "maps":
                 this.helpMaps(message);
@@ -22,13 +20,18 @@ var HelpCommand = /** @class */ (function () {
             case "replays":
                 this.helpReplays(message);
                 break;
+            case "admin":
+                this.helpAdmins(message);
+                break;
             default:
-                var embed = new discord_js_1.MessageEmbed()
+                const embed = new discord_js_1.MessageEmbed()
                     .setTitle("Help Commands")
                     .addFields([
-                    { name: "$help",
+                    {
+                        name: "$help",
                         value: "Gives this message",
-                        inline: false },
+                        inline: false
+                    },
                     {
                         name: "$help maps",
                         value: "Gives help info about all of the map commands.",
@@ -53,21 +56,32 @@ var HelpCommand = /** @class */ (function () {
                         name: "$help replays",
                         value: 'Gives help info about the submitting of match replay files.',
                         inline: false
+                    },
+                    {
+                        name: "$help admin",
+                        value: 'Gives help info about commands for admins.',
+                        inline: false
                     }
                 ]);
                 message.author.send(embed);
         }
-    };
-    HelpCommand.prototype.helpMaps = function (message) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    helpMaps(message) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Maps Commands")
             .addFields([
-            { name: "$rmap",
-                value: "Returns a random map from the list of approved SD2 League 1v1 Maps.",
-                inline: false },
+            {
+                name: "Primarymode",
+                value: "If the game isn't specified at the end of an command, returns maps of the game that is considered primary for the current channel."
+            },
+            {
+                name: "$rmap",
+                value: "Returns a random map from the list of approved SD2 League 1v1 Maps or warno 1v1 map.",
+                inline: false
+            },
             {
                 name: "$rmap XXX",
-                value: "In addition to $rmap you can also add the following arguments warno, 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories or warno 1v1 maps",
+                value: "In addition to $rmap you can also add the following arguments, 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories.",
                 inline: false
             },
             {
@@ -92,17 +106,21 @@ var HelpCommand = /** @class */ (function () {
             }
         ]);
         message.author.send(embed);
-    };
-    HelpCommand.prototype.helpDivs = function (message) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    helpDivs(message) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Division Commands")
             .addFields([
-            { name: "$rdiv",
+            {
+                name: "$rdiv",
                 value: "Returns a random division from all of the available divisions, it excludes any banned divisions.\nYou may also add the argument Allies or Axis to narrow the random selection down to only that faction.\nExample Usage $rdiv Axis",
-                inline: false },
-            { name: "$divs or $alldivs",
+                inline: false
+            },
+            {
+                name: "$divs or $alldivs",
                 value: "Returns a list of all divisions, it includes the division name and its alias.",
-                inline: false },
+                inline: false
+            },
             {
                 name: "$bandiv",
                 value: "Allows you to ban a division (or multiple divisions) and remove it from the active list of divisions.\nYou may use the offical name of the division or its alias.\nExample Usage: $bandiv 1. Skijager  and  $bandiv 1SJ  (both work the same way)",
@@ -125,17 +143,21 @@ var HelpCommand = /** @class */ (function () {
             }
         ]);
         message.author.send(embed);
-    };
-    HelpCommand.prototype.helpMisc = function (message) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    helpMisc(message) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Misc Commands")
             .addFields([
-            { name: "$piat or $ptrd or $laws",
+            {
+                name: "$piat or $ptrd or $laws",
                 value: "FIRE the Piat, PTRD or LAWS.   Can you get a Hit, find the secret messages?",
-                inline: false },
-            { name: "$info",
+                inline: false
+            },
+            {
+                name: "$info",
                 value: "Shows info about the bot.",
-                inline: false },
+                inline: false
+            },
             {
                 name: "$faction",
                 value: "Returns a random faction, ie. returns Allies or Axis.",
@@ -153,17 +175,21 @@ var HelpCommand = /** @class */ (function () {
             }
         ]);
         message.author.send(embed);
-    };
-    HelpCommand.prototype.helpPlayer = function (message) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    helpPlayer(message) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Player Commands")
             .addFields([
-            { name: "$register",
+            {
+                name: "$register",
                 value: "This command will register (if they are unknown to the bot) or update (if they have previously registered) a player to the bot.\n The command makes a link between the Discord User submitting the request and the Eugen Player ID provided in the request.\nExample Usage: $register 123456 (where 123456 is the player's Eugen Player ID).",
-                inline: false },
-            { name: "$player",
+                inline: false
+            },
+            {
+                name: "$player",
                 value: "Provides a summary of the player. When submitted without an argument will return information about the submitter.  When used with the @player argument will return information about that player.\n Exmaple Usage: $player @ExamplePlayer (returns player information for ExamplePlayer)",
-                inline: false },
+                inline: false
+            },
             {
                 name: "$allratings",
                 value: "Returns a list of the top 100 active players and their ratings.\nA active player is defined as a player who has been listed in a submitted rated match in the last 6 months.",
@@ -171,36 +197,69 @@ var HelpCommand = /** @class */ (function () {
             }
         ]);
         message.author.send(embed);
-    };
-    HelpCommand.prototype.helpReplays = function (message) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    helpReplays(message) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help - Replays")
             .addFields([
-            { name: "Uploading a game replay",
+            {
+                name: "Uploading a game replay",
                 value: "Uploading a game replay into one of the channels supported by the bot will trigger the bot to return summary information about the match.",
-                inline: false },
-            { name: "\u200b",
+                inline: false
+            },
+            {
+                name: "\u200b",
                 value: "This includes information about the match (eg. Winner, Loser, VictoryState, Duration, Map etc as well as information about the players themselves (eg Discord and Eugen Names, Lvl, Rating, Deck and Income used)",
-                inline: false },
-            { name: "\u200b",
+                inline: false
+            },
+            {
+                name: "\u200b",
                 value: "If the game has been submitted via a channel that also allows rating, the match will be rated by the BOT and updates to the player ratings added to the player database.",
-                inline: false },
-            { name: "-------------------------------------------------------------",
+                inline: false
+            },
+            {
+                name: "-------------------------------------------------------------",
                 value: "\u200b",
-                inline: false },
-            { name: "Replay Location On Your PC",
+                inline: false
+            },
+            {
+                name: "Replay Location On Your PC",
                 value: "First thing is to navigate in-game to Profile/Replays and ensure the check box \"Cloud\" is unchecked on the replay, this will ensure a copy of the game has been saved to your local device.",
-                inline: false },
-            { name: "\u200b",
+                inline: false
+            },
+            {
+                name: "\u200b",
                 value: "Not every computer is the same but generally you can find your locally saved replay files under -\nC:/user/xxxxxx/SavedGames/EugenSystems/SteelDivision 2/",
-                inline: false }
+                inline: false
+            }
         ]);
         message.author.send(embed);
-    };
-    HelpCommand.prototype.addCommands = function (bot) {
-        bot.registerCommand("help", this.help);
-    };
-    return HelpCommand;
-}());
+    }
+    helpAdmins(message) {
+        const embed = new discord_js_1.MessageEmbed()
+            .setTitle("Help - Admin commands")
+            .addFields([
+            {
+                name: "$primarymode",
+                value: "Provides info about the primary mode of a server.\nAdding a game name as an argument changes the primary mode.",
+                inline: false
+            },
+            {
+                name: "$addchannel",
+                value: "Adds channel into the opposite channels.\nAdding channel id as an argument adds that channel.",
+                inline: false
+            },
+            {
+                name: "$removechannel",
+                value: "Removes channel from the opposite channels.\nAdding channel id as an argument removes that channel.\nAdding argument 'all' removes all the opposite channels.",
+                inline: false
+            }
+        ]);
+        message.author.send(embed);
+    }
+    addCommands(bot) {
+        bot.registerCommand("help", this.help.bind(this));
+    }
+}
 exports.HelpCommand = HelpCommand;
 //# sourceMappingURL=help.js.map

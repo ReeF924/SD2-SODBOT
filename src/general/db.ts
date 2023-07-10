@@ -80,18 +80,12 @@ import { Message } from 'discord.js';
 import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
 import { Client } from 'discord.js';
 import { DiscordBot } from "./discordBot";
+import { BlobOptions } from "buffer";
 
 export class DB {
     public redisClient = Redis.createClient();
     public  constructor() {
-        console.log("start");
         let redisClient = Redis.createClient();
-
-        // redisClient.connect().then() => {
-        //     console.log("connected");
-        //     this.redisSaveServers(null);
-
-        console.log("DB initialized");
     }
 
     public async setServer(server: DiscordServer): Promise<DBObject> {
@@ -100,48 +94,40 @@ export class DB {
         //     primaryMode: server.primaryMode,
         //     oppositeChannelIds: server.oppositeChannelIds
         // };
+
         return serverStore.insert(server);
     }
     public async getAllServers(): Promise<DiscordServer[]> {
-        const servers = await serverStore.find({});
+        let servers = await serverStore.find({});
         return servers;
     }
-    public async getServer(serverId: string): Promise<DiscordServer> {
+    public async getServer(serverId: string, saveNew:boolean = true): Promise<DiscordServer> {
         let server = await serverStore.findOne({ _id: serverId });
-
+        if(server === null && saveNew){
+            await this.saveNewServers(DiscordBot.bot);
+            server = await serverStore.findOne({ _id: serverId });
+        }
         return server;
     }
     public async putServer(server: DiscordServer) {
         await serverStore.update({ _id: server._id }, { $set: { primaryMode: server.primaryMode, oppositeChannelIds: server.oppositeChannelIds } });
         serverStore.loadDatabase();
         this.setRedis(server);
-        console.log("succesful Put");
     }
     //Called on ready in discordBot.ts
     public async saveNewServers(client: Client): Promise<void> {
-        const servers: DiscordServer[] = this.getSodbotServers(client);
-
-        // if(servers == null) return;
-        for (const server of servers) {
-            const savedServer = await this.getServer(server._id);
-            console.log(server._id);
-            console.log(savedServer);
-            if (savedServer == null) {
-                console.log("new");
+        const guildServers: DiscordServer[] = this.getSodbotServers(client);
+        for (const server of guildServers) {
+            const savedServer = await this.getFromRedis(server._id, false);
+            if (savedServer === null) {
                 await this.setServer(server);
                 await this.setRedis(server);
             }
         }
     }
     public getSodbotServers(client: Client): DiscordServer[] {
-        const servers: DiscordServer[] = new Array<DiscordServer>();
-        let guildIds = client.guilds.cache.map(guild => guild.id);
-        guildIds.forEach(guild => servers.push(new DiscordServer(guild)));
+        const servers:DiscordServer[] = client.guilds.cache.map(guild => new DiscordServer(guild.id));
 
-
-        if (servers == null || servers.length == 0) {
-            console.log("empty");
-        }
         return servers;
     }
     public async setRedis(server: DiscordServer): Promise<void> {
@@ -152,22 +138,20 @@ export class DB {
         }
         await this.redisClient.set(server._id, JSON.stringify(data));
     }
-    public async getFromRedis(serverId: string): Promise<DiscordServer> {
+    public async getFromRedis(serverId: string, saveNew:boolean = true): Promise<DiscordServer> {
         const data = await this.redisClient.get(serverId);
         if(data === null){
-            return null;
+            return await this.getServer(serverId, saveNew);
         }
         const parsed = JSON.parse(data);
         return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
     }
     public async redisSaveServers(servers:DiscordServer[]): Promise<void>{
-        console.log("in redisSave");
         if(servers == null){
             servers = await this.getAllServers();
         }
         servers.forEach(async server => {
             await this.setRedis(server);
-            console.log(`saved: ${server._id}`);
         });
     }
     //players

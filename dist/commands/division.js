@@ -1,33 +1,24 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DivisionCommand = void 0;
-var discordBot_1 = require("../general/discordBot");
-var sd2_data_1 = require("sd2-data");
-var common_1 = require("../general/common");
-var logs_1 = require("../general/logs");
-var discord_js_1 = require("discord.js");
+const discordBot_1 = require("../general/discordBot");
+const sd2_data_1 = require("sd2-data");
+const common_1 = require("../general/common");
+const logs_1 = require("../general/logs");
+const discord_js_1 = require("discord.js");
 //@todo clean up array mess in this file created by addition of divsion alias names.
-var DivisionCommand = /** @class */ (function () {
-    function DivisionCommand() {
+class DivisionCommand {
+    constructor() {
         this.bans = new Map(); // 2d array of playerIds to banned divisions.
     }
-    DivisionCommand.prototype.randomDiv = function (message, input) {
-        var divs;
+    randomDiv(message, input) {
+        let divs;
         logs_1.Logs.log("command Random Division with Inputs " + JSON.stringify(input));
         if (input.length == 0) {
-            divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsAllies, true), sd2_data_1.divisions.divisionsAxis, true);
+            divs = [...sd2_data_1.divisions.divisionsAllies, ...sd2_data_1.divisions.divisionsAxis];
         }
         else {
-            var side = input[0].toLowerCase();
+            const side = input[0].toLowerCase();
             if (side !== "axis" && side !== "allies" && side !== "warno") {
                 discordBot_1.MsgHelper.reply(message, "Unknown faction, please specify 'axis' or 'allies' or 'warno' as a faction if you want to pick a certain faction or choose a warno division.");
                 return;
@@ -37,34 +28,30 @@ var DivisionCommand = /** @class */ (function () {
             if (side == "axis")
                 divs = sd2_data_1.divisions.divisionsAxis;
             if (side == "warno")
-                divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsNato, true), sd2_data_1.divisions.divisionsPact, true);
+                divs = [...sd2_data_1.divisions.divisionsNato, ...sd2_data_1.divisions.divisionsPact];
         }
         //check for bans
         if (this.bans[message.member.id]) {
-            var _loop_1 = function (key) {
-                divs = divs.filter(function (x) {
+            for (const key of Object.keys(this.bans[message.member.id])) {
+                divs = divs.filter((x) => {
                     return x.id != Number(key);
                 });
-            };
-            for (var _i = 0, _a = Object.keys(this.bans[message.member.id]); _i < _a.length; _i++) {
-                var key = _a[_i];
-                _loop_1(key);
             }
         }
         if (divs.length == 0)
             discordBot_1.MsgHelper.reply(message, "all divisions have been banned. Please unban some divisions");
         else {
-            var pick = Math.floor(Math.random() * divs.length);
-            var pickname = divs[pick].name;
+            const pick = Math.floor(Math.random() * divs.length);
+            const pickname = divs[pick].name;
             logs_1.Logs.log(message.author.id + " has picked " + pickname + " from " + JSON.stringify(divs) + " side: " + input);
             discordBot_1.MsgHelper.reply(message, pickname);
         }
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.prototype.allDivs = function (message, input) {
-        var allieddivs = "";
-        var axisdivs = "";
-        for (var i = 0; i < sd2_data_1.divisions.divisionsAllies.length; i++) {
+    allDivs(message, input) {
+        let allieddivs = "";
+        let axisdivs = "";
+        for (let i = 0; i < sd2_data_1.divisions.divisionsAllies.length; i++) {
             if (sd2_data_1.divisions.divisionsAllies[i])
                 allieddivs += sd2_data_1.divisions.divisionsAllies[i].name + '\n';
             //if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
@@ -72,16 +59,16 @@ var DivisionCommand = /** @class */ (function () {
                 axisdivs += sd2_data_1.divisions.divisionsAxis[i].name + '\n';
             //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
         }
-        var alliedembed = new discord_js_1.MessageEmbed().setTitle("-- All Divisions --");
+        let alliedembed = new discord_js_1.MessageEmbed().setTitle("-- All Divisions --");
         alliedembed = alliedembed.addFields({ name: "Allied Divisions", value: allieddivs, inline: true });
         message.channel.send(alliedembed);
-        var axisembed = new discord_js_1.MessageEmbed();
+        let axisembed = new discord_js_1.MessageEmbed();
         axisembed = axisembed.addFields({ name: "Axis Divisions", value: axisdivs, inline: true });
         message.channel.send(axisembed);
-    };
-    DivisionCommand.prototype.unbanDivision = function (message, input) {
+    }
+    unbanDivision(message, input) {
         if (input.length == 0) {
-            discordBot_1.MsgHelper.reply(message, "I don't know what that division is, please use ".concat(common_1.CommonUtil.config("prefix"), "alldivs, to get the list of divisions."));
+            discordBot_1.MsgHelper.reply(message, `I don't know what that division is, please use ${common_1.CommonUtil.config("prefix")}alldivs, to get the list of divisions.`);
             return;
         }
         if (input[0].toLocaleLowerCase() == "all") {
@@ -90,15 +77,14 @@ var DivisionCommand = /** @class */ (function () {
             discordBot_1.MsgHelper.reply(message, 'unbanned all divisions');
             return;
         }
-        var _loop_2 = function (line) {
-            var divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsAllies, true), sd2_data_1.divisions.divisionsAxis, true);
-            var target = divs.filter(function (x) {
+        for (const line of input) {
+            const divs = [...sd2_data_1.divisions.divisionsAllies, ...sd2_data_1.divisions.divisionsAxis];
+            const target = divs.filter((x) => {
                 return 0 == line.toLocaleLowerCase().localeCompare(x.name.toLocaleLowerCase());
             });
             if (target.length == 0) {
-                var target_1 = divs.filter(function (x) {
-                    for (var _i = 0, _a = x.alias; _i < _a.length; _i++) {
-                        var i = _a[_i];
+                const target = divs.filter((x) => {
+                    for (const i of x.alias) {
                         if (0 == i.toLocaleLowerCase().localeCompare(line.toLocaleLowerCase()))
                             return true;
                     }
@@ -106,45 +92,36 @@ var DivisionCommand = /** @class */ (function () {
                 });
             }
             if (target.length == 0) {
-                discordBot_1.MsgHelper.say(message, "I don't know what that division is, did you mean ***".concat(common_1.CommonUtil.lexicalGuesser(line, divs.map(function (x) { return x["name"]; })), "*** instead of ***").concat(line, "***... It has not been unbanned."));
-                return { value: void 0 };
+                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => { return x["name"]; }))}*** instead of ***${line}***... It has not been unbanned.`);
+                return;
             }
             else {
-                this_1.bans[message.author.id][target[0].id] = null;
+                this.bans[message.author.id][target[0].id] = null;
                 logs_1.Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, target[0].name + " has been unbanned.");
-                var all = false;
-                for (var _a = 0, _b = this_1.bans[message.author.id]; _a < _b.length; _a++) {
-                    var z = _b[_a];
+                let all = false;
+                for (const z of this.bans[message.author.id]) {
                     all = z || all;
                 }
                 console.log(all);
                 if (!all)
-                    this_1.bans[message.author.id] = null;
+                    this.bans[message.author.id] = null;
             }
-        };
-        var this_1 = this;
-        for (var _i = 0, input_1 = input; _i < input_1.length; _i++) {
-            var line = input_1[_i];
-            var state_1 = _loop_2(line);
-            if (typeof state_1 === "object")
-                return state_1.value;
         }
-    };
-    DivisionCommand.prototype.banDivision = function (message, input) {
+    }
+    banDivision(message, input) {
         if (input.length == 0) {
-            discordBot_1.MsgHelper.reply(message, "Please specify a division to ban. Use ".concat(common_1.CommonUtil.config("prefix"), "alldivs, to get the list of divisions."));
+            discordBot_1.MsgHelper.reply(message, `Please specify a division to ban. Use ${common_1.CommonUtil.config("prefix")}alldivs, to get the list of divisions.`);
             return;
         }
-        var _loop_3 = function (line) {
-            var divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsAllies, true), sd2_data_1.divisions.divisionsAxis, true);
-            var target = divs.filter(function (x) {
+        for (const line of input) {
+            const divs = [...sd2_data_1.divisions.divisionsAllies, ...sd2_data_1.divisions.divisionsAxis];
+            let target = divs.filter((x) => {
                 return 0 == line.toLocaleLowerCase().localeCompare(x.name.toLocaleLowerCase());
             });
             if (target.length == 0) {
-                target = divs.filter(function (x) {
-                    for (var _i = 0, _a = x.alias; _i < _a.length; _i++) {
-                        var i = _a[_i];
+                target = divs.filter((x) => {
+                    for (const i of x.alias) {
                         if (0 == i.toLocaleLowerCase().localeCompare(line.toLocaleLowerCase()))
                             return true;
                     }
@@ -152,62 +129,50 @@ var DivisionCommand = /** @class */ (function () {
                 });
             }
             if (target.length == 0) {
-                discordBot_1.MsgHelper.say(message, "I don't know what that division is, did you mean ***".concat(common_1.CommonUtil.lexicalGuesser(line, divs.map(function (x) { return x["name"]; })), "*** instead of ***").concat(line, "***... It has not been banned."));
-                console.log(JSON.stringify(divs.map(function (x) { return x["name"]; })));
-                return { value: void 0 };
+                discordBot_1.MsgHelper.say(message, `I don't know what that division is, did you mean ***${common_1.CommonUtil.lexicalGuesser(line, divs.map(x => { return x["name"]; }))}*** instead of ***${line}***... It has not been banned.`);
+                console.log(JSON.stringify(divs.map(x => { return x["name"]; })));
+                return;
             }
             else {
-                if (!this_2.bans[message.author.id]) {
-                    this_2.bans[message.author.id] = new Map();
+                if (!this.bans[message.author.id]) {
+                    this.bans[message.author.id] = new Map();
                 }
-                this_2.bans[message.author.id][target[0].id] = true;
+                this.bans[message.author.id][target[0].id] = true;
                 logs_1.Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]));
                 discordBot_1.MsgHelper.reply(message, target[0].name + " has been banned.");
             }
-        };
-        var this_2 = this;
-        for (var _i = 0, input_2 = input; _i < input_2.length; _i++) {
-            var line = input_2[_i];
-            var state_2 = _loop_3(line);
-            if (typeof state_2 === "object")
-                return state_2.value;
         }
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.prototype.unbanDivisionAll = function (message, input) {
+    unbanDivisionAll(message, input) {
         this.unbanDivision(message, ["all"]);
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    DivisionCommand.prototype.bannedDivisions = function (message, input) {
-        var bannedDivs = this.bans[message.author.id];
+    bannedDivisions(message, input) {
+        const bannedDivs = this.bans[message.author.id];
         if (!bannedDivs) {
             discordBot_1.MsgHelper.reply(message, "You have no banned Divisions");
             return;
         }
         else {
-            var divs = __spreadArray(__spreadArray([], sd2_data_1.divisions.divisionsAllies, true), sd2_data_1.divisions.divisionsAxis, true);
-            var divString = [];
-            var _loop_4 = function (x) {
+            const divs = [...sd2_data_1.divisions.divisionsAllies, ...sd2_data_1.divisions.divisionsAxis];
+            const divString = [];
+            for (const x of Object.keys(bannedDivs)) {
                 console.log(x);
-                divString.push(divs.find(function (y) {
+                divString.push(divs.find((y) => {
                     return y["id"] == Number(x);
                 }).name);
-            };
-            for (var _i = 0, _a = Object.keys(bannedDivs); _i < _a.length; _i++) {
-                var x = _a[_i];
-                _loop_4(x);
             }
-            var ret = "You have Banned: ";
-            for (var _b = 0, divString_1 = divString; _b < divString_1.length; _b++) {
-                var name_1 = divString_1[_b];
-                ret += "`" + name_1 + "`,";
+            let ret = "You have Banned: ";
+            for (const name of divString) {
+                ret += "`" + name + "`,";
             }
             ret = ret.slice(0, ret.length - 1);
             logs_1.Logs.log(message.author.id + " requested list of banned divisions " + JSON.stringify(bannedDivs));
             discordBot_1.MsgHelper.reply(message, ret);
         }
-    };
-    DivisionCommand.prototype.addCommands = function (bot) {
+    }
+    addCommands(bot) {
         bot.registerCommand("rdiv", this.randomDiv);
         bot.registerCommand("alldivs", this.allDivs);
         bot.registerCommand("divs", this.allDivs);
@@ -215,8 +180,7 @@ var DivisionCommand = /** @class */ (function () {
         bot.registerCommand("resetdivs", this.unbanDivisionAll);
         bot.registerCommand("bandiv", this.banDivision);
         bot.registerCommand("banneddivs", this.bannedDivisions);
-    };
-    return DivisionCommand;
-}());
+    }
+}
 exports.DivisionCommand = DivisionCommand;
 //# sourceMappingURL=division.js.map

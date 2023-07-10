@@ -185,11 +185,6 @@ export class AdminCommand extends CommandDB {
         // let server:DiscordServer = await this.database.getServer(serverId); 
 
         let server: DiscordServer = await this.database.getFromRedis(guild.id);
-        if (server === null) {
-            await this.database.saveNewServers(DiscordBot.bot);
-            let servers: DiscordServer[] = await this.database.getAllServers();
-            server = servers.find(server => server._id == guild.id);
-        }
 
         if (input.length === 0) {
             let reply: string = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
@@ -228,7 +223,7 @@ export class AdminCommand extends CommandDB {
         await this.database.putServer(server);
         message.reply(`Primary mode changed to ${server.primaryMode}`);
     }
-    private async addOppositeChannel(message: Message, input: string[]) {
+    private async addChannel(message: Message, input: string[]) {
         if (!this.checkAccess(message)) {
             message.reply("Only server admin can change oppositeChannels");
             return false;
@@ -236,12 +231,7 @@ export class AdminCommand extends CommandDB {
 
         const guild: Guild = message.guild;
         const channel: Channel = message.channel;
-        let server = await this.database.getServer(guild.id);
-
-        if (server === null) {
-            await this.database.saveNewServers(DiscordBot.bot);
-            server = await this.database.getServer(guild.id);
-        }
+        let server = await this.database.getFromRedis(guild.id);
 
         if (input.length > 0) {
             if (guild.channels.cache.some(channel => channel.id === input[0])) {
@@ -271,12 +261,7 @@ export class AdminCommand extends CommandDB {
 
         const guild: Guild = message.guild;
         const channel: Channel = message.channel;
-        let server = await this.database.getServer(guild.id);
-
-        if (server === null) {
-            await this.database.saveNewServers(DiscordBot.bot);
-            server = await this.database.getServer(guild.id);
-        }
+        let server = await this.database.getFromRedis(guild.id);
 
         if (input.length > 0) {
             if (input[0] === "all") {
@@ -298,7 +283,7 @@ export class AdminCommand extends CommandDB {
         return;
     }
     private async filterChannel(server:DiscordServer, channelId:string, message:Message):Promise<boolean>{
-        if (server.oppositeChannelIds.some(channelId => channelId === channelId)) {
+        if (server.oppositeChannelIds.some(oppositeChannelId => oppositeChannelId === channelId)) {
             server.oppositeChannelIds = server.oppositeChannelIds.filter(id => id !== channelId);
             await this.database.putServer(server);
             message.reply("Channel has been removed from the list of opposite channels.")
@@ -310,8 +295,6 @@ export class AdminCommand extends CommandDB {
         return (message.member instanceof GuildMember) || this.admins.some(adminID => message.member.id === adminID)
     }
     private getOppositeChannelsReply(guild: Guild, channelIds: string[]): string {
-        console.log("inOppositeMethod");
-        console.log(channelIds);
         if (channelIds.length === 0) {
             return "server has no opposite channels";
         }
@@ -333,7 +316,7 @@ export class AdminCommand extends CommandDB {
         bot.registerCommand("setchannel", this.setChannelPrems);
         bot.registerCommand("resetchannel", this.resetChannelPrems);
         bot.registerCommand("primarymode", this.primaryMode.bind(this));
-        bot.registerCommand("addchannel", this.addOppositeChannel.bind(this));
+        bot.registerCommand("addchannel", this.addChannel.bind(this));
         bot.registerCommand("removechannel", this.removeChannel.bind(this));
     }
 }

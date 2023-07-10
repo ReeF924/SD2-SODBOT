@@ -44,19 +44,19 @@ export class MapCommand {
     ];
 
     private warnoMapsWaryes2v2 = [
-      "Two Lakes",
-      "Two Ways 2v2",
-      "Vertigo",
-      "Chemical 2v2",
-      "Ripple",
-      "Mount River 3v3",
-      "Cyrus 3v3",
-      "Loop"
+        "Two Lakes",
+        "Two Ways 2v2",
+        "Vertigo",
+        "Chemical 2v2",
+        "Ripple",
+        "Mount River 3v3",
+        "Cyrus 3v3",
+        "Loop"
     ];
 
 
     // Returns a random map  can be League, 1v1, 2v2, 3v3, 4v4
-    private randomMap(message: Message, input: string[]): void {
+    private async randomMap(message: Message, input: string[]): Promise<void> {
 
 
         function getRandomMaps(mapList, count = 1) {
@@ -77,43 +77,56 @@ export class MapCommand {
         let pickCount = 1;
         let count = 1;
         Logs.log("command Random Map with Inputs " + JSON.stringify(input));
-        if (input.length == 0) {
-            maplist = importedMapData.mapData.sd2League;
-        } else {
-            const size = input[0].toLowerCase();
-            switch (size) {
-                case "1v1": maplist = importedMapData.mapData.byPlayerSize[2]; break;
-                case "get2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 2; break;
-                case "get3": maplist = importedMapData.mapData.byPlayerSize[2]; count = 3; break;
-                case "get4": maplist = importedMapData.mapData.byPlayerSize[2]; count = 4; break;
-                case "get5": maplist = importedMapData.mapData.byPlayerSize[2]; count = 5; break;
-                case "get6": maplist = importedMapData.mapData.byPlayerSize[2]; count = 6; break;
-                case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
-                case "get5 2v2": maplist = importedMapData.mapData.byPlayerSize[4]; count = 5; break;
-                case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
-                case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
-
-                case "warno": maplist = this.warnoMaps; break;
-                case "warno 1v1": maplist = this.warnoMaps; break;
-                case "warno 2v2": maplist = this.warnoMaps; break;
-                case "warno 3v3": maplist = this.warnoMaps3v3; break;
-                case "warno 4v4": maplist = this.warnoMaps4v4; break;
-
-                case "warno waryes 2v2": maplist = this.warnoMapsWaryes2v2; break;
-
-                default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
-                    return
-            }
+        let size = input[0] ?? "";
+        if (!size.includes("warno") && !size.includes("sd2")) {
+            if (size !== "") size += " ";
+            size += await CommonUtil.getPrimaryGame(message);
         }
-/*         //check for bans
-        if (this.bans[message.member.id]) {
-            for (const key of Object.keys(this.bans[message.member.id])) {
-                maplist = maplist.filter((x) => {
-                    return x != key;
-                })
-            }
-        } */
+        switch (size) {
+            case "sd2": maplist = importedMapData.mapData.sd2League;break;
+            case "get2 sdl sd2" : maplist = importedMapData.mapData.sd2League; count = 2; break;
+            case "get3 sdl sd2" : maplist = importedMapData.mapData.sd2League; count = 3; break;
+            case "get4 sdl sd2" : maplist = importedMapData.mapData.sd2League; count = 3; break;
+            case "get5 sdl sd2" : maplist = importedMapData.mapData.sd2League; count = 5; break;
+
+            case "1v1 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; break;
+            case "get2 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 2; break;
+            case "get3 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 3; break;
+            case "get4 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 4; break;
+            case "get5 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 5; break;
+            case "get6 sd2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 6; break;
+
+            case "2v2 sd2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
+            case "get5 2v2 sd2": maplist = importedMapData.mapData.byPlayerSize[4]; count = 5; break;
+            case "3v3 sd2": maplist = importedMapData.mapData.byPlayerSize[6]; break;
+            case "4v4 sd2": maplist = importedMapData.mapData.byPlayerSize[8]; break;
+
+            case "warno": maplist = this.warnoMaps;
+            case "1v1 warno": maplist = this.warnoMaps; break;
+            case "get2 warno": maplist = this.warnoMaps; count = 2; break;
+            case "get3 warno": maplist = this.warnoMaps; count = 3; break;
+            case "get4 warno": maplist = this.warnoMaps; count = 4; break;
+            case "get5 warno": maplist = this.warnoMaps; count = 5; break;
+
+            case "2v2 warno": maplist = this.warnoMapsWaryes2v2; break; //ReeF: not sure why warnoMapsWaryes2v2 but whatever
+            case "3v3 warno": maplist = this.warnoMaps3v3; break;
+            case "4v4 warno": maplist = this.warnoMaps4v4; break;
+
+            case "waryes 2v2 warno": maplist = this.warnoMapsWaryes2v2; break;
+
+            default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
+                return;
+        }
+        /*         //check for bans
+                if (this.bans[message.member.id]) {
+                    for (const key of Object.keys(this.bans[message.member.id])) {
+                        maplist = maplist.filter((x) => {
+                            return x != key;
+                        })
+                    }
+                } */
         let picks = 0
+
         while (picks < pickCount) {
             if (maplist.length == 0) {
                 MsgHelper.reply(message, "all maps have been banned. Please unban some maps");
@@ -214,8 +227,7 @@ export class MapCommand {
             if (target.length == 0) {
                 MsgHelper.say(
                     message,
-                    `I don't know what map that is, did you mean ***${
-                    CommonUtil.lexicalGuesser(line, mapPool)
+                    `I don't know what map that is, did you mean ***${CommonUtil.lexicalGuesser(line, mapPool)
                     }*** instead of ***${line}***... It has not been unbanned.`
                 );
                 return;
@@ -246,8 +258,7 @@ export class MapCommand {
             if (target.length == 0) {
                 MsgHelper.say(
                     message,
-                    `I don't know what map that is, did you mean ***${
-                    CommonUtil.lexicalGuesser(line, targetMaps)
+                    `I don't know what map that is, did you mean ***${CommonUtil.lexicalGuesser(line, targetMaps)
                     }*** instead of ***${line}***... It has not been banned.`
                 );
                 return;
@@ -268,7 +279,7 @@ export class MapCommand {
         this.unbanMap(message, ["all"]);
     }
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("rmap", this.randomMap);
+        bot.registerCommand("rmap", this.randomMap.bind(this));
         bot.registerCommand("allmaps", this.allMaps);
         bot.registerCommand("maps", this.allMaps);
         bot.registerCommand("unbanmap", this.unbanMap);

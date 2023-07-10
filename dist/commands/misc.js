@@ -1,31 +1,15 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MiscCommand = void 0;
-var discord_js_1 = require("discord.js");
-var common_1 = require("../general/common");
-var discordBot_1 = require("../general/discordBot");
-var deckParser_1 = require("sd2-utilities/lib/parser/deckParser");
-var Command_1 = require("./Command");
-var MiscCommand = /** @class */ (function (_super) {
-    __extends(MiscCommand, _super);
-    function MiscCommand(database) {
-        var _this = _super.call(this, database) || this;
-        _this.sodbotReplies = [
+const discord_js_1 = require("discord.js");
+const common_1 = require("../general/common");
+const discordBot_1 = require("../general/discordBot");
+const deckParser_1 = require("sd2-utilities/lib/parser/deckParser");
+const Command_1 = require("./Command");
+class MiscCommand extends Command_1.CommandDB {
+    constructor(database) {
+        super(database);
+        this.sodbotReplies = [
             "Ping! Your shot bounced!",
             "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
             "Miss! Your shot couldn't hit the broad side of a barn!",
@@ -60,7 +44,7 @@ var MiscCommand = /** @class */ (function (_super) {
             "Hit! Lets dance I will show you how to tango you hobo",
             "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
         ];
-        _this.sodbotReplies2 = [
+        this.sodbotReplies2 = [
             "Hit! Target destroyed!",
             "Miss! Mission failed. We'll get em next time!",
             "Miss! Damn it where's my .50 cal",
@@ -84,7 +68,7 @@ var MiscCommand = /** @class */ (function (_super) {
             "Hit!, sneaky sneaky you little ptrd squad",
             "Hit!, hi ho hi ho a transport sniping we go"
         ];
-        _this.sodbotReplies3 = [
+        this.sodbotReplies3 = [
             "Hit! Target destroyed!",
             "Hit! We blew him away",
             "Hit! They drew first blood!",
@@ -103,29 +87,28 @@ var MiscCommand = /** @class */ (function (_super) {
             "Hit!  I eat Green Berets for breakfast. And right now, I'm very hungry!",
             "Hit! A strange game, the only winning move is to not play"
         ];
-        return _this;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MiscCommand.prototype.flip = function (message, input) {
+    flip(message, input) {
         if (Math.random() > 0.5) {
             discordBot_1.MsgHelper.reply(message, "Heads");
         }
         else {
             discordBot_1.MsgHelper.reply(message, "Tails");
         }
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MiscCommand.prototype.faction = function (message, input) {
+    faction(message, input) {
         if (Math.random() > 0.5) {
             discordBot_1.MsgHelper.reply(message, "Axis");
         }
         else {
             discordBot_1.MsgHelper.reply(message, "Allied");
         }
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MiscCommand.prototype.help = function (message, input) {
-        var embed = new discord_js_1.MessageEmbed()
+    help(message, input) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("Help")
             .setDescription("prefix commands with " + common_1.CommonUtil.config('prefix'))
             .addFields([
@@ -137,12 +120,12 @@ var MiscCommand = /** @class */ (function (_super) {
             { name: "Misc", value: '', inline: true }
         ]);
         message.channel.send(embed);
-    };
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    MiscCommand.prototype.piat = function (message, input) {
-        var name = message.author.username;
-        var k = Math.random();
-        var i = Math.random();
+    piat(message, input) {
+        const name = message.author.username;
+        const k = Math.random();
+        const i = Math.random();
         if (i > 0.80) {
             discordBot_1.MsgHelper.reply(message, this.sodbotReplies[Math.floor(Math.random() * this.sodbotReplies.length)], true);
         }
@@ -152,26 +135,26 @@ var MiscCommand = /** @class */ (function (_super) {
         }
         else {
             k < 0.7
-                ? (discordBot_1.MsgHelper.reply(message, "You hit!", true),
-                    setTimeout(function () {
-                        discordBot_1.MsgHelper.reply(message, "Just kidding, you didn't.", true);
+                ? (discordBot_1.MsgHelper.reply(message, `You hit!`, true),
+                    setTimeout(() => {
+                        discordBot_1.MsgHelper.reply(message, `Just kidding, you didn't.`, true);
                     }, 5000))
-                : (discordBot_1.MsgHelper.say(message, "Private ".concat(name, " has dishonored himself and dishonored the discord. I have tried to help him. But I have failed."), true),
-                    setTimeout(function () {
-                        discordBot_1.MsgHelper.say(message, "I have failed because YOU have not helped me. YOU people have not given Private ".concat(name, " the proper motivation! "), true);
-                        setTimeout(function () {
-                            discordBot_1.MsgHelper.say(message, "So, from now on, whenever Private ".concat(name, " fucks up, I will not punish him! I will punish all of YOU!"), true);
-                            setTimeout(function () {
-                                discordBot_1.MsgHelper.say(message, "And the way I see it ladies, you owe me for ONE JELLY DOUGHNUT! NOW GET ON YOUR FACES!", true);
+                : (discordBot_1.MsgHelper.say(message, `Private ${name} has dishonored himself and dishonored the discord. I have tried to help him. But I have failed.`, true),
+                    setTimeout(() => {
+                        discordBot_1.MsgHelper.say(message, `I have failed because YOU have not helped me. YOU people have not given Private ${name} the proper motivation! `, true);
+                        setTimeout(() => {
+                            discordBot_1.MsgHelper.say(message, `So, from now on, whenever Private ${name} fucks up, I will not punish him! I will punish all of YOU!`, true);
+                            setTimeout(() => {
+                                discordBot_1.MsgHelper.say(message, `And the way I see it ladies, you owe me for ONE JELLY DOUGHNUT! NOW GET ON YOUR FACES!`, true);
                             }, 10000);
                         }, 10000);
                     }, 10000));
         }
-    };
-    MiscCommand.prototype.ptrd = function (message, input) {
-        var name = message.author.username;
-        var k = Math.random();
-        var i = Math.random();
+    }
+    ptrd(message, input) {
+        const name = message.author.username;
+        const k = Math.random();
+        const i = Math.random();
         if (i > 0.80) {
             discordBot_1.MsgHelper.reply(message, this.sodbotReplies2[Math.floor(Math.random() * this.sodbotReplies2.length)], true);
         }
@@ -179,11 +162,11 @@ var MiscCommand = /** @class */ (function (_super) {
             discordBot_1.MsgHelper.reply(message, "Miss!");
             return;
         }
-    };
-    MiscCommand.prototype.laws = function (message, input) {
-        var name = message.author.username;
-        var k = Math.random();
-        var i = Math.random();
+    }
+    laws(message, input) {
+        const name = message.author.username;
+        const k = Math.random();
+        const i = Math.random();
         if (i > 0.70) {
             discordBot_1.MsgHelper.reply(message, this.sodbotReplies3[Math.floor(Math.random() * this.sodbotReplies3.length)], true);
         }
@@ -191,19 +174,18 @@ var MiscCommand = /** @class */ (function (_super) {
             discordBot_1.MsgHelper.reply(message, "Miss!");
             return;
         }
-    };
-    MiscCommand.prototype.deck = function (message, input) {
-        var embed = new discord_js_1.MessageEmbed();
+    }
+    deck(message, input) {
+        let embed = new discord_js_1.MessageEmbed();
         if (String.length > 0) {
-            var deck = deckParser_1.DeckParser.parse(input[0]);
+            const deck = deckParser_1.DeckParser.parse(input[0]);
             embed = embed.setTitle(deck.division);
             embed = embed.setDescription(deck.income);
-            var a = [];
-            var b = [];
-            var c = [];
-            for (var _i = 0, _a = deck.units; _i < _a.length; _i++) {
-                var unit = _a[_i];
-                var u = "";
+            const a = [];
+            const b = [];
+            const c = [];
+            for (const unit of deck.units) {
+                let u = "";
                 if (unit.count > 1) {
                     u += unit.count + "x ";
                 }
@@ -225,19 +207,16 @@ var MiscCommand = /** @class */ (function (_super) {
                     c.push(u);
                 }
             }
-            var astr = "";
-            for (var _b = 0, a_1 = a; _b < a_1.length; _b++) {
-                var i = a_1[_b];
+            let astr = "";
+            for (const i of a) {
                 astr += i + "\n";
             }
-            var bstr = '';
-            for (var _c = 0, b_1 = b; _c < b_1.length; _c++) {
-                var i = b_1[_c];
+            let bstr = '';
+            for (const i of b) {
                 bstr += i + "\n";
             }
-            var cstr = "";
-            for (var _d = 0, c_1 = c; _d < c_1.length; _d++) {
-                var i = c_1[_d];
+            let cstr = "";
+            for (const i of c) {
                 cstr += i + "\n";
             }
             embed = embed.addField("A Phase", astr, true);
@@ -246,9 +225,9 @@ var MiscCommand = /** @class */ (function (_super) {
             embed = embed.setFooter("counts are in # of cards, not # of units");
             message.channel.send(embed);
         }
-    };
-    MiscCommand.prototype.info = function (message, input) {
-        var embed = new discord_js_1.MessageEmbed()
+    }
+    info(message, input) {
+        const embed = new discord_js_1.MessageEmbed()
             .setTitle("SODBOT III Info")
             .setDescription("SODBOT III is is the latest version of the Steel Division 2 bot")
             .addFields([
@@ -258,8 +237,8 @@ var MiscCommand = /** @class */ (function (_super) {
             }
         ]);
         message.author.send(embed);
-    };
-    MiscCommand.prototype.addCommands = function (bot) {
+    }
+    addCommands(bot) {
         bot.registerCommand("flip", this.flip);
         bot.registerCommand("faction", this.faction);
         bot.registerCommand("help", this.help);
@@ -268,8 +247,7 @@ var MiscCommand = /** @class */ (function (_super) {
         bot.registerCommand("laws", this.laws);
         bot.registerCommand("deck", this.deck);
         bot.registerCommand("info", this.info);
-    };
-    return MiscCommand;
-}(Command_1.CommandDB));
+    }
+}
 exports.MiscCommand = MiscCommand;
 //# sourceMappingURL=misc.js.map
