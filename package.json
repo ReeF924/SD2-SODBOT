@@ -33,7 +33,7 @@
     "nedb-promises": "^6.1.0",
     "redis": "^4.6.7",
     "sd2-data": "^0.7.5",
-    "sd2-utilities": "^0.1.27",
+    "sd2-utilities": "^0.1.28",
     "winston": "3.3.3",
     "winston-azure-transport": "3.0.5"
   },
