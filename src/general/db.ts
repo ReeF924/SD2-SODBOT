@@ -90,6 +90,11 @@ export class DB {
         this.redisClient = Redis.createClient(
             {url: process.env.REDIS_URL}
         );
+
+        this.redisClient.on('error', (err) => {
+            console.log('error', err);
+            return;
+        });
     }
 
     public async setServer(server: DiscordServer): Promise<DBObject> {
@@ -98,7 +103,6 @@ export class DB {
         //     primaryMode: server.primaryMode,
         //     oppositeChannelIds: server.oppositeChannelIds
         // };
-
         return serverStore.insert(server);
     }
 
@@ -154,13 +158,18 @@ export class DB {
         await this.redisClient.set(server._id, JSON.stringify(data));
     }
 
-    public async getFromRedis(serverId: string, saveNew: boolean = true): Promise<DiscordServer> {
-        const data = await this.redisClient.get(serverId);
-        if ( data === null ) {
-            return await this.getServer(serverId, saveNew);
+    public async getFromRedis(serverId: string, saveNew: boolean = true): Promise<DiscordServer | null > {
+        try{
+            const data = await this.redisClient.get(serverId);
+            if ( data === null ) {
+                return await this.getServer(serverId, saveNew);
+            }
+            const parsed = JSON.parse(data);
+            return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+        }catch(err){
+            console.error("REDIS ERRO", err);
+            return null
         }
-        const parsed = JSON.parse(data);
-        return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
     }
 
     public async redisSaveServers(servers: DiscordServer[]): Promise<void> {
@@ -172,7 +181,6 @@ export class DB {
         });
     }
 
-    //players
 
     public async setPlayer(player: Player): Promise<DBObject> {
         const data = {
@@ -183,7 +191,6 @@ export class DB {
             impliedName: player.impliedName,
             lastPlayed: player.lastPlayed
         }
-
         return userStore.insert(data)
         // return await DB.exec(DB.updatePlayerSql,data,{id:sql.Int,elo:sql.Float,pickBanElo:sql.Float,lastPlayed:sql.DateTime})
     }

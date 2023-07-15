@@ -279,12 +279,15 @@ export class Replays {
 
                     // Add the player details to the embed
                     embed = embed.addField("\u200b", "-------------------------------------------------")
+                        .setAuthor({ name: 'SODBOT', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
                         .addField("Player", playerid, false)
                         .addField("Elo", playerElo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
                         .addField("Deck Code", player.deck.raw.code, false)
-                        
+                        .addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false)
+                        .setTimestamp()
+
                 }
             }
             message.channel.send(embed)
