@@ -5,7 +5,7 @@
   "main": "src/main.ts",
   "scripts": {
     "build": "tsc",
-    "postbuild": "npx copyfiles -r ./assets ./dist/assets",
+    "postbuild": "npx copyfiles docker-compose.yml Dockerfile .dockerignore package.json assets/**/* ./dist",
     "watch": "tsc --watch",
     "inspect": "npm run build && node --inspect dist/main.js",
     "dev": "npm run build && npm run start",

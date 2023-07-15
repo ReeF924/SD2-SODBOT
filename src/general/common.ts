@@ -1,45 +1,51 @@
-import { Logs } from "./logs";
+import {Logs} from "./logs";
 import * as fs from 'fs';
-import * as Levenshtein from  'levenshtein';
+import * as Levenshtein from 'levenshtein';
 import {DB, DiscordServer} from "./db";
-import { DiscordBot } from "./discordBot";
-import { Message } from "discord.js";
+import {DiscordBot} from "./discordBot";
+import {Message} from "discord.js";
 
 export class CommonUtil {
 
-    static configData:Map<string,unknown> = new Map<string,unknown>();
+    static configData: Map<string, unknown> = new Map<string, unknown>();
     static database: DB;
-    static async getPrimaryGame(message:Message):Promise<string>{
+
+    static async getPrimaryGame(message: Message): Promise<string> {
         const serverId = message.guild.id;
-        let server:DiscordServer = await CommonUtil.database.getFromRedis(serverId);
-        
-        if(server.oppositeChannelIds.some(channelId => channelId === message.channel.id)){
-            if(server.primaryMode === "sd2") return "warno";
+        let server: DiscordServer = await CommonUtil.database.getFromRedis(serverId);
+
+        if (server.oppositeChannelIds.some(channelId => channelId === message.channel.id)) {
+            if (server.primaryMode === "sd2") return "warno";
             return "sd2";
         }
         return server.primaryMode;
     }
-    static init(database:DB):void{
+
+    static init(database: DB): void {
         CommonUtil.database = database;
         //load config file;
-        const load = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
-        for(const key of Object.keys(load)){
-            this.configData[key.toLocaleLowerCase()] = load[key];
+        try {
+            const load = JSON.parse(fs.readFileSync("config.json", {encoding: "utf8"}));
+            for (const key of Object.keys(load)) {
+                this.configData[key.toLocaleLowerCase()] = load[key];
+            }
+        } catch (err) {
+            // let's try to reduce the amount of config files we have to deal with
         }
         //this.configData = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
         Logs.init();
     }
 
-    static configBoolean(key:string,defaultSetting = false):boolean {
+    static configBoolean(key: string, defaultSetting = false): boolean {
         key = key.toLocaleLowerCase();
-        if(this.configData[key]) 
+        if (this.configData[key])
             return Boolean(this.configData[key]);
         return defaultSetting;
     }
 
-    static config(key:string, defaultSetting = ''):string {
+    static config(key: string, defaultSetting = ''): string {
         key = key.toLocaleLowerCase();
-        if(this.configData[key]) 
+        if (this.configData[key])
             return String(this.configData[key]);
         return defaultSetting;
     }
@@ -50,22 +56,22 @@ export class CommonUtil {
         let day = '' + date.getDate()
         let year = date.getFullYear()
 
-        if (day.length < 2) 
+        if (day.length < 2)
             day = '0' + day;
-    
+
         return [day, month, year].join('-');
     }
 
-    static lexicalGuesser = (input:string, obj:string[]):string => {
+    static lexicalGuesser = (input: string, obj: string[]): string => {
         let closestWord = "";
         let closestNumber = 9999999;
-      
+
         obj.forEach(i => {
-          const x = new Levenshtein(input,i);
-          if (x.distance < closestNumber) {
-            closestNumber = x.distance;
-            closestWord = i;
-          }
+            const x = new Levenshtein(input, i);
+            if (x.distance < closestNumber) {
+                closestNumber = x.distance;
+                closestWord = i;
+            }
         });
         return closestWord;
     };
