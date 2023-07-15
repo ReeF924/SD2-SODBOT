@@ -216,7 +216,7 @@ class Replays {
             }
             // Create embed header
             let embed = new discord_js_1.MessageEmbed()
-                .setTitle(g.serverName)
+                .setTitle(g.serverName || "Game")
                 .setColor("#0099ff")
                 .addField("Winner", `||${winners}||`, true)
                 .addField("Loser", `||${loosers}||`, true)
@@ -297,7 +297,11 @@ class Replays {
                         .addField("Elo", playerElo, false)
                         .addField("Division", player.deck.division, true)
                         .addField("Income", player.deck.income, true)
-                        .addField("Deck Code", player.deck.raw.code, false);
+                        .addField("Deck Code", player.deck.raw.code, false)
+                        .setTimestamp();
+                    if (player.deck.franchise === "WARNO") {
+                        embed.addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false);
+                    }
                 }
             }
             message.channel.send(embed);

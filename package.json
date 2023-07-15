@@ -5,10 +5,11 @@
   "main": "src/main.ts",
   "scripts": {
     "build": "tsc",
+    "postbuild": "npx copyfiles -r ./assets ./dist/assets",
     "watch": "tsc --watch",
     "inspect": "npm run build && node --inspect dist/main.js",
     "dev": "npm run build && npm run start",
-    "start": "npm run build && node dist/main.js",
+    "start": "node dist/main.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 1"
@@ -21,6 +22,7 @@
     "@types/tedious": "^4.0.3",
     "@types/winston": "2.4.4",
     "axios": "^0.24.0",
+    "copyfiles": "^2.4.1",
     "discord.js": "^12.5.1",
     "dotenv": "^16.0.1",
     "express": "^4.17.1",

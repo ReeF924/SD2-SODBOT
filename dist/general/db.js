@@ -88,6 +88,10 @@ const discordBot_1 = require("./discordBot");
 class DB {
     constructor() {
         this.redisClient = Redis.createClient({ url: process.env.REDIS_URL });
+        this.redisClient.on('error', (err) => {
+            console.log('error', err);
+            return;
+        });
     }
     setServer(server) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -156,12 +160,18 @@ class DB {
     }
     getFromRedis(serverId, saveNew = true) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = yield this.redisClient.get(serverId);
-            if (data === null) {
-                return yield this.getServer(serverId, saveNew);
+            try {
+                const data = yield this.redisClient.get(serverId);
+                if (data === null) {
+                    return yield this.getServer(serverId, saveNew);
+                }
+                const parsed = JSON.parse(data);
+                return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
             }
-            const parsed = JSON.parse(data);
-            return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
+            catch (err) {
+                console.error("REDIS ERRO", err);
+                return null;
+            }
         });
     }
     redisSaveServers(servers) {
@@ -174,7 +184,6 @@ class DB {
             }));
         });
     }
-    //players
     setPlayer(player) {
         return __awaiter(this, void 0, void 0, function* () {
             const data = {
@@ -430,7 +439,7 @@ class DB {
         });
     }
     /*
-    public async getPlayerElo(eugenId:number): Promise<Player> {
+    assets async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
       const xx = await DB.exec("Select * from players where id = '" + eugenId + "';");
       console.log("Back from sql")
@@ -460,7 +469,7 @@ class DB {
     }
 
   
-    public async createPlayerElo(eugenId: number) {
+    assets async createPlayerElo(eugenId: number) {
       const data = {
         playerId: eugenId
       }

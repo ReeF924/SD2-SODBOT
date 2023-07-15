@@ -10,7 +10,7 @@ services:
         REDIS_PASSWORD: ${REDIS_PASSWORD}
         LETSENCRYPT_HOST: ${DOMAIN}
         PORT: ${REDIS_PORT}
-        LETSENCRYPT_EMAIL: mirko.friedrich@blandland.de
+        LETSENCRYPT_EMAIL: p.uri.tanner@gmail.com
       ports:
         - '${REDIS_PORT}:${REDIS_PORT}'
       volumes:
@@ -31,7 +31,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_PORT: ${REDIS_PORT}
       LETSENCRYPT_HOST: ${DOMAIN}
-      LETSENCRYPT_EMAIL: mirko.friedrich@blandland.de
+      LETSENCRYPT_EMAIL: p.uri.tanner@gmail.com
     networks:
         - default
 networks:

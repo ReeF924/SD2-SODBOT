@@ -432,7 +432,7 @@ export class DB {
     }
 
     /*
-    public async getPlayerElo(eugenId:number): Promise<Player> {
+    assets async getPlayerElo(eugenId:number): Promise<Player> {
       console.log("It gets to getPlayerELO");
       const xx = await DB.exec("Select * from players where id = '" + eugenId + "';");
       console.log("Back from sql")
@@ -462,7 +462,7 @@ export class DB {
     }
 
   
-    public async createPlayerElo(eugenId: number) {
+    assets async createPlayerElo(eugenId: number) {
       const data = {
         playerId: eugenId
       }

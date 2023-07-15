@@ -144,7 +144,7 @@ export class MapCommand {
                 const pick = maplist[pickIndex]
                 maplist = maplist.filter((x, index) => { return pickIndex != index; })
                 Logs.log(message.author.id + " has picked " + pick + " from " + JSON.stringify(maplist) + " side: " + input);
-                message.reply(pick, { files: ["./src/general/images/" + pick + ".png"] });
+                message.reply(pick, { files: ["./assets/images/" + pick + ".png"] });
 
             }
             picks++;
