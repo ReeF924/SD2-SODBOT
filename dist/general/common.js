@@ -29,9 +29,14 @@ class CommonUtil {
     static init(database) {
         CommonUtil.database = database;
         //load config file;
-        const load = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
-        for (const key of Object.keys(load)) {
-            this.configData[key.toLocaleLowerCase()] = load[key];
+        try {
+            const load = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
+            for (const key of Object.keys(load)) {
+                this.configData[key.toLocaleLowerCase()] = load[key];
+            }
+        }
+        catch (err) {
+            // let's try to reduce the amount of config files we have to deal with
         }
         //this.configData = JSON.parse(fs.readFileSync("config.json",{encoding:"utf8"}));
         logs_1.Logs.init();

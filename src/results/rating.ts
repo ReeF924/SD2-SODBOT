@@ -1,12 +1,6 @@
-import { Connection, Request, TediousType, TYPES } from 'tedious'
-import { Message, MessageEmbed } from "discord.js"
-import * as axios from "axios"
-import { Elos, ElosDelta, Player, DB} from "../general/db";
-import { DiscordBot } from "../general/discordBot";
-import { Logs } from '../general/logs';
-import { RawGameData } from 'sd2-utilities/lib/parser/gameParser';
+import { Message } from "discord.js"
+import { DB, Elos, ElosDelta } from "../general/db";
 import { DeckData } from 'sd2-utilities/lib/parser/deckParser';
-
 
 
 export class RatingEngine {
