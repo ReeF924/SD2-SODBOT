@@ -13,15 +13,16 @@ export class API {
     
 
     public start():void{
-        this.express.get('/replay', async (req,res)=>{
-            if(req.query.user){
-                const results = await this.database.getServerLadder(req.query.server as string)
-                res.send(results);
-            }else{
-                const results = await this.database.getGlobalLadder()
-                res.send(results);
-            }
-        });
+        //The same as leaderboard?
+        // this.express.get('/replay', async (req,res)=>{
+        //     if(req.query.user){
+        //         const results = await this.database.getServerLadder(req.query.server as string)
+        //         res.send(results);
+        //     }else{
+        //         const results = await this.database.getGlobalLadder()
+        //         res.send(results);
+        //     }
+        // });
         this.express.get('/leaderboard', async (req,res)=>{
             if(req.query.server){
                 const results = await this.database.getServerLadder(req.query.server as string)
@@ -34,8 +35,14 @@ export class API {
         this.express.get('/divElo', async (req,res)=>{
             const results = await this.database.getAllDivisionElo()
             res.send(results);
-        })
-        this.express.get('/', (req,res)=>{res.send(200)})
+        });
+        this.express.get('/', (req,res)=>{res.send(200)});
+
+        this.express.get('/replays', (req, res) => {
+
+        });
+
+
         this.express.listen(this.port, ()=>{
             Logs.log("HTTP server started on " + this.port);
         });

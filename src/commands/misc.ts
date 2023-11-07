@@ -268,13 +268,13 @@ export class MiscCommand extends CommandDB  {
             message.author.send(embed);
     }
     public addCommands(bot:DiscordBot): void{
-        bot.registerCommand("flip", this.flip);
-        bot.registerCommand("faction", this.faction);
-        bot.registerCommand("help", this.help);
-        bot.registerCommand("piat",this.piat);
-        bot.registerCommand("ptrd",this.ptrd);
-        bot.registerCommand("laws",this.laws);
-        bot.registerCommand("deck",this.deck);
-        bot.registerCommand("info",this.info);
+        bot.registerCommand("flip", this.flip.bind(this));
+        bot.registerCommand("faction", this.faction.bind(this));
+        bot.registerCommand("help", this.help.bind(this));
+        bot.registerCommand("piat",this.piat.bind(this));
+        bot.registerCommand("ptrd",this.ptrd.bind(this));
+        bot.registerCommand("laws",this.laws.bind(this));
+        bot.registerCommand("deck",this.deck.bind(this));
+        bot.registerCommand("info",this.info.bind(this));
     }
 }

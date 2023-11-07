@@ -311,10 +311,10 @@ export class AdminCommand extends CommandDB {
         return names;
     }
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("adjustelo", this.adjustElo);
-        bot.registerCommand("setadmin", this.setAdmin);
-        bot.registerCommand("setchannel", this.setChannelPrems);
-        bot.registerCommand("resetchannel", this.resetChannelPrems);
+        bot.registerCommand("adjustelo", this.adjustElo.bind(this));
+        bot.registerCommand("setadmin", this.setAdmin.bind(this));
+        bot.registerCommand("setchannel", this.setChannelPrems.bind(this));
+        bot.registerCommand("resetchannel", this.resetChannelPrems.bind(this));
         bot.registerCommand("primarymode", this.primaryMode.bind(this));
         bot.registerCommand("addchannel", this.addChannel.bind(this));
         bot.registerCommand("removechannel", this.removeChannel.bind(this));

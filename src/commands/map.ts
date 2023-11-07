@@ -280,11 +280,11 @@ export class MapCommand {
     }
     public addCommands(bot: DiscordBot): void {
         bot.registerCommand("rmap", this.randomMap.bind(this));
-        bot.registerCommand("allmaps", this.allMaps);
-        bot.registerCommand("maps", this.allMaps);
-        bot.registerCommand("unbanmap", this.unbanMap);
-        bot.registerCommand("resetmaps", this.unbanMapAll);
-        bot.registerCommand("banmap", this.banMap);
+        bot.registerCommand("allmaps", this.allMaps.bind(this));
+        bot.registerCommand("maps", this.allMaps.bind(this));
+        bot.registerCommand("unbanmap", this.unbanMap.bind(this));
+        bot.registerCommand("resetmaps", this.unbanMapAll.bind(this));
+        bot.registerCommand("banmap", this.banMap.bind(this));
         //bot.registerCommand("defaultMapPool",this.defaultMapPool); @todo
     }
 }

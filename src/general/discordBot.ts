@@ -11,12 +11,14 @@ import {DiscordServer , DB} from "./db";
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
 export class DiscordBot {
-
+    
     static bot: Client;
     private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
     private database:DB;
     private perms: Permissions;
+
     constructor(database:DB) {
+        console.log("In ctor of bot");
         //this.loadBlacklist();
         this.database = database;
         this.perms = new Permissions(database);
@@ -27,6 +29,7 @@ export class DiscordBot {
         });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
+        console.log("exiting ctor of bot");
     }
 
     login(): void {
@@ -98,6 +101,7 @@ export class DiscordBot {
 
     }
     private async onReady(database:DB) {
+        console.log("In ready");
         await database.redisClient.connect();
        // await database.redisSaveServers(null);
         await database.saveNewServers(DiscordBot.bot);

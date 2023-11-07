@@ -187,12 +187,12 @@ export class DivisionCommand {
     }
 
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("rdiv", this.randomDiv);
-        bot.registerCommand("alldivs", this.allDivs);
-        bot.registerCommand("divs", this.allDivs);
-        bot.registerCommand("unbandiv", this.unbanDivision);
-        bot.registerCommand("resetdivs", this.unbanDivisionAll);
-        bot.registerCommand("bandiv", this.banDivision);
-        bot.registerCommand("banneddivs", this.bannedDivisions);
+        bot.registerCommand("rdiv", this.randomDiv.bind(this));
+        bot.registerCommand("alldivs", this.allDivs.bind(this));
+        bot.registerCommand("divs", this.allDivs.bind(this));
+        bot.registerCommand("unbandiv", this.unbanDivision.bind(this));
+        bot.registerCommand("resetdivs", this.unbanDivisionAll.bind(this));
+        bot.registerCommand("bandiv", this.banDivision.bind(this));
+        bot.registerCommand("banneddivs", this.bannedDivisions.bind(this));
     }
 }

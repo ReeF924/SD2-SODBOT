@@ -228,8 +228,8 @@ export class PlayerCommand extends CommandDB{
             }
         }
         public addCommands(bot:DiscordBot):void{
-            bot.registerCommand("player",this.getPlayer);
-            bot.registerCommand("ladder",this.getLadder);
-            bot.registerCommand("register",this.register)
+            bot.registerCommand("player",this.getPlayer.bind(this));
+            bot.registerCommand("ladder",this.getLadder.bind(this));
+            bot.registerCommand("register",this.register.bind(this));
         }
 }

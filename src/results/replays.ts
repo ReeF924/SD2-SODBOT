@@ -342,6 +342,8 @@ export class Replays {
 
     }
 
+    
+
 
     static duration(seconds: number): string {
         return `${Math.floor(seconds / 60)} Minutes and ${seconds % 60} Seconds`
