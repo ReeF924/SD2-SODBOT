@@ -519,7 +519,7 @@ export interface DiscordUser {
 export class DiscordServer {
     _id: string;
     primaryMode: string;
-    oppositeChannelIds: Array<string>; //always the opposite than primaryMode
+    oppositeChannelIds: Array<string>; //always the opposite mode than primaryMode
 
     public constructor(id: string, primaryMode: string = "sd2", oppositeChannelIds = new Array<string>()) {
         this._id = id;

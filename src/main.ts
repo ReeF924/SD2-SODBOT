@@ -53,4 +53,3 @@ Logs.log(`Starting healthcheck server on 8080, version ${p.version}`)
 //healthcheck.listen(8080);
 const api = new API(database);
 api.start();
-console.log("Started all")

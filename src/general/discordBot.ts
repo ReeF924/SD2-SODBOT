@@ -5,23 +5,20 @@ import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "disc
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
-import {DiscordServer , DB} from "./db";
+import { DiscordServer, DB } from "./db";
 
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
 export class DiscordBot {
-    
+
     static bot: Client;
     private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
-    private database:DB;
-    private perms: Permissions;
+    private database: DB;
 
-    constructor(database:DB) {
-        console.log("In ctor of bot");
+    constructor(database: DB) {
         //this.loadBlacklist();
         this.database = database;
-        this.perms = new Permissions(database);
         DiscordBot.bot = new Client();
         DiscordBot.bot.on("message", this.onMessage.bind(this));
         DiscordBot.bot.on("ready", async () => {
@@ -29,7 +26,6 @@ export class DiscordBot {
         });
         DiscordBot.bot.on("error", this.onError.bind(this));
         DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
-        console.log("exiting ctor of bot");
     }
 
     login(): void {
@@ -68,11 +64,12 @@ export class DiscordBot {
     }
 
     private async onMessage(message: Message) {
+        console.log('in onMessage');
         let channel, guild
         if (message.channel) channel = message.channel.id;
         if (message.guild) guild = message.guild.id;
         if (message.content.startsWith(CommonUtil.config("prefix"))) {
-            const perms = this.perms.getPermissions(channel, guild)
+            const perms = Permissions.getPermissions(channel, guild, this.database);
             if (!(await perms).areCommandsBlocked) {
                 const inputList = message.content
                     .substr(1, message.content.length)
@@ -87,23 +84,20 @@ export class DiscordBot {
                 this.runCommand(message, command, (await perms));
             }
         }
+        const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
+        console.log('replays_amount: ' + replays.length);
+        replays.forEach(async replay => {
 
-        if (message.attachments.first()) {
-            const perms = this.perms.getPermissions(channel, guild)
+            const perms = Permissions.getPermissions(channel, guild, this.database);
             if (!(await perms).areReplaysBlocked) {
-                if (message.attachments.first().url.endsWith(".rpl3")) {
-                    if (message.channel.type !== "dm") {
-                        Replays.extractReplayInfo(message, (await perms), this.database);
-                    }
-                }
+                Replays.extractReplayInfo(message, (await perms), this.database);
+                console.log('extractReplayInfo');
             }
-        }
-
+        });
     }
-    private async onReady(database:DB) {
-        console.log("In ready");
+    private async onReady(database: DB) {
         await database.redisClient.connect();
-       // await database.redisSaveServers(null);
+        // await database.redisSaveServers(null);
         await database.saveNewServers(DiscordBot.bot);
         Logs.log("Bot Online!");
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
