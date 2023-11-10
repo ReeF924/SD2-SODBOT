@@ -64,7 +64,6 @@ export class DiscordBot {
     }
 
     private async onMessage(message: Message) {
-        console.log('in onMessage');
         let channel, guild
         if (message.channel) channel = message.channel.id;
         if (message.guild) guild = message.guild.id;
@@ -84,15 +83,13 @@ export class DiscordBot {
                 this.runCommand(message, command, (await perms));
             }
         }
-        const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
-        console.log('replays_amount: ' + replays.length);
-        replays.forEach(async replay => {
+        const perms = await Permissions.getPermissions(channel, guild, this.database);
 
-            const perms = Permissions.getPermissions(channel, guild, this.database);
-            if (!(await perms).areReplaysBlocked) {
-                Replays.extractReplayInfo(message, (await perms), this.database);
-                console.log('extractReplayInfo');
-            }
+        if (perms.areReplaysBlocked) return;
+
+        const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
+        replays.forEach((r) => {
+            Replays.extractReplayInfo(message, perms, this.database, r.url);
         });
     }
     private async onReady(database: DB) {
