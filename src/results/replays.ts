@@ -145,11 +145,11 @@ export class Replays {
 
                 //if valid insert to db (setReplay returns if is duplicate)
                 const valid = Replays.isValidReplay(g);
-                let reply:string;
+                let reply: string;
                 if (valid != null) {
-                    reply = "Replas not saved to database.";
+                    reply = "Replay not saved to database:" + valid + 'prb: ' + g.gameMode;
                 }
-                else{
+                else {
                     reply = await database.setReplay(message, g, players)
                         ? "Results Submitted" : "This is a duplicate replay won't be saved to database.";
                 }
@@ -205,10 +205,10 @@ export class Replays {
     }
 
     private static isValidReplay(g: RawGameData): string {
-        if (g.playerCount != 2) return "playerCount";
+        if (g.players.length != 2) return "playerLength";
         if (g.aiCount > 0) return "aiCount";
         if (g.players[0]?.deck?.franchise != "SD2") return "franchise";
-        if (g.gameMode != 2) return "gameMode";
+        if (g.gameMode != 1) return "gameMode"; //Check misc.js after
         if (g.incomeRate != 3) return "incomeRate";
         if (g.scoreLimit != 2000) return "scoreLimit";
         return null;
@@ -229,7 +229,7 @@ export class Replays {
             .addField('Income Rate', misc.incomeLevel[g.incomeRate], true)
             .addField('Game Mode', misc.mode[g.gameMode], true)
             .addField('Starting Points', g.initMoney + " pts", true)
-            .addField('Map', misc.map[g.map_raw], true)
+            .addField('Map', misc.map[g.map_raw], true);
 
 
         // If embed is less than 4 we can send in single embed
@@ -252,12 +252,6 @@ export class Replays {
                     playerid += "(id:" + player.id + ")";
                 }
 
-                const raitingsString = (delta: number) => {
-                    let sign = "";
-                    if (delta > 0) sign = "+";
-                    return sign + Math.round(delta)
-                }
-
                 // Add the player details to the embed
                 embed = embed.addField("\u200b", "-------------------------------------------------")
                     .addField("Player", playerid, false)
@@ -265,64 +259,52 @@ export class Replays {
                     .addField("Division", player.deck.division, true)
                     .addField("Income", player.deck.income, true)
                     .addField("Deck Code", player.deck.raw.code, false)
-                    .setTimestamp()
+                    .setTimestamp();
 
                 if (player.deck.franchise === "WARNO") {
-                    embed.addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false)
-
+                    embed.addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false);
                 }
             }
             message.channel.send(embed);
             return;
         }
-
-        // But if the number so players are equal to or greater than 4 we need to break it over several embeds 
-        let counter = 0;
-        embed = new MessageEmbed()
-            .setColor("#0099ff")
-        for (const player of g.players) {
-            let playerid = player.name;
-            let playerElo = player.elo;
-            let discordId = ""
-            const discordUser = await database.getDiscordUserFromEugenId(player.id);
-            if (discordUser)
-                discordId = discordUser.id
-            if (discordId != "") {
-                const user = await DiscordBot.bot.users.fetch(String(discordId))
-                if (!user)
-                    playerid = "BORKED! Please yell at <@!271792666910392325>"
-                else
-                    playerid += "*<@!" + user.id + ">*"
-            } else {
-                playerid += " (id:" + player.id + ")";
-            }
-            // This code is no longer used as bot has lost the elo DB
-            //let elo = ""
-            //const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
-            //        if (perms.isChannelEloShown){            
-            //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-            //        }
-            //        if (perms.isServerEloShown){
-            //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
-            //        }
-            //        if (perms.isGlobalEloShown){
-            //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
-            //        }
-            embed = embed.addField("-------------------------------------------------", "\u200B")
-                .addField("Player", playerid, false)
-                .addField("Elo", playerElo, false)
-                .addField("Division", player.deck.division, true)
-                .addField("Income", player.deck.income, true)
-                .addField("Deck Code", player.deck.raw.code, false)
-            counter++;
-            if (counter == 4) {
-                message.channel.send(embed)
+        message.channel.send(embed);
+            // But if the number so players are equal to or greater than 4 we need to break it over several embeds 
+            if (g.players.length >= 4) {
+                let counter = 0;
                 embed = new MessageEmbed()
                     .setColor("#0099ff")
-                counter = 0;
+                for (const player of g.players) {
+                    let playerid = player.name;
+                    let playerElo = player.elo;
+                    let discordId = ""
+                    const discordUser = await database.getDiscordUserFromEugenId(player.id);
+                    if (discordUser)
+                        discordId = discordUser.id
+                    if (discordId != "") {
+                        const user = await DiscordBot.bot.users.fetch(String(discordId))
+                        if (!user)
+                            playerid = "BORKED! Please yell at <@!271792666910392325>"
+                        else
+                            playerid += "*<@!" + user.id + ">*"
+                    } else {
+                        playerid += " (id:" + player.id + ")";
+                    }
+                    embed = embed.addField("-------------------------------------------------", "\u200B")
+                        .addField("Player", playerid, false)
+                        .addField("Elo", playerElo, false)
+                        .addField("Division", player.deck.division, true)
+                        .addField("Income", player.deck.income, true)
+                        .addField("Deck Code", player.deck.raw.code, false)
+                    counter++;
+                    if (counter == 4) {
+                        message.channel.send(embed)
+                        embed = new MessageEmbed()
+                            .setColor("#0099ff")
+                        counter = 0;
+                    }
             }
         }
-        message.channel.send(embed);
     }
 
 
