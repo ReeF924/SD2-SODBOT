@@ -178,129 +178,9 @@ export class AdminCommand extends CommandDB {
             MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
         }
     }
-    private async primaryMode(message: Message, input: string[]) {
-        const guild: Guild = message.guild;
 
-        //ReeF: No idea why it doesn't work, the below works for some reason so who cares
-        // let server:DiscordServer = await this.database.getServer(serverId); 
-
-        let server: DiscordServer = await this.database.getFromRedis(guild.id);
-
-        if (input.length === 0) {
-            let reply: string = this.getOppositeChannelsReply(guild, server.oppositeChannelIds);
-
-            message.reply(`Server's primary mode is ${server.primaryMode}, ${reply}`);
-            return;
-        }
-
-        if (input[0].split(' ').length > 1) {
-            message.reply("Invalid arguments for the command.");
-            return;
-        }
-
-        //Check if the user has rights to change the primary mode (the commments implemented user.db but it's not used appereantly)
-        if (!this.checkAccess(message)) {
-            message.reply("Only server admin can change the primary mode");
-            return;
-        }
-
-        switch (input[0].toLocaleLowerCase()) {
-            case "steeldivision":
-            case "steeldivision2":
-            case "sd":
-            case "sd2":
-                server.primaryMode = "sd2";
-                break;
-
-            case "warno":
-            case "objectivelyworseeugengame":
-                server.primaryMode = "warno";
-                break;
-            default:
-                message.reply("Invalid input, try sd2 or warno");
-                return;
-        }
-        await this.database.putServer(server);
-        message.reply(`Primary mode changed to ${server.primaryMode}`);
-    }
-    private async addChannel(message: Message, input: string[]) {
-        if (!this.checkAccess(message)) {
-            message.reply("Only server admin can change oppositeChannels");
-            return false;
-        }
-
-        const guild: Guild = message.guild;
-        const channel: Channel = message.channel;
-        let server = await this.database.getFromRedis(guild.id);
-
-        if (input.length > 0) {
-            if (guild.channels.cache.some(channel => channel.id === input[0])) {
-                server.oppositeChannelIds.push(input[0]);
-                await this.database.putServer(server);
-                const channelName:string = await guild.channels.cache.find(channel => channel.id === input[0]).name;
-                message.reply(`Channel "${channelName}" has been added to the list of opposite channels`);
-                return;
-            }
-            message.reply("Invalid arguments.");
-            return;
-        }
-
-        if (server.oppositeChannelIds.some(channelId => channel.id === channelId)) {
-            message.reply("This channel is already in the opposite channels, if you wish to delete it, use $removechannel");
-            return;
-        }
-        server.oppositeChannelIds.push(channel.id);
-        await this.database.putServer(server);
-        message.reply("Channel has been added to the list of opposite channels");
-    }
-    private async removeChannel(message: Message, input: string[]) {
-        if (!this.checkAccess(message)) {
-            message.reply("Only server admin can remove oppositeChannels");
-            return false;
-        }
-
-        const guild: Guild = message.guild;
-        const channel: Channel = message.channel;
-        let server = await this.database.getFromRedis(guild.id);
-
-        if (input.length > 0) {
-            if (input[0] === "all") {
-                server.oppositeChannelIds = [];
-                await this.database.putServer(server);
-                message.reply("The list of opposite channels has been cleared.");
-                return;
-            }
-            if(await this.filterChannel(server, input[0], message)){
-                return;
-            }
-            message.reply("Invalid arguments, did you mean \"all\"?");
-            return;
-        }
-        if(await this.filterChannel(server, channel.id, message)){
-            return;
-        }
-        message.reply("This channel isn't in the opposite channels list, if you wish to add it, use $removechannel");
-        return;
-    }
-    private async filterChannel(server:DiscordServer, channelId:string, message:Message):Promise<boolean>{
-        if (server.oppositeChannelIds.some(oppositeChannelId => oppositeChannelId === channelId)) {
-            server.oppositeChannelIds = server.oppositeChannelIds.filter(id => id !== channelId);
-            await this.database.putServer(server);
-            message.reply("Channel has been removed from the list of opposite channels.")
-            return true;
-        }
-        return false;
-    }
     private checkAccess(message: Message): boolean {
         return (message.member instanceof GuildMember) || this.admins.some(adminID => message.member.id === adminID)
-    }
-    private getOppositeChannelsReply(guild: Guild, channelIds: string[]): string {
-        if (channelIds.length === 0) {
-            return "server has no opposite channels";
-        }
-
-        let names: string[] = this.getChannelNamesFromIds(guild, channelIds);
-        return `opposite channels are: ${names.join(", ")}`;
     }
     private getChannelNamesFromIds(guild:Guild, channelIds:string[]):string[]{
         let names: string[] = [];
@@ -315,8 +195,5 @@ export class AdminCommand extends CommandDB {
         bot.registerCommand("setadmin", this.setAdmin.bind(this));
         bot.registerCommand("setchannel", this.setChannelPrems.bind(this));
         bot.registerCommand("resetchannel", this.resetChannelPrems.bind(this));
-        bot.registerCommand("primarymode", this.primaryMode.bind(this));
-        bot.registerCommand("addchannel", this.addChannel.bind(this));
-        bot.registerCommand("removechannel", this.removeChannel.bind(this));
     }
 }

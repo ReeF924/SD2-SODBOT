@@ -33,7 +33,6 @@
     "lodash": "^4.17.21",
     "mssql": "^6.3.2",
     "nedb-promises": "^6.1.0",
-    "redis": "^4.6.7",
     "sd2-data": "^0.7.5",
     "sd2-utilities": "^0.1.28",
     "winston": "3.3.3",

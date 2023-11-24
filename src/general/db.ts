@@ -1,7 +1,4 @@
-import { RedisClientType } from 'redis';
-
 const Datastore = require('nedb-promises')
-const Redis = require("redis");
 
 class DatastoreWrapper {
     private db
@@ -87,101 +84,14 @@ import { isObject } from 'util';
 import { PlayerCommand } from '../commands/player';
 
 export class DB {
-    public redisClient: RedisClientType
-
-    public constructor() {
-        this.redisClient = Redis.createClient(
-            { url: process.env.REDIS_URL }
-        );
-
-        this.redisClient.on('error', (err) => {
-            console.log('error', err);
-            return;
-        });
-    }
 
     public async setServer(server: DiscordServer): Promise<DBObject> {
-        // const data = {
-        //     _id: server.id,
-        //     primaryMode: server.primaryMode,
-        //     oppositeChannelIds: server.oppositeChannelIds
-        // };
         return serverStore.insert(server);
     }
 
     public async getAllServers(): Promise<DiscordServer[]> {
         let servers = await serverStore.find({});
         return servers;
-    }
-
-    public async getServer(serverId: string, saveNew: boolean = true): Promise<DiscordServer> {
-        let server = await serverStore.findOne({ _id: serverId });
-        if (server === null && saveNew) {
-            await this.saveNewServers(DiscordBot.bot);
-            server = await serverStore.findOne({ _id: serverId });
-        }
-        return server;
-    }
-
-    public async putServer(server: DiscordServer) {
-        await serverStore.update({ _id: server._id }, {
-            $set: {
-                primaryMode: server.primaryMode,
-                oppositeChannelIds: server.oppositeChannelIds
-            }
-        });
-        serverStore.loadDatabase();
-        this.setRedis(server);
-    }
-
-    //Called on ready in discordBot.ts
-    public async saveNewServers(client: Client): Promise<void> {
-        const guildServers: DiscordServer[] = this.getSodbotServers(client);
-        for (const server of guildServers) {
-            const savedServer = await this.getFromRedis(server._id, false);
-            if (savedServer === null) {
-                await this.setServer(server);
-                await this.setRedis(server);
-            }
-        }
-    }
-
-    public getSodbotServers(client: Client): DiscordServer[] {
-        const servers: DiscordServer[] = client.guilds.cache.map(guild => new DiscordServer(guild.id));
-
-        return servers;
-    }
-
-    public async setRedis(server: DiscordServer): Promise<void> {
-        // redisClient.set("servers", JSON.stringify(servers));
-        const data = {
-            primaryMode: server.primaryMode,
-            oppositeChannelIds: server.oppositeChannelIds
-        }
-        await this.redisClient.set(server._id, JSON.stringify(data));
-    }
-
-    public async getFromRedis(serverId: string, saveNew: boolean = true): Promise<DiscordServer | null> {
-        try {
-            const data = await this.redisClient.get(serverId);
-            if (data === null) {
-                return await this.getServer(serverId, saveNew);
-            }
-            const parsed = JSON.parse(data);
-            return new DiscordServer(serverId, parsed.primaryMode, parsed.oppositeChannelIds);
-        } catch (err) {
-            console.error("REDIS ERRO", err);
-            return null
-        }
-    }
-
-    public async redisSaveServers(servers: DiscordServer[]): Promise<void> {
-        if (servers == null) {
-            servers = await this.getAllServers();
-        }
-        servers.forEach(async server => {
-            await this.setRedis(server);
-        });
     }
 
 
@@ -544,15 +454,18 @@ export interface DiscordUser {
 }
 
 export class DiscordServer {
-    _id: string;
-    primaryMode: string;
-    oppositeChannelIds: Array<string>; //always the opposite mode than primaryMode
+    public _id: string;
+    public channels: Map<string, ServerType>; //channelId, replayType
 
-    public constructor(id: string, primaryMode: string = "sd2", oppositeChannelIds = new Array<string>()) {
+
+    public constructor(id: string) {
         this._id = id;
-        this.primaryMode = primaryMode;
-        this.oppositeChannelIds = oppositeChannelIds;
+        this.channels = new Map<string, ServerType>();
     }
+}
+type ServerType = {
+    defaultRules:boolean,
+    tournamentType:string
 }
 
 export interface EloLadderElement {

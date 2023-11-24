@@ -10,17 +10,6 @@ export class CommonUtil {
     static configData: Map<string, unknown> = new Map<string, unknown>();
     static database: DB;
 
-    static async getPrimaryGame(message: Message): Promise<string> {
-        const serverId = message.guild.id;
-        let server: DiscordServer = await CommonUtil.database.getFromRedis(serverId);
-
-        if (server.oppositeChannelIds.some(channelId => channelId === message.channel.id)) {
-            if (server.primaryMode === "sd2") return "warno";
-            return "sd2";
-        }
-        return server.primaryMode;
-    }
-
     static init(database: DB): void {
         CommonUtil.database = database;
         //load config file;
