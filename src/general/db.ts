@@ -76,12 +76,7 @@ async function findSorted(page, perPage = 10) {
 
 import { Logs } from "./logs";
 import { Message } from 'discord.js';
-import { RawGameData, StoredGameData, StoredPlayerData } from 'sd2-utilities/lib/parser/gameParser';
-import { Client } from 'discord.js';
-import { DiscordBot } from "./discordBot";
-import { raw } from 'express';
-import { isObject } from 'util';
-import { PlayerCommand } from '../commands/player';
+import { RawGameData, StoredGameData, StoredPlayerData, ReplayType } from 'sd2-utilities/lib/parser/gameParser';
 
 export class DB {
 
@@ -92,6 +87,11 @@ export class DB {
     public async getAllServers(): Promise<DiscordServer[]> {
         let servers = await serverStore.find({});
         return servers;
+    }
+
+    public async getServer(id: string): Promise<DiscordServer> {
+        let server = await serverStore.findOne({ _id: id });
+        return server;
     }
 
 
@@ -386,7 +386,7 @@ export class DB {
 
 
     // Returns 0 for new replay and 1 for existing replay
-    public async setReplay(message: Message, rawReplay: RawGameData, players:{winner:StoredPlayerData, loser:StoredPlayerData}): Promise<boolean> {
+    public async setReplay(message: Message, rawReplay: RawGameData, replayType:ReplayType, players:{winner:StoredPlayerData, loser:StoredPlayerData}): Promise<boolean> {
 
         //@todo check for unwanted replays: other modes, more players(maybe?), different game settings, must be MP
         //watch out : players might be only observers?
@@ -402,7 +402,7 @@ export class DB {
 
         if (Object.keys(existing).length === 0) {
             Logs.log("Committing replay: " + messageData.uuid);
-            const replay = this.formatReplay(rawReplay, players);
+            const replay = this.formatReplay(rawReplay,replayType, players);
             await replayStore.insert(replay);
             return true;
         }
@@ -413,9 +413,10 @@ export class DB {
         // await replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })
     }
 
-    private formatReplay(replay: RawGameData,players:{winner:StoredPlayerData, loser:StoredPlayerData}): StoredGameData {
+    private formatReplay(replay: RawGameData,replayType:ReplayType,players:{winner:StoredPlayerData, loser:StoredPlayerData}): StoredGameData {
         return {
             id: replay.uniqueSessionId,
+            replayType: replayType,
             version: replay.version,
             gameType: replay.gameType,
             map_raw: replay.map_raw,
@@ -455,18 +456,15 @@ export interface DiscordUser {
 
 export class DiscordServer {
     public _id: string;
-    public channels: Map<string, ServerType>; //channelId, replayType
+    public channels: Map<string, ReplayType>; //channelId, replayType
 
 
     public constructor(id: string) {
         this._id = id;
-        this.channels = new Map<string, ServerType>();
+        this.channels = new Map<string, ReplayType>();
     }
 }
-type ServerType = {
-    defaultRules:boolean,
-    tournamentType:string
-}
+
 
 export interface EloLadderElement {
     rank: number,

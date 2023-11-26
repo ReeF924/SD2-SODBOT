@@ -1,8 +1,8 @@
 import { ChannelData, Message, MessageAttachment, MessageEmbed } from "discord.js"
-import { GameParser, RawGameData, RawPlayer, StoredPlayerData } from "sd2-utilities/lib/parser/gameParser"
+import { GameParser, RawGameData, RawPlayer, ReplayType, StoredPlayerData } from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
-import { EloLadderElement, Elos, ElosDelta, DB } from "../general/db";
+import { EloLadderElement, Elos, ElosDelta, DB, DiscordServer } from "../general/db";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { PermissionsSet } from "../general/permissions";
 import { StoredDeckData } from "sd2-utilities/lib/parser/deckParser";
@@ -150,7 +150,14 @@ export class Replays {
                     reply = "Replay not saved to database:" + valid + 'prb: ' + g.gameMode;
                 }
                 else {
-                    reply = await database.setReplay(message, g, players)
+                    const server:DiscordServer = await database.getServer(message.guild.id);
+                    const replayType:ReplayType = server !== null ? server.channels.get(message.channel.id) 
+                    : {
+                        defaultRules: false,
+                        tournamentType: "other"
+                    }
+
+                    reply = await database.setReplay(message, g,replayType, players)
                         ? "Results Submitted" : "This is a duplicate replay won't be saved to database.";
                 }
 
