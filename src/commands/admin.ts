@@ -204,7 +204,7 @@ export class AdminCommand extends CommandDB {
         let server: DiscordServer = await this.database.getServer(message.guild.id) ?? new DiscordServer(message.guild.id);
 
         this.addChannel(message, input, server);
-        this.database.putServer(server);
+        // this.database.putServer(server);
     }
 
     private addChannel(message: Message, input: string[], server: DiscordServer): void {

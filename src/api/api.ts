@@ -42,7 +42,6 @@ export class API {
             
         });
 
-
         this.express.listen(this.port, ()=>{
             Logs.log("HTTP server started on " + this.port);
         });
