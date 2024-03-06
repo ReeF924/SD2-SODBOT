@@ -93,7 +93,7 @@ export class DiscordBot {
         });
     }
     private async onReady(database: DB) {
-        Logs.log("Bot Online!");
+        Logs.log(`Bot Online at ${new Date()}`);
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"
         });

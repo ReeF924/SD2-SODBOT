@@ -4,6 +4,7 @@ import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { MessageEmbed } from "discord.js";
+import { map } from "mssql";
 
 export class MapCommand {
     private bans: Map<string, Map<string, boolean>> = new Map<string, Map<string, boolean>>(); // 2d array of playerIds to banned divisions.
@@ -43,14 +44,14 @@ export class MapCommand {
     ]
 
     private warnoMapsWaryes2v2 = [
-      "Two Lakes",
-      "Two Ways 2v2",
-      "Vertigo",
-      "Chemical 2v2",
-      "Ripple",
-      "Mount River 3v3",
-      "Cyrus 3v3",
-      "Loop"
+        "Two Lakes",
+        "Two Ways 2v2",
+        "Vertigo",
+        "Chemical 2v2",
+        "Ripple",
+        "Mount River 3v3",
+        "Cyrus 3v3",
+        "Loop"
     ]
 
 
@@ -71,72 +72,77 @@ export class MapCommand {
             return maps
         }
 
-        let maplist: string[] = []
         const importedMapData = Data.maps;
-        let pickCount = 1;
+        let maplist: string[] = Data.maps.mapData.sd2League;
         let count = 1;
         Logs.log("command Random Map with Inputs " + JSON.stringify(input));
-        if (input.length == 0) {
-            maplist = importedMapData.mapData.sd2League;
-        } else {
-            const size = input[0].toLowerCase();
-            switch (size) {
-                case "1v1": maplist = importedMapData.mapData.byPlayerSize[2]; break;
-                case "get2": maplist = importedMapData.mapData.byPlayerSize[2]; count = 2; break;
-                case "get3": maplist = importedMapData.mapData.byPlayerSize[2]; count = 3; break;
-                case "get4": maplist = importedMapData.mapData.byPlayerSize[2]; count = 4; break;
-                case "get5": maplist = importedMapData.mapData.byPlayerSize[2]; count = 5; break;
-                case "get6": maplist = importedMapData.mapData.byPlayerSize[2]; count = 6; break;
-                case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
-                case "get5 2v2": maplist = importedMapData.mapData.byPlayerSize[4]; count = 5; break;
-                case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
-                case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
 
-                case "warno": maplist = this.warnoMaps; break;
-                case "warno 1v1": maplist = this.warnoMaps; break;
-                case "warno 2v2": maplist = this.warnoMaps; break;
-                case "warno 3v3": maplist = this.warnoMaps3v3; break;
-                case "warno 4v4": maplist = this.warnoMaps4v4; break;
+        if (input.length > 0) {
+            const inputArgs = input[0].toLowerCase().split(' ');
 
-                case "warno waryes 2v2": maplist = this.warnoMapsWaryes2v2; break;
+            const countArgIndex = inputArgs.findIndex((x) => !isNaN(Number(x)));
 
-                default: MsgHelper.reply(message, size + " is not a valid map size. for example, 1v1.");
-                    return
+            count = countArgIndex == -1 ? 1 : Number(inputArgs.splice(countArgIndex, 1));
+
+            if (count > 9) {
+                MsgHelper.reply(message, "Please select less than 10 maps.")
+                return;
             }
-        }
-/*         //check for bans
-        if (this.bans[message.member.id]) {
-            for (const key of Object.keys(this.bans[message.member.id])) {
-                maplist = maplist.filter((x) => {
-                    return x != key;
-                })
-            }
-        } */
-        let picks = 0
-        while (picks < pickCount) {
-            if (maplist.length == 0) {
-                MsgHelper.reply(message, "all maps have been banned. Please unban some maps");
-                break;
-            }
-            else {
 
-                if (count > 1) {
-                    const maps = getRandomMaps(maplist, count)
-                    Logs.log(message.author.id + " has picked " + maps.join(",") + " from " + JSON.stringify(maplist) + " side: " + input);
-                    message.reply(maps.join(", "));
-                    return
+            if (count < 1) {
+                MsgHelper.reply(message, "Please select at least 1 map.")
+                return;
+            }
+
+            if (inputArgs.length > 0) {
+                //not nice, but I won't refactor this rn, you started with this monstrosity
+                inputArgs.join(' ');
+                const mapType = inputArgs[0].toLowerCase();
+                switch (mapType) {
+                    case "1v1": maplist = importedMapData.mapData.byPlayerSize[2]; break;
+                    case "2v2": maplist = importedMapData.mapData.byPlayerSize[4]; break;
+                    case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
+                    case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
+
+                    case "warno": maplist = this.warnoMaps; break;
+                    case "warno 1v1": maplist = this.warnoMaps; break;
+                    case "warno 2v2": maplist = this.warnoMaps; break;
+                    case "warno 2v2": maplist = this.warnoMapsWaryes2v2; break;
+                    case "warno 3v3": maplist = this.warnoMaps3v3; break;
+                    case "warno 4v4": maplist = this.warnoMaps4v4; break;
+
+
+                    default: MsgHelper.reply(message, mapType + " Wrong arguments. For instance try $rmap 1v1 3 or $rmap warno 2v2 3");
+                        return
                 }
-                const pickIndex = Math.floor(Math.random() * maplist.length)
-                const pick = maplist[pickIndex]
-                maplist = maplist.filter((x, index) => { return pickIndex != index; })
-                Logs.log(message.author.id + " has picked " + pick + " from " + JSON.stringify(maplist) + " side: " + input);
-                message.reply(pick, { files: ["./assets/images/" + pick + ".png"] });
-
             }
-            picks++;
+        }
+        /*         //check for bans
+                if (this.bans[message.member.id]) {
+                    for (const key of Object.keys(this.bans[message.member.id])) {
+                        maplist = maplist.filter((x) => {
+                            return x != key;
+                        })
+                    }
+                } */
+
+
+        if (maplist.length < count) {
+            MsgHelper.reply(message, "There aren't enough maps to pick from. If some are banned, you might wanna unban them. To unban all type $resetmaps");
+            return;
         }
 
+        if (count > 1) {
+            const maps = getRandomMaps(maplist, count)
+            Logs.log(message.author.id + " has picked " + maps.join(",") + " from " + JSON.stringify(maplist) + " side: " + input);
+            message.reply(maps.join(", "));
+            return;
+        }
 
+        const pickIndex = Math.floor(Math.random() * maplist.length);
+        const pick = maplist[pickIndex];
+        maplist = maplist.filter((x, index) => { return pickIndex != index; });
+        message.reply(pick, { files: ["./assets/images/" + pick + ".png"] });
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private allMaps(message: Message, input: string[]): void {
@@ -213,8 +219,7 @@ export class MapCommand {
             if (target.length == 0) {
                 MsgHelper.say(
                     message,
-                    `I don't know what map that is, did you mean ***${
-                    CommonUtil.lexicalGuesser(line, mapPool)
+                    `I don't know what map that is, did you mean ***${CommonUtil.lexicalGuesser(line, mapPool)
                     }*** instead of ***${line}***... It has not been unbanned.`
                 );
                 return;
@@ -245,8 +250,7 @@ export class MapCommand {
             if (target.length == 0) {
                 MsgHelper.say(
                     message,
-                    `I don't know what map that is, did you mean ***${
-                    CommonUtil.lexicalGuesser(line, targetMaps)
+                    `I don't know what map that is, did you mean ***${CommonUtil.lexicalGuesser(line, targetMaps)
                     }*** instead of ***${line}***... It has not been banned.`
                 );
                 return;

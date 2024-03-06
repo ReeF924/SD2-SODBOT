@@ -1,25 +1,9 @@
 # version: '3'
 
 # services:
-#   # redis:
-#   #     image: 'bitnami/redis:6.2.12-debian-11-r27'
-#   #     restart: always
-#   #     environment:
-#   #       # ALLOW_EMPTY_PASSWORD is recommended only for development.
-#   #       REDIS_DISABLE_COMMANDS: FLUSHDB,FLUSHALL
-#   #       REDIS_PASSWORD: ${REDIS_PASSWORD}
-#   #       LETSENCRYPT_HOST: ${DOMAIN}
-#   #       PORT: ${REDIS_PORT}
-#   #       LETSENCRYPT_EMAIL: p.uri.tanner@gmail.com
-#   #     ports:
-#   #       - '${REDIS_PORT}:${REDIS_PORT}'
-#   #     volumes:
-#   #       - 'redis_data:/bitnami/redis/data'
 #   sodbot:
 #     restart: always
 #     build: .
-#     # depends_on:
-#     #   - redis
 #     volumes:
 #       - ./data:/db/sd2.struktur.online
 #     ports:
@@ -28,16 +12,11 @@
 #       DOMAIN: ${DOMAIN}
 #       VIRTUAL_HOST: ${DOMAIN}
 #       VIRTUAL_PORT: 8080
-#       REDIS_PASSWORD: ${REDIS_PASSWORD}
-#       REDIS_PORT: ${REDIS_PORT}
 #       LETSENCRYPT_HOST: ${DOMAIN}
-#       LETSENCRYPT_EMAIL: p.uri.tanner@gmail.com
+#       LETSENCRYPT_EMAIL: vesecky.lukas7@gmail.com
 #     networks:
 #         - default
 # networks:
 #     default:
 #         external:
 #             name: web
-# volumes:
-#   redis_data:
-#     driver: local
