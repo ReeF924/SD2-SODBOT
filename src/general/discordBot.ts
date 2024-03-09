@@ -5,7 +5,7 @@ import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "disc
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
-import { DiscordServer, DB } from "./db";
+import { DB } from "./db";
 
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
@@ -64,7 +64,7 @@ export class DiscordBot {
     }
 
     private async onMessage(message: Message) {
-        let channel, guild
+        let channel, guild;
         if (message.channel) channel = message.channel.id;
         if (message.guild) guild = message.guild.id;
         if (message.content.startsWith(CommonUtil.config("prefix"))) {
@@ -81,6 +81,7 @@ export class DiscordBot {
                     return;
                 }
                 this.runCommand(message, command, (await perms));
+                Logs.log(`Command: ${command} by ${message.author.username} in ${message.guild.name}`);
             }
         }
         const perms = await Permissions.getPermissions(channel, guild, this.database);
@@ -93,7 +94,7 @@ export class DiscordBot {
         });
     }
     private async onReady(database: DB) {
-        Logs.log(`Bot Online at ${new Date()}`);
+        Logs.log(`Bot Online!`);
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: "LISTENING"
         });

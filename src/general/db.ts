@@ -76,23 +76,22 @@ async function findSorted(page, perPage = 10) {
 
 import { Logs } from "./logs";
 import { Message } from 'discord.js';
-import { RawGameData, StoredGameData, StoredPlayerData, ReplayType } from 'sd2-utilities/lib/parser/gameParser';
 
 export class DB {
 
-    public async setServer(server: DiscordServer): Promise<DBObject> {
-        return serverStore.insert(server);
-    }
-
-    public async getAllServers(): Promise<DiscordServer[]> {
-        let servers = await serverStore.find({});
-        return servers;
-    }
-
-    public async getServer(id: string): Promise<DiscordServer> {
-        let server = await serverStore.findOne({ _id: id });
-        return server;
-    }
+    // public async setServer(server: DiscordServer): Promise<DBObject> {
+    //     return serverStore.insert(server);
+    // }
+    //
+    // public async getAllServers(): Promise<DiscordServer[]> {
+    //     let servers = await serverStore.find({});
+    //     return servers;
+    // }
+    //
+    // public async getServer(id: string): Promise<DiscordServer> {
+    //     let server = await serverStore.findOne({ _id: id });
+    //     return server;
+    // }
 
 
     public async setPlayer(player: Player): Promise<DBObject> {
@@ -386,47 +385,47 @@ export class DB {
 
 
     // Returns 0 for new replay and 1 for existing replay
-    public async setReplay(message: Message, rawReplay: RawGameData, replayType:ReplayType, players:{winner:StoredPlayerData, loser:StoredPlayerData}): Promise<boolean> {
-
-        //@todo check for unwanted replays: other modes, more players(maybe?), different game settings, must be MP
-        //watch out : players might be only observers?
-        let existing: StoredGameData = await replayStore.find({ id: rawReplay.uniqueSessionId });
-        
-        const messageData = {
-            uuid: rawReplay.uniqueSessionId,
-            discordId: message.author.id,
-            serverId: message.guild.id,
-            channelId: message.channel.id,
-            replay: JSON.stringify(rawReplay)
-        };
-
-        if (Object.keys(existing).length === 0) {
-            Logs.log("Committing replay: " + messageData.uuid);
-            const replay = this.formatReplay(rawReplay,replayType, players);
-            await replayStore.insert(replay);
-            return true;
-        }
-        Logs.log("Replay already exists: " + messageData.uuid);
-        return false;
-        
-        // await replayStore.update(replay);
-        // await replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })
-    }
-
-    private formatReplay(replay: RawGameData,replayType:ReplayType,players:{winner:StoredPlayerData, loser:StoredPlayerData}): StoredGameData {
-        return {
-            id: replay.uniqueSessionId,
-            replayType: replayType,
-            version: replay.version,
-            gameType: replay.gameType,
-            map_raw: replay.map_raw,
-            timeLimit: replay.timeLimit,
-            scoreLimit: replay.scoreLimit,
-            victoryCondition: replay.victoryCondition,
-            players:players,
-            result: replay.result
-        }
-    }
+    // public async setReplay(message: Message, rawReplay: RawGameData, replayType:ReplayType, players:{winner:StoredPlayerData, loser:StoredPlayerData}): Promise<boolean> {
+    //
+    //     //@todo check for unwanted replays: other modes, more players(maybe?), different game settings, must be MP
+    //     //watch out : players might be only observers?
+    //     let existing: StoredGameData = await replayStore.find({ id: rawReplay.uniqueSessionId });
+    //
+    //     const messageData = {
+    //         uuid: rawReplay.uniqueSessionId,
+    //         discordId: message.author.id,
+    //         serverId: message.guild.id,
+    //         channelId: message.channel.id,
+    //         replay: JSON.stringify(rawReplay)
+    //     };
+    //
+    //     if (Object.keys(existing).length === 0) {
+    //         Logs.log("Committing replay: " + messageData.uuid);
+    //         const replay = this.formatReplay(rawReplay,replayType, players);
+    //         await replayStore.insert(replay);
+    //         return true;
+    //     }
+    //     Logs.log("Replay already exists: " + messageData.uuid);
+    //     return false;
+    //
+    //     // await replayStore.update(replay);
+    //     // await replayStore.update({ uuid: replayData.uuid }, replay, { upsert: true })
+    // }
+    //
+    // private formatReplay(replay: RawGameData,replayType:ReplayType,players:{winner:StoredPlayerData, loser:StoredPlayerData}): StoredGameData {
+    //     return {
+    //         id: replay.uniqueSessionId,
+    //         replayType: replayType,
+    //         version: replay.version,
+    //         gameType: replay.gameType,
+    //         map_raw: replay.map_raw,
+    //         timeLimit: replay.timeLimit,
+    //         scoreLimit: replay.scoreLimit,
+    //         victoryCondition: replay.victoryCondition,
+    //         players:players,
+    //         result: replay.result
+    //     }
+    // }
     //This is expensive. And an unprepared statement. and it returns *....
     //it needs work. @todo
     public async getReplaysByEugenId(eugenId: number): Promise<DBObject> {
@@ -454,16 +453,16 @@ export interface DiscordUser {
     impliedName: string
 }
 
-export class DiscordServer {
-    public _id: string;
-    public channels: Map<string, ReplayType>; //channelId, replayType
-
-
-    public constructor(id: string) {
-        this._id = id;
-        this.channels = new Map<string, ReplayType>();
-    }
-}
+// export class DiscordServer {
+//     public _id: string;
+//     public channels: Map<string, ReplayType>; //channelId, replayType
+//
+//
+//     public constructor(id: string) {
+//         this._id = id;
+//         this.channels = new Map<string, ReplayType>();
+//     }
+// }
 
 
 export interface EloLadderElement {

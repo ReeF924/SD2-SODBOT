@@ -1,7 +1,7 @@
 import {Logs} from "./logs";
 import * as fs from 'fs';
 import * as Levenshtein from 'levenshtein';
-import {DB, DiscordServer} from "./db";
+import {DB} from "./db";
 import {DiscordBot} from "./discordBot";
 import {Message} from "discord.js";
 

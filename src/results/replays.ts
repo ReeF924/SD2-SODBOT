@@ -1,11 +1,10 @@
 import { ChannelData, Message, MessageAttachment, MessageEmbed } from "discord.js"
-import { GameParser, RawGameData, RawPlayer, ReplayType, StoredPlayerData } from "sd2-utilities/lib/parser/gameParser"
+import { GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
 import { misc } from "sd2-data"
 import * as axios from "axios"
-import { EloLadderElement, Elos, ElosDelta, DB, DiscordServer } from "../general/db";
+import { EloLadderElement, Elos, ElosDelta, DB } from "../general/db";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { PermissionsSet } from "../general/permissions";
-import { StoredDeckData } from "sd2-utilities/lib/parser/deckParser";
 
 const ax = axios.default;
 
@@ -141,7 +140,7 @@ export class Replays {
                     loosers = loosers.substring(0, 19)
                 }
 
-                const players = Replays.createStoredPlayers(g);
+                // const players = Replays.createStoredPlayers(g);
 
                 //if valid insert to db (setReplay returns if is duplicate)
                 const valid = Replays.isValidReplay(g);
@@ -149,17 +148,17 @@ export class Replays {
                 if (valid != null) {
                     reply = "Replay not saved to database:" + valid + 'prb: ' + g.gameMode;
                 }
-                else {
-                    const server:DiscordServer = await database.getServer(message.guild.id);
-                    const replayType:ReplayType = server !== null ? server.channels.get(message.channel.id) 
-                    : {
-                        defaultRules: false,
-                        tournamentType: "other"
-                    }
-
-                    reply = await database.setReplay(message, g,replayType, players)
-                        ? "Results Submitted" : "This is a duplicate replay won't be saved to database.";
-                }
+                // else {
+                //     const server:DiscordServer = await database.getServer(message.guild.id);
+                //     const replayType:ReplayType = server !== null ? server.channels.get(message.channel.id)
+                //     : {
+                //         defaultRules: false,
+                //         tournamentType: "other"
+                //     }
+                //
+                //     reply = await database.setReplay(message, g,replayType, players)
+                //         ? "Results Submitted" : "This is a duplicate replay won't be saved to database.";
+                // }
 
                 MsgHelper.say(message, reply);
             }
@@ -169,47 +168,47 @@ export class Replays {
             Replays.sendEmbed(message, g, database, winners, loosers);
         });
     }
-    static createStoredPlayers(g: RawGameData) {
-        let winner: StoredPlayerData, loser: StoredPlayerData;
-        for (const player of g.players) {
-
-            const deck: StoredDeckData = {
-                income: player.deck.raw.income,
-                division: player.deck.raw.division,
-                code: player.deck.raw.code
-            }
-
-            if (g.ingamePlayerId == player.alliance) {
-                loser = {
-                    id: player.id,
-                    alliance: player.alliance,
-                    elo: player.elo,
-                    level: player.level,
-                    name: player.name,
-                    deckCode: deck,
-                    scoreLimit: player.scoreLimit,
-                    incomeRate: player.incomeRate,
-                    mapPos: player.mapPos
-                }
-            } else {
-                winner = {
-                    id: player.id,
-                    alliance: player.alliance,
-                    elo: player.elo,
-                    level: player.level,
-                    name: player.name,
-                    deckCode: deck,
-                    scoreLimit: player.scoreLimit,
-                    incomeRate: player.incomeRate,
-                    mapPos: player.mapPos
-                }
-            }
-        }
-        return {
-            winner: winner,
-            loser: loser
-        }
-    }
+    // static createStoredPlayers(g: RawGameData) {
+    //     let winner: StoredPlayerData, loser: StoredPlayerData;
+    //     for (const player of g.players) {
+    //
+    //         const deck: StoredDeckData = {
+    //             income: player.deck.raw.income,
+    //             division: player.deck.raw.division,
+    //             code: player.deck.raw.code
+    //         }
+    //
+    //         if (g.ingamePlayerId == player.alliance) {
+    //             loser = {
+    //                 id: player.id,
+    //                 alliance: player.alliance,
+    //                 elo: player.elo,
+    //                 level: player.level,
+    //                 name: player.name,
+    //                 deckCode: deck,
+    //                 scoreLimit: player.scoreLimit,
+    //                 incomeRate: player.incomeRate,
+    //                 mapPos: player.mapPos
+    //             }
+    //         } else {
+    //             winner = {
+    //                 id: player.id,
+    //                 alliance: player.alliance,
+    //                 elo: player.elo,
+    //                 level: player.level,
+    //                 name: player.name,
+    //                 deckCode: deck,
+    //                 scoreLimit: player.scoreLimit,
+    //                 incomeRate: player.incomeRate,
+    //                 mapPos: player.mapPos
+    //             }
+    //         }
+    //     }
+    //     return {
+    //         winner: winner,
+    //         loser: loser
+    //     }
+    // }
 
     private static isValidReplay(g: RawGameData): string {
         if (g.players.length != 2) return "playerLength";

@@ -2,9 +2,6 @@ import { Client, Message, GuildChannel, GuildMember, Guild, Channel } from "disc
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import { Logs } from "../general/logs";
 import { DB } from "../general/db";
-import { DiscordServer } from "../general/db";
-import { serialize } from "v8";
-import { measureMemory } from "vm";
 import { CommandDB } from "./Command";
 export class AdminCommand extends CommandDB {
     //Only RoguishTiger or Kuriosly can set Admin rights 
@@ -13,22 +10,11 @@ export class AdminCommand extends CommandDB {
         super(database);
     }
     private admins: string[] = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
-    private defaultReplayTypes: string[] = [
-        'div1',
-        'div2',
-        'div3',
-        'div4',
-        'div5',
-        'monthlyOpen',
-        'monthlyIntermediate',
-        'montlyGreenhorn',
-        'defaultOther'
-    ]
     private async setAdmin(message: Message, input: string[]) {
         if (this.admins.some(adminId => message.author.id == adminId)) {
             //Check for argument
             if (input.length === 1) {
-                (async () => {
+                await (async () => {
                     //Get user from the DiscordUsers Table
                     let user = await this.database.getDiscordUser(input[0])
                     const discordUser = await DiscordBot.bot.users.fetch(String(input[0]))
@@ -189,32 +175,32 @@ export class AdminCommand extends CommandDB {
             MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
         }
     }
-    private async setReplayChannel(message: Message, input: string[]) {
-        //Check if requestor has admin access
-        if (!this.checkAccess(message)) {
-            message.reply("You do not have the admin access to use this command");
-            return;
-        }
-        // Check if formatted correctly
-        if (input.length != 1) {
-            message.reply("Try channel <replays Type>");
-            return
-        }
+    // private async setReplayChannel(message: Message, input: string[]) {
+    //     //Check if requestor has admin access
+    //     if (!this.checkAccess(message)) {
+    //         message.reply("You do not have the admin access to use this command");
+    //         return;
+    //     }
+    //     // Check if formatted correctly
+    //     if (input.length != 1) {
+    //         message.reply("Try channel <replays Type>");
+    //         return
+    //     }
+    //
+    //     let server: DiscordServer = await this.database.getServer(message.guild.id) ?? new DiscordServer(message.guild.id);
+    //
+    //     this.addChannel(message, input, server);
+    //     // this.database.putServer(server);
+    // }
 
-        let server: DiscordServer = await this.database.getServer(message.guild.id) ?? new DiscordServer(message.guild.id);
-
-        this.addChannel(message, input, server);
-        // this.database.putServer(server);
-    }
-
-    private addChannel(message: Message, input: string[], server: DiscordServer): void {
-        if (this.defaultReplayTypes.includes(input[0])) {
-            server.channels.set(message.channel.id, { defaultRules: true, tournamentType: input[0] });
-        }
-        else {
-            server.channels.set(message.channel.id, { defaultRules: false, tournamentType: "other" });
-        }
-    }
+    // private addChannel(message: Message, input: string[], server: DiscordServer): void {
+    //     if (this.defaultReplayTypes.includes(input[0])) {
+    //         server.channels.set(message.channel.id, { defaultRules: true, tournamentType: input[0] });
+    //     }
+    //     else {
+    //         server.channels.set(message.channel.id, { defaultRules: false, tournamentType: "other" });
+    //     }
+    // }
 
     private checkAccess(message: Message): boolean {
         return this.admins.some(adminID => message.member.id === adminID);
