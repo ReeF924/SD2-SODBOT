@@ -175,6 +175,7 @@ export class AdminCommand extends CommandDB {
             MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
         }
     }
+
     // private async setReplayChannel(message: Message, input: string[]) {
     //     //Check if requestor has admin access
     //     if (!this.checkAccess(message)) {

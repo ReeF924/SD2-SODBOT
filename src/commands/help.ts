@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 export class HelpCommand {
 
@@ -30,60 +30,52 @@ export class HelpCommand {
                 break;
 
             default:
-                const embed = new MessageEmbed()
-                    .setTitle("Help Commands")
-                    .addFields([
-                        {
-                            name: "$help",
-                            value: "Gives this message",
-                            inline: false
-                        },
-                        {
-                            name: "$help maps",
-                            value: "Gives help info about all of the map commands.",
-                            inline: false
-                        },
-                        {
-                            name: "$help divs",
-                            value: 'Gives help info about all of the division commands.',
-                            inline: false
-                        },
-                        {
-                            name: "$help misc",
-                            value: 'Gives help info about all of the misc commands.',
-                            inline: false
-                        },
-                        {
-                            name: "$help player",
-                            value: 'Gives help info about all of the commands that relate to the player.',
-                            inline: false
-                        },
-                        {
-                            name: "$help replays",
-                            value: 'Gives help info about the submitting of match replay files.',
-                            inline: false
-                        },
-                        {
-                            name: "$help admin",
-                            value: 'Gives help info about commands for admins.',
-                            inline: false
-                        }
+                const embed = this.createEmbed("Help Commands", [
+                    {
+                        name: "$help",
+                        value: "Gives this message",
+                        inline: false
+                    },
+                    {
+                        name: "$help maps",
+                        value: "Gives help info about all of the map commands.",
+                        inline: false
+                    },
+                    {
+                        name: "$help divs",
+                        value: 'Gives help info about all of the division commands.',
+                        inline: false
+                    },
+                    {
+                        name: "$help misc",
+                        value: 'Gives help info about all of the misc commands.',
+                        inline: false
+                    },
+                    {
+                        name: "$help player",
+                        value: 'Gives help info about all of the commands that relate to the player.',
+                        inline: false
+                    },
+                    {
+                        name: "$help replays",
+                        value: 'Gives help info about the submitting of match replay files.',
+                        inline: false
+                    },
+                    {
+                        name: "$help admin",
+                        value: 'Gives help info about commands for admins.',
+                        inline: false
+                    }
 
-                    ])
-                message.author.send(embed);
+                ]);
+                message.author.send({embeds: [embed]});
         }
     }
 
 
 
     private helpMaps(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Maps Commands")
-            .addFields([
-                {
-                    name:"Primarymode",
-                    value:"If the game isn't specified at the end of an command, returns maps of the game that is considered primary for the current channel."
-                },
+        const embed = this.createEmbed("Help - Maps Commands",[
                 {
                     name: "$rmap",
                     value: "Returns a random map from the list of approved SD2 League 1v1 Maps or warno 1v1 map.",
@@ -114,15 +106,13 @@ export class HelpCommand {
                     value: "This command will clear all currently banned maps and reset the maps list back to its default state.",
                     inline: false
                 }
-            ])
-        message.author.send(embed);
+            ]);
+        message.author.send({embeds: [embed]});
     }
 
 
     private helpDivs(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Division Commands")
-            .addFields([
+        const embed = this.createEmbed("Help - Division Commands", [
                 {
                     name: "$rdiv",
                     value: "Returns a random division from all of the available divisions, it excludes any banned divisions.\nYou may also add the argument Allies or Axis to narrow the random selection down to only that faction.\nExample Usage $rdiv Axis",
@@ -153,15 +143,13 @@ export class HelpCommand {
                     value: "Will provide a list of the currently banned divisions.",
                     inline: false
                 }
-            ])
-        message.author.send(embed);
+            ]);
+        message.author.send({embeds: [embed]});
     }
 
 
     private helpMisc(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Misc Commands")
-            .addFields([
+        const embed = this.createEmbed("Help - Misc Commands", [
                 {
                     name: "$piat or $ptrd or $laws",
                     value: "FIRE the Piat, PTRD or LAWS.   Can you get a Hit, find the secret messages?",
@@ -188,14 +176,12 @@ export class HelpCommand {
                     inline: false
                 }
             ])
-        message.author.send(embed);
+        message.author.send({embeds: [embed]});
     }
 
 
     private helpPlayer(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Player Commands")
-            .addFields([
+        const embed = this.createEmbed("Help - Player Commands", [
                 {
                     name: "$register",
                     value: "This command will register (if they are unknown to the bot) or update (if they have previously registered) a player to the bot.\n The command makes a link between the Discord User submitting the request and the Eugen Player ID provided in the request.\nExample Usage: $register 123456 (where 123456 is the player's Eugen Player ID).",
@@ -212,12 +198,10 @@ export class HelpCommand {
                     inline: false
                 }
             ]);
-        message.author.send(embed);
+        message.author.send({embeds: [embed]});
     }
     private helpReplays(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Replays")
-            .addFields([
+        const embed = this.createEmbed("Help - Replays", [
                 {
                     name: "Uploading a game replay",
                     value: "Uploading a game replay into one of the channels supported by the bot will trigger the bot to return summary information about the match.",
@@ -249,12 +233,10 @@ export class HelpCommand {
                     inline: false
                 }
             ])
-        message.author.send(embed);
+        message.author.send({embeds: [embed]});
     }
     private helpAdmins(message: Message) {
-        const embed = new MessageEmbed()
-            .setTitle("Help - Admin commands")
-            .addFields([
+        const embed = this.createEmbed("Help - Admin commands", [
                 {
                     name: "$primarymode",
                     value: "Provides info about the primary mode of a server.\nAdding a game name as an argument changes the primary mode.",
@@ -271,13 +253,27 @@ export class HelpCommand {
                     inline: false
                 }
             ]);
-            message.author.send(embed);
+            message.author.send({embeds: [embed]});
     }
+
+
+
+    private createEmbed(title: string, fields:EmbedField[]): EmbedBuilder{
+       return new EmbedBuilder()
+            .setTitle(title)
+            .addFields(fields)
+    }
+
     public addCommands(bot: DiscordBot): void {
         bot.registerCommand("help", this.help.bind(this));
 
     }
+}
 
+declare type EmbedField = {
+    name: string,
+    value: string,
+    inline: boolean
 }
 
 

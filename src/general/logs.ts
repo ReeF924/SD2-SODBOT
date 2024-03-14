@@ -19,7 +19,6 @@ export class Logs {
         if (!message) return;
 
         Logs.logger.log("info", message);
-        console.log(`${new Date()}:"${message}"`);
     }
 
     static error(message: unknown): void {

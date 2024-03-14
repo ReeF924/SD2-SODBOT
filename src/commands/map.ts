@@ -1,9 +1,9 @@
-import { Message } from "discord.js";
+import {Embed, Message} from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { map } from "mssql";
 
 export class MapCommand {
@@ -141,21 +141,23 @@ export class MapCommand {
 
         const pickIndex = Math.floor(Math.random() * maplist.length);
         const pick = maplist[pickIndex];
-        maplist = maplist.filter((x, index) => { return pickIndex != index; });
-        message.reply(pick, { files: ["./assets/images/" + pick + ".png"] });
+
+        // maplist = maplist.filter((x, index) => { return pickIndex != index; });
+
+        message.reply({content :pick,  files: ["./assets/images/" + pick + ".png"]});
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private allMaps(message: Message, input: string[]): void {
         const importedMapData = Data.maps;
         console.log(JSON.stringify(importedMapData));
         const bannedMaps = this.bans[message.author.id];
         const legaueMaps = importedMapData.mapData.sd2League;
         //Set up discord embed
-        let embed = new MessageEmbed().setTitle(message.author.username + '\'s Maps')
+        let embed = new EmbedBuilder().setTitle(message.author.username + '\'s Maps')
         let text1v1 = "";
         let text2v2 = "";
         let text3v3 = "";
         let text4v4 = "";
+
         for (let i = 0; i < importedMapData.mapData.byPlayerSize[2].length; i++) { //this needs to be rewritten into 4 loops.
             let maps1 = importedMapData.mapData.byPlayerSize[2][i];
             let maps2 = importedMapData.mapData.byPlayerSize[4][i];
@@ -195,8 +197,10 @@ export class MapCommand {
             { name: "3v3", value: text3v3, inline: true },
             { name: "4v4", value: text4v4, inline: true }
         )
-        embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
-        message.channel.send(embed);
+        // embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
+        embed = embed.setFooter({text: "Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)"});
+
+        message.channel.send({embeds: [embed]});
     }
 
 

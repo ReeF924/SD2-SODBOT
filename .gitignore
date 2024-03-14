@@ -32,6 +32,8 @@ dist
 dist/
 data/
 
+packege.json.copy
+
 coverage/
 config.json
 app.log

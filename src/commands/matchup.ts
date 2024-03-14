@@ -1,10 +1,10 @@
-import { Message } from "discord.js";
+import {Embed, Message} from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { log } from "console";
 
 
@@ -52,12 +52,12 @@ export class MatchupCommand {
             out += `${i}) \t ${matchup} \n`
         }
 
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
         embed = embed.addFields(
             { name: `Matchups ${side}`, value: out, inline: true },
         )
 
-        message.channel.send(embed);
+        message.channel.send({ embeds: [embed]});
 
     }
     public addCommands(bot: DiscordBot): void {

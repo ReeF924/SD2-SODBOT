@@ -2,9 +2,6 @@ import {Logs} from "./logs";
 import * as fs from 'fs';
 import * as Levenshtein from 'levenshtein';
 import {DB} from "./db";
-import {DiscordBot} from "./discordBot";
-import {Message} from "discord.js";
-
 export class CommonUtil {
 
     static configData: Map<string, unknown> = new Map<string, unknown>();

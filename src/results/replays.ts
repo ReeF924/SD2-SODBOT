@@ -1,10 +1,10 @@
-import { ChannelData, Message, MessageAttachment, MessageEmbed } from "discord.js"
-import { GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
-import { misc } from "sd2-data"
+import {Message, EmbedBuilder, Embed} from "discord.js"
+import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
+import {misc} from "sd2-data"
 import * as axios from "axios"
-import { EloLadderElement, Elos, ElosDelta, DB } from "../general/db";
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { PermissionsSet } from "../general/permissions";
+import {EloLadderElement, Elos, ElosDelta, DB} from "../general/db";
+import {DiscordBot, MsgHelper} from "../general/discordBot";
+import {PermissionsSet} from "../general/permissions";
 
 const ax = axios.default;
 
@@ -20,7 +20,6 @@ export class Replays {
             let winnerList: RawPlayer[] = []
             let looserList: RawPlayer[] = []
 
-            const channel = await DiscordBot.bot.channels.fetch(message.channel.id) as ChannelData
             if (g.result.victory < 3) {
                 for (const player of g.players) {
                     const playerid = player.name
@@ -161,13 +160,13 @@ export class Replays {
                 // }
 
                 MsgHelper.say(message, reply);
-            }
-            else {
+            } else {
                 MsgHelper.say(message, "Only 1v1 replays are uploaded in database.");
             }
             Replays.sendEmbed(message, g, database, winners, loosers);
         });
     }
+
     // static createStoredPlayers(g: RawGameData) {
     //     let winner: StoredPlayerData, loser: StoredPlayerData;
     //     for (const player of g.players) {
@@ -219,24 +218,25 @@ export class Replays {
         if (g.scoreLimit != 2000) return "scoreLimit";
         return null;
     }
+
     static async sendEmbed(message: Message, g: RawGameData, database: DB, winners: string, losers: string): Promise<void> {
 
         // Create embed header
-        let embed = new MessageEmbed()
+        let embed = new EmbedBuilder()
             .setTitle(g.serverName || "Game")
             .setColor("#0099ff")
-            .addField("Winner", `||${winners}||`, true)
-            .addField("Loser", `||${losers}||`, true)
-            .addField("victoryState", `||${misc.victory[g.result.victory]}||`, true)
-            .addField("Duration", `||${Replays.duration(g.result.duration)}||`, true)
-            .setFooter(`Game Version: ${g.version}`)
-            .addField("Score Limit", g.scoreLimit, true)
-            .addField("Time Limit", g.timeLimit, true)
-            .addField('Income Rate', misc.incomeLevel[g.incomeRate], true)
-            .addField('Game Mode', misc.mode[g.gameMode], true)
-            .addField('Starting Points', g.initMoney + " pts", true)
-            .addField('Map', misc.map[g.map_raw], true);
-
+            .addFields(
+                [{name: "Winner", value: `||${winners}||`, inline: true},
+                    {name: "Loser", value: `||${losers}||`, inline: true},
+                    {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
+                    {name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true},
+                    {name: "Game Version", value: `||${g.version}||`, inline: true},
+                    {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
+                    {name: "Time Limit", value: g.timeLimit, inline: true},
+                    {name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true},
+                    {name: "Game Mode", value: misc.mode[g.gameMode.toString()], inline: true},
+                    {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
+                    {name: "Map", value: misc.map[g.map_raw], inline: true}]);
 
         // If embed is less than 4 we can send in single embed
         if (g.players.length < 4) {
@@ -259,56 +259,63 @@ export class Replays {
                 }
 
                 // Add the player details to the embed
-                embed = embed.addField("\u200b", "-------------------------------------------------")
-                    .addField("Player", playerid, false)
-                    .addField("Elo", playerElo, false)
-                    .addField("Division", player.deck.division, true)
-                    .addField("Income", player.deck.income, true)
-                    .addField("Deck Code", player.deck.raw.code, false)
-                    .setTimestamp();
+                embed = embed
+                    .addFields(
+                        [{name: "\u200b", value: "-------------------------------------------------"},
+                            {name: "Player", value: playerid, inline: false},
+                            {name: "Elo", value: playerElo.toString(), inline: false},
+                            {name: "Division", value: player.deck.division, inline: true},
+                            {name: "Income", value: player.deck.income, inline: true},
+                            {name: "Deck Code", value: player.deck.raw.code, inline: false}]
+                    ).setTimestamp();
+
 
                 if (player.deck.franchise === "WARNO") {
-                    embed.addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false);
+                    embed.addFields([{name:"Deck", value:`[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, inline:false}]);
                 }
             }
-            message.channel.send(embed);
+            MsgHelper.sendEmbed(message, embed);
             return;
         }
-        message.channel.send(embed);
-            // But if the number so players are equal to or greater than 4 we need to break it over several embeds 
-            if (g.players.length >= 4) {
-                let counter = 0;
-                embed = new MessageEmbed()
-                    .setColor("#0099ff")
-                for (const player of g.players) {
-                    let playerid = player.name;
-                    let playerElo = player.elo;
-                    let discordId = ""
-                    const discordUser = await database.getDiscordUserFromEugenId(player.id);
-                    if (discordUser)
-                        discordId = discordUser.id
-                    if (discordId != "") {
-                        const user = await DiscordBot.bot.users.fetch(String(discordId))
-                        if (!user)
-                            playerid = "BORKED! Please yell at <@!271792666910392325>"
-                        else
-                            playerid += "*<@!" + user.id + ">*"
-                    } else {
-                        playerid += " (id:" + player.id + ")";
-                    }
-                    embed = embed.addField("-------------------------------------------------", "\u200B")
-                        .addField("Player", playerid, false)
-                        .addField("Elo", playerElo, false)
-                        .addField("Division", player.deck.division, true)
-                        .addField("Income", player.deck.income, true)
-                        .addField("Deck Code", player.deck.raw.code, false)
-                    counter++;
-                    if (counter == 4) {
-                        message.channel.send(embed)
-                        embed = new MessageEmbed()
-                            .setColor("#0099ff")
-                        counter = 0;
-                    }
+        MsgHelper.sendEmbed(message, embed);
+        // But if the number so players are equal to or greater than 4 we need to break it over several embeds
+        if (g.players.length >= 4) {
+            let counter = 0;
+            embed = new EmbedBuilder()
+                .setColor("#0099ff")
+            for (const player of g.players) {
+                let playerid = player.name;
+                let playerElo = player.elo;
+                let discordId = ""
+                const discordUser = await database.getDiscordUserFromEugenId(player.id);
+                if (discordUser)
+                    discordId = discordUser.id
+                if (discordId != "") {
+                    const user = await DiscordBot.bot.users.fetch(String(discordId))
+                    if (!user)
+                        playerid = "BORKED! Please yell at <@!271792666910392325>"
+                    else
+                        playerid += "*<@!" + user.id + ">*"
+                } else {
+                    playerid += " (id:" + player.id + ")";
+                }
+
+                embed = embed
+                    .addFields(
+                        [{name:"-------------------------------------------------", value:"\u200B"},
+                        { name: "Player", value: playerid, inline: false },
+                        { name: "Elo", value: playerElo.toString(), inline: false },
+                        { name: "Division", value: player.deck.division, inline: true },
+                        { name: "Income", value: player.deck.income, inline: true },
+                        { name: "Deck Code", value: player.deck.raw.code, inline: false }]);
+
+                counter++;
+                if (counter == 4) {
+                    MsgHelper.sendEmbed(message, embed);
+                    embed = new EmbedBuilder()
+                        .setColor("#0099ff")
+                    counter = 0;
+                }
             }
         }
     }

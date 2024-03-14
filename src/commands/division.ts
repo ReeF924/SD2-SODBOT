@@ -1,10 +1,10 @@
-import { Message } from "discord.js";
+import {Embed, Message} from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 
 //@todo clean up array mess in this file created by addition of divsion alias names.
@@ -82,19 +82,13 @@ export class DivisionCommand {
 
             //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
         }
-        let alliedembed = new MessageEmbed().setTitle("-- All Divisions --")
-        console.log(allieddivs.length);
-        alliedembed = alliedembed.addFields(
-            { name: "Allied Divisions", value: allieddivs, inline: true },
-        )
-        message.channel.send(alliedembed);
-        console.log(axisdivs.length);
-        let axisembed = new MessageEmbed()
-        axisembed = axisembed.addFields(
-            { name: "Axis Divisions", value: axisdivs, inline: true },
-        )
-        message.channel.send(axisembed);
+        const alliedDivsEmbed = new EmbedBuilder()
+            .setTitle("-- All Divisions --");
+        alliedDivsEmbed.addFields({ name: 'Allied Divisions', value: allieddivs, inline: true });
 
+        let axisDivsEmbed = new EmbedBuilder();
+        axisDivsEmbed = axisDivsEmbed.addFields({ name: "Axis Divisions", value: axisdivs, inline: true });
+        message.channel.send({embeds: [alliedDivsEmbed, axisDivsEmbed]});
     }
 
     private unbanDivision(message: Message, input: string[]): void {
