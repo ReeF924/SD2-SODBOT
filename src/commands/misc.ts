@@ -14,17 +14,7 @@ export class MiscCommand extends CommandDB {
         super(database);
     }
 
-    private sodbotReplies = [
-        "Ping! Your shot bounced!",
-        "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
-        "Miss! Your shot couldn't hit the broad side of a barn!",
-        "Miss! Come on bruh, just boogaloo it",
-        "Another miss! Your aim is like Gonzo's analysis....lacking",
-        "Miss! This piat is rubbish, just use your Sherman",
-        "Miss! Just side shot it bro",
-        "Miss! You cabbage, aim straight next time",
-        "Hit! Jerry's in trouble now",
-        "Bounce! You do know that is a King Tiger right?",
+    private piatReplies = [
         "Hit! We're Airborne. We don't start fights, we finish 'em!",
         "Hit! Up the Ox and Bucks. Up the Ox and Bucks.",
         "Hit! There are few things more fundamentally encouraging and stimulating than seeing someone else die.",
@@ -44,13 +34,29 @@ export class MiscCommand extends CommandDB {
         "Hit, piat goes brrrrrrrrrrrrr",
         "Hit, Jai Mahakali, Ayo Gorkhali!",
         "Hit, Rhodesians never die!",
-        "Miss!, keep practicing, one day you might be able to last 10mins with Nilla",
         "Hit! Finally it is the piat meta",
+        "Hit! I am the piat god, bow before me",
+        "Hit! Allies OP please nerf",
         "Hit! Lets dance I will show you how to tango you hobo",
-        "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
+        "Hit! Jerry's in trouble now",
+        "Miss! Come on bruh, just boogaloo it",
+        "Miss! Your shot couldn't hit the broad side of a barn!",
+        "Miss! This piat is rubbish, just use your Sherman",
+        "Miss! You cabbage, aim straight next time",
+        "Miss!, keep practicing, one day you might be able to last 10mins with Nilla",
+        "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?",
+        "Miss. You didn't expect me to hit halfway stressed, did you?",
+        "Miss. It's not my fault, the tank stopped out of nowhere!",
+        "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
+        "Another miss! Your aim is like Gonzo's analysis....lacking",
+        "Bounce! Next time side shot it bro",
+        "Bounce! You do know that is a King Tiger right?",
+        "Ping! Your shot bounced!",
+
+
     ];
 
-    private sodbotReplies2 = [
+    private ptrdReplies = [
         "Hit! Target destroyed!",
         "Miss! Mission failed. We'll get em next time!",
         "Miss! Damn it where's my .50 cal",
@@ -100,18 +106,17 @@ export class MiscCommand extends CommandDB {
     private flip(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Heads");
-        } else {
-            MsgHelper.reply(message, "Tails");
+            return;
         }
+        MsgHelper.reply(message, "Tails");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private faction(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Axis");
-        } else {
-            MsgHelper.reply(message, "Allied");
         }
+        MsgHelper.reply(message, "Allied");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -133,45 +138,31 @@ export class MiscCommand extends CommandDB {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private piat(message: Message, input: string[]): void {
-        const name = message.author.username;
-        const k = Math.random();
         const i = Math.random();
+
+        if (message.author.id === '607962880154927113') { //I had to...
+            const replies = this.piatReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
+            MsgHelper.reply(
+                message,
+                replies[Math.floor(Math.random() * replies.length)],
+            );
+            return;
+        }
+
+
         if (i > 0.80) {
             MsgHelper.reply(
                 message,
-                this.sodbotReplies[Math.floor(Math.random() * this.sodbotReplies.length)],
+                this.piatReplies[Math.floor(Math.random() * this.piatReplies.length)],
             );
-        } else if (i > 0.005) {
+        } else if (i > 0.05) {
             MsgHelper.reply(message, "Miss!");
             return;
         } else {
-            k < 0.7
-                ? (MsgHelper.reply(message, `You hit!`),
-                    setTimeout(() => {
-                        MsgHelper.reply(message, `Just kidding, you didn't.`);
-                    }, 5000))
-                : (MsgHelper.say(
-                    message,
-                    `Private ${name} has dishonored himself and dishonored the discord. I have tried to help him. But I have failed.`,
-                ),
-                    setTimeout(() => {
-                        MsgHelper.say(
-                            message,
-                            `I have failed because YOU have not helped me. YOU people have not given Private ${name} the proper motivation! `,
-                        );
-                        setTimeout(() => {
-                            MsgHelper.say(
-                                message,
-                                `So, from now on, whenever Private ${name} fucks up, I will not punish him! I will punish all of YOU!`,
-                            );
-                            setTimeout(() => {
-                                MsgHelper.say(
-                                    message,
-                                    `And the way I see it ladies, you owe me for ONE JELLY DOUGHNUT! NOW GET ON YOUR FACES!`,
-                                );
-                            }, 10000);
-                        }, 10000);
-                    }, 10000));
+            (MsgHelper.reply(message, `You hit!`),
+                setTimeout(() => {
+                    MsgHelper.reply(message, `Just kidding, you didn't.`);
+                }, 5000));
         }
     }
 
@@ -182,7 +173,7 @@ export class MiscCommand extends CommandDB {
         if (i > 0.80) {
             MsgHelper.reply(
                 message,
-                this.sodbotReplies2[Math.floor(Math.random() * this.sodbotReplies2.length)],
+                this.ptrdReplies[Math.floor(Math.random() * this.ptrdReplies.length)],
             );
         } else {
             MsgHelper.reply(message, "Miss!");
@@ -250,7 +241,7 @@ export class MiscCommand extends CommandDB {
                 {name: "B Phase", value: bstr, inline: true},
                 {name: "C Phase", value: cstr, inline: true}
             ]);
-            embed = embed.setFooter({ text: "counts are in # of cards, not # of units"})
+            embed = embed.setFooter({text: "counts are in # of cards, not # of units"})
             message.channel.send({embeds: [embed]});
         }
     }

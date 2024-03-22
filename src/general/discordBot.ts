@@ -1,11 +1,11 @@
 `use strict`
 
-import { CommonUtil } from "./common";
-import {Client, Message, IntentsBitField, EmbedBuilder, Collection} from "discord.js";
-import { Logs } from "./logs";
-import { Replays } from "../results/replays";
-import { Permissions, PermissionsSet } from "./permissions"
-import { DB } from "./db";
+import {CommonUtil} from "./common";
+import {Client, Message, IntentsBitField, EmbedBuilder, Collection, SlashCommandBuilder} from "discord.js";
+import {Logs} from "./logs";
+import {Replays} from "../results/replays";
+import {Permissions, PermissionsSet} from "./permissions"
+import {DB} from "./db";
 
 const {GatewayIntentBits} = require('discord.js');
 
@@ -44,6 +44,7 @@ export class DiscordBot {
     removeCommand(command: string): void {
         this.commands.delete(command);
     }
+
     private onError(message: unknown) {
         Logs.error(message)
     }
@@ -92,9 +93,17 @@ export class DiscordBot {
 
         const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
-            Replays.extractReplayInfo(message, perms, this.database, r.url);
+            Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
+            try {
+                Replays.extractReplayInfo(message, perms, this.database, r.url);
+            }
+            catch (e){
+                Logs.error(e);
+                message.reply('Error processing replay, contact <@607962880154927113>');
+            }
         });
     }
+
     private async onReady(database: DB) {
         Logs.log(`Bot Online!`);
         DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
@@ -104,10 +113,15 @@ export class DiscordBot {
     }
 }
 
+export interface DiscordCommand {
+    data: SlashCommandBuilder;
+    execute: (message: Message) => Promise<void>;
+}
+
 export class MsgHelper {
 
     static reply(message: Message, content: string): void {
-        message.reply(content);
+        message.reply(`${message.author} ${content}`);
     }
 
     static say(message: Message, content: string): void {
