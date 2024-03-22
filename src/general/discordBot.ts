@@ -107,7 +107,7 @@ export class DiscordBot {
 export class MsgHelper {
 
     static reply(message: Message, content: string): void {
-        message.reply(content);
+        message.reply(`${message.author} ${content}`);
     }
 
     static say(message: Message, content: string): void {
