@@ -8,7 +8,7 @@ Deck code fragment example, 33 units:
 |1 bit|T|1 bit|F|8 bit|division|6 bit|cards |1 bit|$|count|phase|xp   |unit || unit card                      ||
 
 for comparison, 1 unit deck:
-|bool   |bool   | division     |crd cnt|income |units encoding         ||headr|unit       |transport  || padding
+|bool   |bool   | division     |crd cnt|income |units encoding         ||header|unit       |transport  || padding
 |00001|1|00001|0|01000|10000110|00001|1|00001|0|00001|00001|00001|01011||1|0|1|01100011100|00000000000||00000000
 |1    |1|1    |0|8    |<   8  >|1    |1|1    |1|1    |1    |1    |11   ||< 1+1+1+11+11               >||
   
@@ -69,7 +69,7 @@ const incomeLevel = {
   5: "Very High"
 };
 
-//Need to double check this - why missing numbers?
+//Need to double-check this - why missing numbers?
 const mode = {
   2: "Conquest",
   3: "Closer Combat",

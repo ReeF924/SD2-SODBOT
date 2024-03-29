@@ -1,12 +1,13 @@
 `use strict`
 
-import { CommonUtil } from "./common";
-import { APIMessageContentResolvable, Client, Message, MessageEmbed } from "discord.js";
-import { Logs } from "./logs";
-import { Replays } from "../results/replays";
-import { Permissions, PermissionsSet } from "./permissions"
-import {DiscordServer , DB} from "./db";
+import {CommonUtil} from "./common";
+import {Client, Message, IntentsBitField, EmbedBuilder, Collection, SlashCommandBuilder} from "discord.js";
+import {Logs} from "./logs";
+import {Replays} from "../results/replays";
+import {Permissions, PermissionsSet} from "./permissions"
+import {DB} from "./db";
 
+const {GatewayIntentBits} = require('discord.js');
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
@@ -14,23 +15,26 @@ export class DiscordBot {
 
     static bot: Client;
     private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
-    private database:DB;
-    private perms: Permissions;
-    constructor(database:DB) {
+    private database: DB;
+
+    constructor(database: DB) {
         //this.loadBlacklist();
         this.database = database;
-        this.perms = new Permissions(database);
-        DiscordBot.bot = new Client();
-        DiscordBot.bot.on("message", this.onMessage.bind(this));
+
+        const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
+
+        DiscordBot.bot = new Client({intents: intents});
+
+        DiscordBot.bot.on("messageCreate", this.onMessage.bind(this));
         DiscordBot.bot.on("ready", async () => {
             await this.onReady(database);
         });
         DiscordBot.bot.on("error", this.onError.bind(this));
-        DiscordBot.bot.on('unhandledRejection', this.onError.bind(this));
+        // DiscordBot.bot.on('', this.onError.bind(this));
     }
 
     login(): void {
-        DiscordBot.bot.login(process.env.discordToken);
+        DiscordBot.bot.login(process.env.DISCORD_TOKEN);
     }
 
     registerCommand(command: string, funct: BotCommand): void {
@@ -40,6 +44,7 @@ export class DiscordBot {
     removeCommand(command: string): void {
         this.commands.delete(command);
     }
+
     private onError(message: unknown) {
         Logs.error(message)
     }
@@ -65,11 +70,11 @@ export class DiscordBot {
     }
 
     private async onMessage(message: Message) {
-        let channel, guild
+        let channel, guild;
         if (message.channel) channel = message.channel.id;
         if (message.guild) guild = message.guild.id;
         if (message.content.startsWith(CommonUtil.config("prefix"))) {
-            const perms = this.perms.getPermissions(channel, guild)
+            const perms = Permissions.getPermissions(channel, guild, this.database);
             if (!(await perms).areCommandsBlocked) {
                 const inputList = message.content
                     .substr(1, message.content.length)
@@ -78,60 +83,56 @@ export class DiscordBot {
                     .split(" ");
                 const command = inputList[0];
 
-                if (message.channel.type === "dm") {
-                    return;
-                }
                 this.runCommand(message, command, (await perms));
+                Logs.log(`Command: "${command}" by ${message.author.username} in ${message.guild.name}`);
             }
         }
+        const perms = await Permissions.getPermissions(channel, guild, this.database);
 
-        if (message.attachments.first()) {
-            const perms = this.perms.getPermissions(channel, guild)
-            if (!(await perms).areReplaysBlocked) {
-                if (message.attachments.first().url.endsWith(".rpl3")) {
-                    if (message.channel.type !== "dm") {
-                        Replays.extractReplayInfo(message, (await perms), this.database);
-                    }
-                }
+        if (perms.areReplaysBlocked) return;
+
+        const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
+        replays.forEach((r) => {
+            Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
+            try {
+                Replays.extractReplayInfo(message, perms, this.database, r.url);
             }
-        }
-
-    }
-    private async onReady(database:DB) {
-        await database.redisClient.connect();
-       // await database.redisSaveServers(null);
-        await database.saveNewServers(DiscordBot.bot);
-        Logs.log("Bot Online!");
-        DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
-            type: "LISTENING"
+            catch (e){
+                Logs.error(e);
+                message.reply('Error processing replay, contact <@607962880154927113>');
+            }
         });
-        // DB.saveNewServers(DiscordBot.bot);
     }
+
+    private async onReady(database: DB) {
+        Logs.log(`Bot Online!`);
+        DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
+            type: 2
+        });
+
+    }
+}
+
+export interface DiscordCommand {
+    data: SlashCommandBuilder;
+    execute: (message: Message) => Promise<void>;
 }
 
 export class MsgHelper {
 
-    static reply(message: Message, content: APIMessageContentResolvable | MessageEmbed, mentions = true): void {
-        const opts = {};
-        //if(!mentions){
-        //    opts["allowed_mentions"] = true;
-        //}
-        message.reply(content);
+    static reply(message: Message, content: string): void {
+        message.reply(`${message.author} ${content}`);
     }
 
-    static say(message: Message, content: APIMessageContentResolvable | MessageEmbed, mentions = true): void {
-        const opts = {};
-        if (!mentions) {
-            opts["allowed_mentions"] = "{parse:[]}";
-        }
-        if (typeof content as any != String) {
-            opts["embed"] = "rich";
-        }
-        //Logs.log(content);
+    static say(message: Message, content: string): void {
         message.channel.send(content);
     }
 
-    static dmUser(message: Message, content: APIMessageContentResolvable | MessageEmbed): void {
+    static sendEmbed(message: Message, content: EmbedBuilder): void {
+        message.channel.send({embeds: [content]});
+    }
+
+    static dmUser(message: Message, content: string): void {
         message.author.send(content);
     }
 

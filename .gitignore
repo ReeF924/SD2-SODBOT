@@ -32,6 +32,10 @@ dist
 dist/
 data/
 
+toAddMaps.log
+
+packege.json.copy
+
 coverage/
 config.json
 app.log

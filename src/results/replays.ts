@@ -1,347 +1,216 @@
-import {ChannelData, Message, MessageEmbed} from "discord.js"
-import {GameParser, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
-import {misc} from "sd2-data"
+import {Message, EmbedBuilder, EmbedField} from "discord.js"
+import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
+import {misc, maps} from "sd2-data"
 import * as axios from "axios"
-import {EloLadderElement, Elos, ElosDelta, DB} from "../general/db";
+import {DB} from "../general/db";
 import {DiscordBot, MsgHelper} from "../general/discordBot";
-import {RatingEngine} from "./rating";
 import {PermissionsSet} from "../general/permissions";
+import {Logs} from "../general/logs";
 
 const ax = axios.default;
+//todo maps - 2v2..., mode - brk, cqc, meet, maybe add to embed? (display only if not default?)
+//todo what if-else shit in retractPlayerInfo
+//todo crases when there are multiple players? maybe something to do with db save?cd
 
 export class Replays {
-    static extractReplayInfo(message: Message, perms: PermissionsSet, database: DB): void {
-        const url = message.attachments.first().url
-        const ratingEng: RatingEngine = new RatingEngine(database);
+    private static readonly blankEmbedField: EmbedField = {name: '\u200b', value: '\u200b', inline: true};
+
+    //todo delete, will be in sdData
+    private static readonly AILevel = {
+        0: "Very Easy",
+        1: "Easy",
+        2: "Medium",
+        3: "Hard",
+        4: "Very Hard"
+    }
+
+    static extractReplayInfo(message: Message, perms: PermissionsSet, database: DB, url: string): void {
         ax.get(url).then(async (res) => {
-            const g = GameParser.parseRaw(res.data)
-            //discover winning team alliance....Not sure we need this now?
-            const replayPlayer = g.players[g.ingamePlayerId];
+            const g = GameParser.parseRaw(res.data);
 
-            //we need to commit the replay to the DB
-            let updatedDocumentCount = await database.setReplay(message, g);
-            message.channel.send("Results Submitted")
 
-            // and check if game has been uploaded in a non-ELO channel
-            if (!perms.isEloComputed) {
-                MsgHelper.say(message, "This game is unranked")
-            }
-            // and check the game is 1v1, if it isn't warn that results will not be rated
-            else if (g.players.length > 2) {
-                MsgHelper.say(message, "This reply is not a 1v1 player game, outcome will not be used in ELO")
-            }
-            // and check if the game already existed in DB 
-            else if (updatedDocumentCount == 1) {
-                MsgHelper.say(message, "This is a duplicate upload and will not be counted for ELO")
-            }
-            // and check if the game already existed in DB 
-            else if (g.version < 51345) {
-                MsgHelper.say(message, "This replay is from a older version of the game and won't be used in ELO Calcs")
+            const winnerList: RawPlayer[] = []
+            const loserList: RawPlayer[] = []
+
+            const result = g.result.victory > 3 ? g.ingamePlayerId >= g.players.length / 2 : g.ingamePlayerId < g.players.length / 2;
+
+
+            for (const player of g.players) {
+                (result ? player.alliance === 1 : player.alliance === 0) ? winnerList.push(player) : loserList.push(player);
             }
 
-            //determine who won and lost, calculate ELO
-            let winners = ""
-            let loosers = ""
-            let winnerList: RawPlayer[] = []
-            let looserList: RawPlayer[] = []
-            let ratings: { p1: ElosDelta, p2: ElosDelta }
-            const channel = await DiscordBot.bot.channels.fetch(message.channel.id) as ChannelData
-            if (g.result.victory < 3) {
-                for (const player of g.players) {
-                    const playerid = player.name
-                    if (g.players.length == 2) {
-                        if (g.ingamePlayerId == player.alliance) {
-                            loosers += playerid
-                            looserList.push(player)
-                        } else {
-                            winners += playerid
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 4) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 2 || g.ingamePlayerId == 3) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer == player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 6) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 3 || g.ingamePlayerId == 4 || g.ingamePlayerId == 4) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer == player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 8) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 4 || g.ingamePlayerId == 5 || g.ingamePlayerId == 6 || g.ingamePlayerId == 7) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer == player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    }
-                }
-                if (g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345) {
-                    const p1Elo = await database.getElos(winnerList[0].id, message.channel.id, message.guild.id)
-                    const p2Elo = await database.getElos(looserList[0].id, message.channel.id, message.guild.id)
-                    ratings = ratingEng.rateMatch(p1Elo, p2Elo, 1)
-                    await database.setElos(ratings.p1, {impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name})
-                    await database.setElos(ratings.p2, {impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name})
-                    ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5)
-                }
-            } else if (g.result.victory > 3) {
-                for (const player of g.players) {
-                    const playerid = player.name
-                    if (g.players.length == 2) {
-                        if (g.ingamePlayerId != player.alliance) {
-                            loosers += playerid
-                            looserList.push(player)
-                        } else {
-                            winners += playerid
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 4) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 2 || g.ingamePlayerId == 3) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer != player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 6) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 3 || g.ingamePlayerId == 4 || g.ingamePlayerId == 4) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer != player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    } else if (g.players.length == 8) {
-                        let replayPlayer = 0
-                        if (g.ingamePlayerId == 4 || g.ingamePlayerId == 5 || g.ingamePlayerId == 6 || g.ingamePlayerId == 7) {
-                            replayPlayer = 1
-                        }
-                        if (replayPlayer != player.alliance) {
-                            loosers += playerid + "\n"
-                            looserList.push(player)
-                        } else {
-                            winners += playerid + "\n"
-                            winnerList.push(player)
-                        }
-                    }
-                }
-                if (g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345) {
-                    const p1Elo = await database.getElos(winnerList[0].id, message.channel.id, message.guild.id)
-                    const p2Elo = await database.getElos(looserList[0].id, message.channel.id, message.guild.id)
-                    ratings = ratingEng.rateMatch(p1Elo, p2Elo, 1)
-                    await database.setElos(ratings.p1, {impliedName: winnerList[0].name, serverName: message.guild.name, channelName: channel.name})
-                    await database.setElos(ratings.p2, {impliedName: looserList[0].name, serverName: message.guild.name, channelName: channel.name})
-                    ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 5)
-                }
-            } else {
-                winners = "no one"
-                loosers = "everyone"
-                if (g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345) {
-                    const p1Elo = await database.getElos(g.players[0].id, message.channel.id, message.guild.id)
-                    const p2Elo = await database.getElos(g.players[1].id, message.channel.id, message.guild.id)
-                    ratings = ratingEng.rateMatch(p1Elo, p2Elo, .5)
-                    await database.setElos(ratings.p1, {impliedName: g.players[0].name, serverName: message.guild.name, channelName: channel.name})
-                    await database.setElos(ratings.p2, {impliedName: g.players[1].name, serverName: message.guild.name, channelName: channel.name})
-                    ratingEng.doDivisionElo(winnerList[0].deck, looserList[0].deck, 3)
-                }
-            }
-            // For 1v1 Adjust Winner & Losers Fields to be same length
-            if (g.players.length == 2) {
-                const winnersLength = winners.length
-                const losersLength = loosers.length
-                if (winnersLength < 19) {
-                    for (let i = winnersLength; i < 19; i++) {
-                        winners = winners.concat("-")
-                    }
-                } else {
-                    winners = winners.substring(0, 19)
-                }
-                if (losersLength < 20) {
-                    for (let i = losersLength; i < 19; i++) {
-                        loosers = loosers.concat("-")
-                    }
-                } else {
-                    loosers = loosers.substring(0, 19)
-                }
-            }
+            g.players.splice(0, g.players.length);
+            Math.random() < 0.5 ? g.players.push(...winnerList, ...loserList) : g.players.push(...loserList, ...winnerList);
 
-            // Create embed header
-            let embed = new MessageEmbed()
-                .setTitle(g.serverName || "Game")
-                .setColor("#0099ff")
-                .addField("Winner", `||${winners}||`, true)
-                .addField("Loser", `||${loosers}||`, true)
-                .addField("victoryState", `||${misc.victory[g.result.victory]}||`, true)
-                .addField("Duration", `||${Replays.duration(g.result.duration)}||`, true)
-                .setFooter(`Game Version: ${g.version}`)
-                .addField("Score Limit", g.scoreLimit, true)
-                .addField("Time Limit", g.timeLimit, true)
-                .addField('Income Rate', misc.incomeLevel[g.incomeRate], true)
-                .addField('Game Mode', misc.mode[g.gameMode], true)
-                .addField('Starting Points', g.initMoney + " pts", true)
-                .addField('Map', misc.map[g.map_raw], true)
 
-            // If embed is less than 4 we can send in single embed
-            if (g.players.length < 4) {
-                for (const player of g.players) {
-                    let playerid = player.name;
-                    let playerElo = player.elo;
-                    let discordId = ""
-                    //let elo = ""
-                    const discordUser = await database.getDiscordUserFromEugenId(player.id);
-                    if (discordUser)
-                        discordId = discordUser.id
-                    if (discordId != "") {
-                        const user = await DiscordBot.bot.users.fetch(String(discordId))
-                        if (!user)
-                            playerid = "BORKED! Please yell at <@!271792666910392325>"
-                        else
-                            playerid += " *<@!" + user.id + ">*"
-                    } else {
-                        playerid += "(id:" + player.id + ")";
-                    }
+            let longestName = Math.max(...winnerList.map(p => p.name.length), ...loserList.map(p => p.name.length));
 
-                    const raitingsString = (delta: number) => {
-                        let sign = "";
-                        if (delta > 0) sign = "+";
-                        return sign + Math.round(delta)
-                    }
+            let winners = Replays.joinPlayersToString(winnerList, longestName);
+            let losers = Replays.joinPlayersToString(loserList, longestName);
 
-                    // This code is not longer used as the bot has lost the elo db
-                    //if(g.players.length == 2 && updatedDocumentCount == 0 && perms.isEloComputed && g.version >= 51345){
-                    //    if(ratings.p1.eugenId == player.id){
-                    //        if (perms.isChannelEloShown){            
-                    //            elo += `Channel ELO: ||${Math.round(ratings.p1.channelElo)} (${raitingsString(ratings.p1.channelDelta)})||`
-                    //        }
-                    //        if (perms.isServerEloShown){
-                    //            elo += `\nServer ELO: ||${Math.round(ratings.p1.serverElo)}   (${raitingsString(ratings.p1.serverDelta)})||`
-                    //        }
-                    //        if (perms.isGlobalEloShown){
-                    //            elo += `\nGlobal ELO: ||${Math.round(ratings.p1.globalElo)}   (${raitingsString(ratings.p1.globalDelta)})||`
-                    //        }
-                    //    } else if(ratings.p2.eugenId == player.id){
-                    //        if (perms.isChannelEloShown){            
-                    //            elo += `Channel ELO: ||${Math.round(ratings.p2.channelElo)} (${raitingsString(ratings.p2.channelDelta)})||`
-                    //        }
-                    //        if (perms.isServerEloShown){
-                    //            elo += `\nServer ELO: ||${Math.round(ratings.p2.serverElo)}   (${raitingsString(ratings.p2.serverDelta)})||`
-                    //        }
-                    //        if (perms.isGlobalEloShown){
-                    //            elo += `\nGlobal ELO: ||${Math.round(ratings.p2.globalElo)}   (${raitingsString(ratings.p2.globalDelta)})||`
-                    //        }
-                    //    }
-                    //} 
-                    //else {
-                    //        const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
-                    //        if (perms.isChannelEloShown){            
-                    //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-                    //        }
-                    //        if (perms.isServerEloShown){
-                    //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
-                    //        }
-                    //        if (perms.isGlobalEloShown){
-                    //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
-                    //        }
-                    //}
+            await Replays.sendEmbed(message, g, winners, losers);
+        });
+    }
 
-                    // Add the player details to the embed
-                    embed = embed.addField("\u200b", "-------------------------------------------------")
-                        .addField("Player", playerid, false)
-                        .addField("Elo", playerElo, false)
-                        .addField("Division", player.deck.division, true)
-                        .addField("Income", player.deck.income, true)
-                        .addField("Deck Code", player.deck.raw.code, false)
-                        .setTimestamp()
+    private static joinPlayersToString(players: RawPlayer[], longestName: number): string {
+        let result = "";
 
-                    if (player.deck.franchise === "WARNO") {
-                        embed.addField("Deck", `[VIEW](https://war-yes.com/deck-builder?code=${player.deck.raw.code} 'view on war-yes.com')`, false)
+        players.forEach(p => {
 
-                    }
-                }
-            }
-            message.channel.send(embed)
+            //propably not the most optimal way to check for Ai, maybe AICount?
+            let name = '';
 
-            // But if the number so players are equal to or greater than 4 we need to break it over several embeds 
-            if (g.players.length >= 4) {
-                let counter = 0;
-                embed = new MessageEmbed()
-                    .setColor("#0099ff")
-                for (const player of g.players) {
-                    let playerid = player.name;
-                    let playerElo = player.elo;
-                    let discordId = ""
-                    const discordUser = await database.getDiscordUserFromEugenId(player.id);
-                    if (discordUser)
-                        discordId = discordUser.id
-                    if (discordId != "") {
-                        const user = await DiscordBot.bot.users.fetch(String(discordId))
-                        if (!user)
-                            playerid = "BORKED! Please yell at <@!271792666910392325>"
-                        else
-                            playerid += "*<@!" + user.id + ">*"
-                    } else {
-                        playerid += " (id:" + player.id + ")";
-                    }
-                    // This code is no longer used as bot has lost the elo DB
-                    //let elo = ""
-                    //const elox = await DB.getElos(player.id,message.channel.id,message.guild.id)
-                    //        if (perms.isChannelEloShown){            
-                    //            elo += `Channel ELO: ${Math.round(elox.channelElo)}`
-                    //        }
-                    //        if (perms.isServerEloShown){
-                    //            elo += `\nServer ELO: ${Math.round(elox.serverElo)}`
-                    //        }
-                    //        if (perms.isGlobalEloShown){
-                    //            elo += `\nGlobal ELO: ${Math.round(elox.globalElo)}`
-                    //        }
-                    embed = embed.addField("-------------------------------------------------", "\u200B")
-                        .addField("Player", playerid, false)
-                        .addField("Elo", playerElo, false)
-                        .addField("Division", player.deck.division, true)
-                        .addField("Income", player.deck.income, true)
-                        .addField("Deck Code", player.deck.raw.code, false)
+            if (p.name === "" && p.aiLevel < 5)
+                p.name = "AI " + Replays.AILevel[p.aiLevel];
+
+            name = p.name;
+            const maxLength = Math.min(longestName, 20);
+            name = name.substring(0, maxLength);
+            name = name.padEnd(maxLength, '-');
+
+            result += name + "\n";
+        });
+        return result.substring(0, result.length - 1);
+    }
+
+    private static isValidReplay(g: RawGameData): string | null {
+        if (g.players.length != 2) return "playerLength";
+        if (g.aiCount > 0) return "aiCount";
+        if (g.players[0]?.deck?.franchise != "SD2") return "franchise";
+        if (g.gameMode != 1) return "gameMode";
+        if (g.incomeRate != 3) return "incomeRate";
+        if (g.scoreLimit != 2000) return "scoreLimit";
+        return null;
+    }
+
+    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string): Promise<void> {
+        let map = misc.map[g.map_raw];
+
+        if (!map) {
+            const arr = g.map_raw.split('_');
+            map = arr[2];
+            let counter = 3;
+            while (counter < arr.length && isNaN(parseInt(arr[counter][0]))) {
+
+                if (arr[counter] === 'LD') {
                     counter++;
-                    if (counter == 4) {
-                        message.channel.send(embed)
-                        embed = new MessageEmbed()
-                            .setColor("#0099ff")
-                        counter = 0;
-                    }
+                    continue;
                 }
-                message.channel.send(embed)
+
+                map += ' ' + arr[counter];
+                counter++;
             }
 
-        })
+            if (!await Logs.addMap(g.map_raw)) {
+                console.log();
+                console.log('newMap:', g.map_raw);
+                console.log();
+            }
+        }
+
+        let embed = new EmbedBuilder()
+            .setTitle(!g.serverName ? "Game" : g.serverName)
+            // .setTitle("Game")
+            .setColor("#0099ff")
+            .addFields(
+                [
+                    {name: "Winner", value: `||${winners}||`, inline: true},
+                    Replays.blankEmbedField,
+                    {name: "Loser", value: `||${losers}||`, inline: true},
+                    {name: "Map", value: map, inline: true},
+                    {name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true},
+                    {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
+                    {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
+                    Replays.blankEmbedField,
+                    {name: "Time Limit", value: g.timeLimit.toString(), inline: true},
+                    {name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true},
+                    {name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true},
+                    {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
+                ]);
+
+        const playerSeparator: string = "-------------------------------------------";
+        const enemyTeamSeparator: string = "---------------OPPOSING TEAM---------------";
+
+
+        let counter = 1;
+        for (const player of g.players) {
+            const sep = counter === g.players.length / 2 + 1 && g.players.length > 2 ? enemyTeamSeparator : playerSeparator;
+
+            embed.addFields(
+                [{name: "\u200b", value: sep, inline: false},
+                    {name: "Player", value: player.name, inline: false},
+                    {name: "Elo", value: player.elo.toString(), inline: false},
+                    {name: "Division", value: player.deck!.division, inline: true},
+                ]);
+
+            player.deck!.franchise === "WARNO"
+                ? embed.addFields([{
+                    name: "Deck",
+                    value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
+                    inline: false
+                }])
+                :
+                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
+
+            embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
+
+            //every fourth, in the beginning there can be only 2 players
+            //I don't like this, could propably improve it somehow
+            if ((counter % 4 === 0 || counter === 2) && counter !== 0 && counter !== g.players.length) {
+
+                if (g.players.length === 2) break;
+
+                MsgHelper.sendEmbed(message, embed);
+                embed = new EmbedBuilder()
+                    .setColor("#0099ff")
+            }
+            counter++;
+        }
+
+        MsgHelper.sendEmbed(message, embed);
+    }
+
+    static sortPlayers(players: RawPlayer[], winnerAl: number): RawPlayer[] {
+        return [
+            ...players.filter(p => p.alliance === winnerAl),
+            ...players.filter(p => p.alliance !== winnerAl)
+        ];
 
     }
 
+    static getWinnersAndLosers(players: RawPlayer[], winnerAl: number): { winners: RawPlayer[], losers: RawPlayer[] } {
+        const winners: RawPlayer[] = [];
+        const losers: RawPlayer[] = [];
+
+
+        for (const player of players) {
+            const n = players.length;
+
+            if (player.alliance >= n / 2) {
+                winnerAl === 1 ? winners.push(player) : losers.push(player);
+            } else {
+                winnerAl === 0 ? winners.push(player) : losers.push(player);
+            }
+
+
+        }
+
+
+        return {winners: winners, losers: losers}
+    }
+
+    static getGameMode(mapName: string): string {
+        switch (mapName) {
+            case 'CQC':
+                return 'Closer Combat';
+            case 'BKT':
+                return 'Breakthrough';
+            case 'DEST':
+                return 'Destruction';
+            default:
+                return 'Conquest';
+        }
+    }
 
     static duration(seconds: number): string {
         return `${Math.floor(seconds / 60)} Minutes and ${seconds % 60} Seconds`

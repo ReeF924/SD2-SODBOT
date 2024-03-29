@@ -1,31 +1,20 @@
-import { Message, MessageEmbed } from "discord.js";
-import { CommonUtil } from "../general/common";
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
-import { CommandDB } from "./Command";
-import { DB } from "../general/db";
-import { Logs } from "../general/logs";
-import { AdminCommand } from "./admin";
+import {Message, EmbedBuilder} from "discord.js";
+import {CommonUtil} from "../general/common";
+import {DiscordBot, MsgHelper} from "../general/discordBot";
+import {DeckParser} from "sd2-utilities/lib/parser/deckParser"
+import {CommandDB} from "./Command";
+import {DB} from "../general/db";
+import {Logs} from "../general/logs";
+import {AdminCommand} from "./admin";
 
 
+export class MiscCommand extends CommandDB {
 
-export class MiscCommand extends CommandDB  {
-    
-    public constructor(database:DB){
+    public constructor(database: DB) {
         super(database);
     }
 
-    private sodbotReplies = [
-        "Ping! Your shot bounced!",
-        "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
-        "Miss! Your shot couldn't hit the broad side of a barn!",
-        "Miss! Come on bruh, just boogaloo it",
-        "Another miss! Your aim is like Gonzo's analysis....lacking",
-        "Miss! This piat is rubbish, just use your Sherman",
-        "Miss! Just side shot it bro",
-        "Miss! You cabbage, aim straight next time",
-        "Hit! Jerry's in trouble now",
-        "Bounce! You do know that is a King Tiger right?",
+    private piatReplies = [
         "Hit! We're Airborne. We don't start fights, we finish 'em!",
         "Hit! Up the Ox and Bucks. Up the Ox and Bucks.",
         "Hit! There are few things more fundamentally encouraging and stimulating than seeing someone else die.",
@@ -45,13 +34,29 @@ export class MiscCommand extends CommandDB  {
         "Hit, piat goes brrrrrrrrrrrrr",
         "Hit, Jai Mahakali, Ayo Gorkhali!",
         "Hit, Rhodesians never die!",
-        "Miss!, keep practicing, one day you might be able to last 10mins with Nilla",
-        "Hit! Finally it is the piat meta", 
+        "Hit! Finally it is the piat meta",
+        "Hit! I am the piat god, bow before me",
+        "Hit! Allies OP please nerf",
         "Hit! Lets dance I will show you how to tango you hobo",
-        "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?"
-      ];
+        "Hit! Jerry's in trouble now",
+        "Miss! Come on bruh, just boogaloo it",
+        "Miss! Your shot couldn't hit the broad side of a barn!",
+        "Miss! This piat is rubbish, just use your Sherman",
+        "Miss! You cabbage, aim straight next time",
+        "Miss!, keep practicing, one day you might be able to last 10mins with Nilla",
+        "Miss! You know every time you salute the Captain, you make him a target for the Germans. So do us a favor, don't do it. Especially when I'm standing next to him, capisce?",
+        "Miss. You didn't expect me to hit halfway stressed, did you?",
+        "Miss. It's not my fault, the tank stopped out of nowhere!",
+        "You miss 100% of the shots you don't take. Or in your case, 100% of those that you do as well...",
+        "Another miss! Your aim is like Gonzo's analysis....lacking",
+        "Bounce! Next time side shot it bro",
+        "Bounce! You do know that is a King Tiger right?",
+        "Ping! Your shot bounced!",
 
-      private sodbotReplies2 = [
+
+    ];
+
+    private ptrdReplies = [
         "Hit! Target destroyed!",
         "Miss! Mission failed. We'll get em next time!",
         "Miss! Damn it where's my .50 cal",
@@ -65,7 +70,7 @@ export class MiscCommand extends CommandDB  {
         "Hit!, Keep those trucks coming",
         "Hit!, Ura!",
         "Hit! Never tell a soldier that he does not know the cost of war.",
-        "Hit! Every war is different, every war is the same", 
+        "Hit! Every war is different, every war is the same",
         "Hit! Oh no, there are PRTD squads in our rear",
         "Hit! In the silence of the night, we will always hear the screams.",
         "Miss! Maybe you need the piat instead",
@@ -74,9 +79,9 @@ export class MiscCommand extends CommandDB  {
         "Hit!, Another cheese platter sir",
         "Hit!, sneaky sneaky you little ptrd squad",
         "Hit!, hi ho hi ho a transport sniping we go"
-      ];
+    ];
 
-      private sodbotReplies3 = [
+    private sodbotReplies3 = [
         "Hit! Target destroyed!",
         "Hit! We blew him away",
         "Hit! They drew first blood!",
@@ -90,191 +95,183 @@ export class MiscCommand extends CommandDB  {
         "Miss! I am sick and tired of filling body bags with your dumb fucking mistakes.",
         "Miss! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
         "Miss! Come on Marine, you can do better than that",
-        "Hit! Every war is different, every war is the same", 
+        "Hit! Every war is different, every war is the same",
         "Hit! To survive war you gotta become war",
         "Hit!  I eat Green Berets for breakfast. And right now, I'm very hungry!",
         "Hit! A strange game, the only winning move is to not play"
-      ];
+    ];
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private flip(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Heads");
-        } else {
-            MsgHelper.reply(message, "Tails");
+            return;
         }
+        MsgHelper.reply(message, "Tails");
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private faction(message: Message, input: string[]): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(message, "Axis");
-        } else {
-            MsgHelper.reply(message, "Allied");
         }
+        MsgHelper.reply(message, "Allied");
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private help(message: Message, input: string[]): void {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle("Help")
             .setDescription("prefix commands with " + CommonUtil.config('prefix'))
             .addFields([
-                { name: "Maps", value: "rdiv (axis|allies): get a random division from unbanned pool", inline: true },
+                {name: "Maps", value: "rdiv (axis|allies): get a random division from unbanned pool", inline: true},
                 {
                     name: "Divisions", value:
                         "rmap (axis|allies): get a random division from unbanned pool. Can be filtered by allied/axis \n" +
                         "divisions", inline: true
                 },
-                { name: "Misc", value: '', inline: true }
+                {name: "Misc", value: '', inline: true}
             ])
-        message.channel.send(embed);
-    } 
+        message.channel.send({embeds: [embed]});
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private piat(message: Message, input: string[]): void {
-        const name = message.author.username;
-        const k = Math.random();
         const i = Math.random();
-        if (i > 0.80){
+
+        if (message.author.id === '607962880154927113') { //I had to...
+            const replies = this.piatReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
             MsgHelper.reply(
                 message,
-                this.sodbotReplies[Math.floor(Math.random() * this.sodbotReplies.length)],
-                true
+                replies[Math.floor(Math.random() * replies.length)],
             );
-        } else if (i > 0.005) {
+            return;
+        }
+
+
+        if (i > 0.80) {
+            MsgHelper.reply(
+                message,
+                this.piatReplies[Math.floor(Math.random() * this.piatReplies.length)],
+            );
+        } else if (i > 0.05) {
             MsgHelper.reply(message, "Miss!");
             return;
         } else {
-            k < 0.7
-                ? (MsgHelper.reply(message, `You hit!`, true),
-                    setTimeout(() => {
-                        MsgHelper.reply(message, `Just kidding, you didn't.`, true);
-                    }, 5000))
-                : (MsgHelper.say(
-                    message,
-                    `Private ${name} has dishonored himself and dishonored the discord. I have tried to help him. But I have failed.`,
-                    true
-                ),
-                    setTimeout(() => {
-                        MsgHelper.say(
-                            message,
-                            `I have failed because YOU have not helped me. YOU people have not given Private ${name} the proper motivation! `,
-                            true
-                        );
-                        setTimeout(() => {
-                            MsgHelper.say(
-                                message,
-                                `So, from now on, whenever Private ${name} fucks up, I will not punish him! I will punish all of YOU!`,
-                                true
-                            );
-                            setTimeout(() => {
-                                MsgHelper.say(
-                                    message,
-                                    `And the way I see it ladies, you owe me for ONE JELLY DOUGHNUT! NOW GET ON YOUR FACES!`,
-                                    true
-                                );
-                            }, 10000);
-                        }, 10000);
-                    }, 10000));
-                }
+            (MsgHelper.reply(message, `You hit!`),
+                setTimeout(() => {
+                    MsgHelper.reply(message, `Just kidding, you didn't.`);
+                }, 5000));
+        }
     }
+
     private ptrd(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.80){
+        if (i > 0.80) {
             MsgHelper.reply(
                 message,
-                this.sodbotReplies2[Math.floor(Math.random() * this.sodbotReplies2.length)],
-                true
+                this.ptrdReplies[Math.floor(Math.random() * this.ptrdReplies.length)],
             );
-        } else  {
+        } else {
             MsgHelper.reply(message, "Miss!");
             return;
         }
     }
+
     private laws(message: Message, input: string[]): void {
         const name = message.author.username;
         const k = Math.random();
         const i = Math.random();
-        if (i > 0.70){
+        if (i > 0.70) {
             MsgHelper.reply(
                 message,
                 this.sodbotReplies3[Math.floor(Math.random() * this.sodbotReplies3.length)],
-                true
             );
-        } else  {
+        } else {
             MsgHelper.reply(message, "Miss!");
             return;
         }
     }
+
     private deck(message: Message, input: string[]): void {
-        let embed = new MessageEmbed();
-        if(String.length > 0){
+        let embed = new EmbedBuilder();
+        if (String.length > 0) {
             const deck = DeckParser.parse(input[0])
             embed = embed.setTitle(deck.division);
             embed = embed.setDescription(deck.income);
             const a = [];
             const b = [];
             const c = [];
-            for(const unit of deck.units){
+            for (const unit of deck.units) {
                 let u = "";
-                if(unit.count > 1){
+                if (unit.count > 1) {
                     u += unit.count + "x "
                 }
                 u += unit.name;
-                if(unit.raw.transportid != -1){
+                if (unit.raw.transportid != -1) {
                     u += " in " + unit.transport
                 }
-                if( unit.xp == 1) u += " ☆"
-                if( unit.xp == 2) u += " ☆☆"
-                if(unit.phase == 0){
+                if (unit.xp == 1) u += " ☆"
+                if (unit.xp == 2) u += " ☆☆"
+                if (unit.phase == 0) {
                     a.push(u)
-                }else if(unit.phase == 1){
+                } else if (unit.phase == 1) {
                     b.push(u)
-                }else if(unit.phase == 2){
+                } else if (unit.phase == 2) {
                     c.push(u)
                 }
             }
             let astr = "";
-            for(const i of a){
+            for (const i of a) {
                 astr += i + "\n"
             }
             let bstr = ''
-            for(const i of b){
+            for (const i of b) {
                 bstr += i + "\n"
             }
             let cstr = ""
-            for(const i of c){
+            for (const i of c) {
                 cstr += i + "\n"
             }
-            embed = embed.addField("A Phase",astr,true)
-            embed = embed.addField("B Phase",bstr,true)
-            embed = embed.addField("C Phase",cstr,true)
-            embed = embed.setFooter("counts are in # of cards, not # of units")
-            message.channel.send(embed);
+            embed = embed.addFields([
+                {name: "A Phase", value: astr, inline: true},
+                {name: "B Phase", value: bstr, inline: true},
+                {name: "C Phase", value: cstr, inline: true}
+            ]);
+            embed = embed.setFooter({text: "counts are in # of cards, not # of units"})
+            message.channel.send({embeds: [embed]});
         }
     }
+
     private info(message: Message, input: string[]): void {
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setTitle("SODBOT III Info")
             .setDescription("SODBOT III is is the latest version of the Steel Division 2 bot")
             .addFields([
-                { name: "History", value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game.  The bot is now hosted on several Discord servers, all contributing to a Global ELO score for players of Steel Division 2.", inline: false },
+                {
+                    name: "History",
+                    value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game.  The bot is now hosted on several Discord servers, all contributing to a Global ELO score for players of Steel Division 2.",
+                    inline: false
+                },
                 {
                     name: "Created By", value:
                         "SD Nerd HQ Team", inline: false
                 }
             ])
-            message.author.send(embed);
+        message.author.send({embeds: [embed]});
     }
-    public addCommands(bot:DiscordBot): void{
-        bot.registerCommand("flip", this.flip);
-        bot.registerCommand("faction", this.faction);
-        bot.registerCommand("help", this.help);
-        bot.registerCommand("piat",this.piat);
-        bot.registerCommand("ptrd",this.ptrd);
-        bot.registerCommand("laws",this.laws);
-        bot.registerCommand("deck",this.deck);
-        bot.registerCommand("info",this.info);
+
+    public addCommands(bot: DiscordBot): void {
+        bot.registerCommand("flip", this.flip.bind(this));
+        bot.registerCommand("faction", this.faction.bind(this));
+        bot.registerCommand("help", this.help.bind(this));
+        bot.registerCommand("piat", this.piat.bind(this));
+        bot.registerCommand("ptrd", this.ptrd.bind(this));
+        bot.registerCommand("laws", this.laws.bind(this));
+        bot.registerCommand("deck", this.deck.bind(this));
+        bot.registerCommand("info", this.info.bind(this));
     }
 }

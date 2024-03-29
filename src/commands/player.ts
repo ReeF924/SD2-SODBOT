@@ -1,6 +1,6 @@
-import { Message, User } from "discord.js";
+import {Embed, Message, User} from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { EloLadderElement, DB} from "../general/db";
 import { RatingEngine } from "../results/rating";
 import { misc } from "sd2-data";
@@ -15,7 +15,7 @@ export class PlayerCommand extends CommandDB{
         super(database);
     }
     private async getPlayer(message:Message,input:string[],perms:PermissionsSet){
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
         let player:string;
         let icon:string
         //Determine the target player
@@ -40,20 +40,19 @@ export class PlayerCommand extends CommandDB{
             return
         }
         embed.setTitle("Player Details")
-        embed.setColor("75D1EA")
-        embed.addField("Player Name", "<@!"+player+">",false)
-        embed.setThumbnail(icon) 
+        embed.setColor("#75D1EA")
+        embed.addFields([{name: "Player Name", value:"<@!"+player+">",inline:false}]);
+        embed.setThumbnail(icon) ;
         // Add ELO Data
         if (perms.isChannelEloShown){            
-            embed.addField("Channel Rating", Math.round(Elos.channelElo),true)
+            this.addFieldToEmbed(embed, "Channel Rating", Math.round(Elos.channelElo).toString(),true);
         }
         if(perms.isServerEloShown){
-            embed.addField("Server Rating", Math.round(Elos.serverElo),true)
+            this.addFieldToEmbed(embed, "Server Rating", Math.round(Elos.serverElo).toString(),true);
         } 
         if(perms.isGlobalEloShown){
-            embed.addField("Global Rating", Math.round(Elos.globalElo),true)
-
-            embed.addField("\u200b", "\u200b",true)
+            embed.addFields([{name:"Global Rating",value:Math.round(Elos.globalElo).toString(), inline:true},
+                                    {name: "\u200b", value:"\u200b",inline:true }]);
         }    
         // Extract recent games
         const xx = await this.database.getReplaysByEugenId(Elos.eugenId)
@@ -137,7 +136,7 @@ export class PlayerCommand extends CommandDB{
             console.log("No Games found")
         }
         //Send Final Embed  
-       MsgHelper.say(message,embed,false)
+        message.reply({embeds: [embed]});
     }
 
 
@@ -156,9 +155,9 @@ export class PlayerCommand extends CommandDB{
             ladder = await this.database.getServerLadder(message.guild.id);
 
 
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
         embed.setTitle("Top Players")
-        embed.setColor("75D1EA")
+        embed.setColor("#75D1EA")
         var playerDetails = ""
         var yearAgoTime = new Date()
         yearAgoTime.setFullYear(yearAgoTime.getFullYear()-1)
@@ -187,11 +186,12 @@ export class PlayerCommand extends CommandDB{
             MsgHelper.reply(message,"Noone uploaded a ranked replay within a year. The ladder is empty.")
             return;
         }
-        embed.addField("Pos      Elo           Name", playerDetails, true)
+        embed.addFields([{name: "Pos      Elo           Name", value:playerDetails, inline:true}])
         //Send Final Embed
         //embed.setDescription("For full global leaderboard please goto http://eugenplz.com") --site isn't ready
-        embed.setFooter("Only those players who have been involved in a submitted match in the last year will appear in the ladder")
-        MsgHelper.say(message,embed,false)
+        embed.setFooter({text:"Only those players who have been involved in a submitted match in the last year will appear in the ladder"})
+
+        MsgHelper.sendEmbed(message,embed);
     }
 
 
@@ -227,9 +227,13 @@ export class PlayerCommand extends CommandDB{
                 })()
             }
         }
+
+        private addFieldToEmbed(embed:EmbedBuilder,field:string,value:string,inline:boolean):EmbedBuilder{
+            return embed.addFields([{name:field,value:value,inline:inline}])
+        }
         public addCommands(bot:DiscordBot):void{
-            bot.registerCommand("player",this.getPlayer);
-            bot.registerCommand("ladder",this.getLadder);
-            bot.registerCommand("register",this.register)
+            bot.registerCommand("player",this.getPlayer.bind(this));
+            bot.registerCommand("ladder",this.getLadder.bind(this));
+            bot.registerCommand("register",this.register.bind(this));
         }
 }

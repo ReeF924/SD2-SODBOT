@@ -4,7 +4,8 @@
     "target": "ES6",       
     "module": "commonjs",  
     "outDir": "./dist",    
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": ["./src/**/*"],
   "exclude": [
