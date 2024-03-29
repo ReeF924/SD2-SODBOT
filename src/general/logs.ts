@@ -30,6 +30,11 @@ export class Logs {
 
     static async addMap(mapName: string): Promise<boolean> {
         const filePath = path.join(__dirname, '..', '..', 'toAddMaps.log');
+
+        if(fs.existsSync(filePath) === false) {
+            fs.writeFileSync(filePath, '');
+        }
+
         const fileStream = fs.createReadStream(filePath);
 
         const rl = readline.createInterface({

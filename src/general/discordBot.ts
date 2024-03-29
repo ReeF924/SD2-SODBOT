@@ -91,7 +91,7 @@ export class DiscordBot {
 
         if (perms.areReplaysBlocked) return;
 
-        const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
+        const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
             Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
             try {

@@ -48,7 +48,7 @@ export class Replays {
             let winners = Replays.joinPlayersToString(winnerList, longestName);
             let losers = Replays.joinPlayersToString(loserList, longestName);
 
-            await Replays.sendEmbed(message, g, database, winners, losers);
+            await Replays.sendEmbed(message, g, winners, losers);
         });
     }
 
@@ -77,14 +77,13 @@ export class Replays {
         if (g.players.length != 2) return "playerLength";
         if (g.aiCount > 0) return "aiCount";
         if (g.players[0]?.deck?.franchise != "SD2") return "franchise";
-        if (g.gameMode != 1) return "gameMode"; //Check misc.js after
+        if (g.gameMode != 1) return "gameMode";
         if (g.incomeRate != 3) return "incomeRate";
         if (g.scoreLimit != 2000) return "scoreLimit";
         return null;
     }
 
-    static async sendEmbed(message: Message, g: RawGameData, database: DB, winners: string, losers: string): Promise<void> {
-
+    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string): Promise<void> {
         let map = misc.map[g.map_raw];
 
         if (!map) {
@@ -108,11 +107,14 @@ export class Replays {
                 console.log();
             }
         }
+
         let embed = new EmbedBuilder()
-            .setTitle(g.serverName == 'undefined' ? "Game" : g.serverName)
+            .setTitle(!g.serverName ? "Game" : g.serverName)
+            // .setTitle("Game")
             .setColor("#0099ff")
             .addFields(
-                [{name: "Winner", value: `||${winners}||`, inline: true},
+                [
+                    {name: "Winner", value: `||${winners}||`, inline: true},
                     Replays.blankEmbedField,
                     {name: "Loser", value: `||${losers}||`, inline: true},
                     {name: "Map", value: map, inline: true},
