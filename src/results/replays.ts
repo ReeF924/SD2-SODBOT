@@ -29,7 +29,6 @@ export class Replays {
             const g = GameParser.parseRaw(res.data);
 
 
-            //determine who won and lost, calculate ELO
             const winnerList: RawPlayer[] = []
             const loserList: RawPlayer[] = []
 
@@ -57,8 +56,8 @@ export class Replays {
         let result = "";
 
         players.forEach(p => {
-            //propably not the most optimal way to check for Ai, maybe AICount?
 
+            //propably not the most optimal way to check for Ai, maybe AICount?
             let name = '';
 
             if (p.name === "" && p.aiLevel < 5)
@@ -88,12 +87,12 @@ export class Replays {
 
         let map = misc.map[g.map_raw];
 
-        //Not great, but propably the best I can do
         if (!map) {
             const arr = g.map_raw.split('_');
             map = arr[2];
             let counter = 3;
-            while (isNaN(parseInt(arr[counter][0])) && counter <= arr.length) {
+            while (counter < arr.length && isNaN(parseInt(arr[counter][0]))) {
+
                 if (arr[counter] === 'LD') {
                     counter++;
                     continue;
@@ -104,14 +103,13 @@ export class Replays {
             }
 
             if (!await Logs.addMap(g.map_raw)) {
-                MsgHelper.say(message, "Map not found, please contact <@607962880154927113> to add it.");
+                console.log();
+                console.log('newMap:', g.map_raw);
+                console.log();
             }
         }
-
-        // Create embed header
-        //temp, to make the debug easier
         let embed = new EmbedBuilder()
-            .setTitle(!g.serverName || g.serverName === 'undefined' ? "Game" : g.serverName)
+            .setTitle(g.serverName == 'undefined' ? "Game" : g.serverName)
             .setColor("#0099ff")
             .addFields(
                 [{name: "Winner", value: `||${winners}||`, inline: true},
@@ -128,8 +126,8 @@ export class Replays {
                     {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
                 ]);
 
-        const playerSeparator: string = "---------------------------------------------------";
-        const enemyTeamSeparator: string = "-------------------OPPOSING TEAM-------------------";
+        const playerSeparator: string = "-------------------------------------------";
+        const enemyTeamSeparator: string = "---------------OPPOSING TEAM---------------";
 
 
         let counter = 1;
@@ -143,20 +141,16 @@ export class Replays {
                     {name: "Division", value: player.deck!.division, inline: true},
                 ]);
 
-            player.deck!.franchise === "SD2"
+            player.deck!.franchise === "WARNO"
                 ? embed.addFields([{
-                    name: "Income",
-                    value: player.deck!.income,
-                    inline: true
-                }])
-                : embed.addFields([{
                     name: "Deck",
                     value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
                     inline: false
-                }]);
+                }])
+                :
+                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
 
             embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
-
 
             //every fourth, in the beginning there can be only 2 players
             //I don't like this, could propably improve it somehow
@@ -173,7 +167,6 @@ export class Replays {
 
         MsgHelper.sendEmbed(message, embed);
     }
-
 
     static sortPlayers(players: RawPlayer[], winnerAl: number): RawPlayer[] {
         return [

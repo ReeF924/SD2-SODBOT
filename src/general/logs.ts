@@ -1,8 +1,9 @@
 import * as winston from "winston";
 import {CommonUtil} from "./common";
-import * as fs from 'fs';
+import * as fs from "fs";
 import * as readline from "readline";
-import  * as path from 'path';
+import * as path from "path";
+
 export class Logs {
     static logger: winston.Logger;
 
@@ -27,21 +28,22 @@ export class Logs {
             Logs.logger.log("error", message);
     }
 
-    static async addMap(mapName:string): Promise<boolean>{
-        const filePath = path.join(__dirname,'..', '..',  'toAddMaps.log');
-
+    static async addMap(mapName: string): Promise<boolean> {
+        const filePath = path.join(__dirname, '..', '..', 'toAddMaps.log');
         const fileStream = fs.createReadStream(filePath);
 
-        const rl = readline.createInterface({input: fileStream, crlfDelay: Infinity});
+        const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity
+        });
 
         for await (const line of rl) {
-            if(line === mapName){
-                console.log(line);
+            if (line === mapName) {
                 return true;
             }
         }
 
-        fs.appendFile(filePath, mapName + "\n", (err) => {
+        fs.appendFile(filePath, mapName + '\n', (err) => {
             if (err) {
                 Logs.error(err);
                 return false;
