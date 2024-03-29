@@ -135,7 +135,7 @@ export class MapCommand {
         if (count > 1) {
             const maps = getRandomMaps(maplist, count)
             Logs.log(message.author.id + " has picked " + maps.join(",") + " from " + JSON.stringify(maplist) + " side: " + input);
-            message.reply(maps.join(", "));
+            MsgHelper.reply(message, maps.join(", "));
             return;
         }
 

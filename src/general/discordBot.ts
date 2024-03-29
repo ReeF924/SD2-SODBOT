@@ -1,48 +1,58 @@
 `use strict`
 
 import {CommonUtil} from "./common";
-import {Client, Message, IntentsBitField, EmbedBuilder, Collection, SlashCommandBuilder} from "discord.js";
+import {Client, Message, IntentsBitField, EmbedBuilder, SlashCommandBuilder, Collection} from "discord.js";
 import {Logs} from "./logs";
 import {Replays} from "../results/replays";
 import {Permissions, PermissionsSet} from "./permissions"
 import {DB} from "./db";
 
-const {GatewayIntentBits} = require('discord.js');
-
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
-
+class DiscordClient extends Client{
+    commands: Collection<string, SlashCommandBuilder>;
+    constructor(intents: IntentsBitField, commands: Collection<string, SlashCommandBuilder>){
+        super({intents: intents});
+        this.commands = new Collection();
+    }
+}
 export class DiscordBot {
-
-    static bot: Client;
-    private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
+    public DiscordClient: DiscordClient;
+    private static instance: DiscordBot;
+    // private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
     private database: DB;
 
-    constructor(database: DB) {
+    private constructor(database: DB) {
         //this.loadBlacklist();
         this.database = database;
 
         const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
 
-        DiscordBot.bot = new Client({intents: intents});
+        const client = new Client({intents: intents});
+        this.DiscordClient = new DiscordClient(intents, new Collection());
 
-        DiscordBot.bot.on("messageCreate", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", async () => {
-            await this.onReady(database);
-        });
-        DiscordBot.bot.on("error", this.onError.bind(this));
-        // DiscordBot.bot.on('', this.onError.bind(this));
+
+    }
+
+    public static getInstance(database: DB): DiscordBot {
+        if (!this.instance) {
+            this.instance = new DiscordBot(database);
+        }
+        return this.instance;   
     }
 
     login(): void {
-        DiscordBot.bot.login(process.env.DISCORD_TOKEN);
+        this.DiscordClient.login(process.env.DISCORD_TOKEN);
     }
 
-    registerCommand(command: string, funct: BotCommand): void {
-        this.commands[command] = funct;
+    registerCommand(slashCommand: SlashCommandBuilder, commandFunc): void {
+        this.DiscordClient.commands.set(slashCommand.name ,slashCommand);
     }
 
     removeCommand(command: string): void {
-        this.commands.delete(command);
+        const index = this.DiscordClient.commands.findIndex((c) => c.name === command);
+        if (index >= 0) {
+            this.DiscordClient.commands.splice(index, 1);
+        }
     }
 
     private onError(message: unknown) {
@@ -106,7 +116,7 @@ export class DiscordBot {
 
     private async onReady(database: DB) {
         Logs.log(`Bot Online!`);
-        DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
+        this.DiscordClient.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: 2
         });
 

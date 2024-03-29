@@ -4,6 +4,8 @@
   "botName": "SODBOT II ",
   "version": "1.1.0",
   "token": "",
+  "clientId": "",
+  "guildId": "",
   "tts_enabled_global": true,
   "max_purge_num": 20,
   "k_value": 32,

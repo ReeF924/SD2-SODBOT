@@ -172,7 +172,7 @@ export class AdminCommand extends CommandDB {
             MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been reset back to default settings.")
         }
         else {
-            MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
+            MsgHelper.reply(message, "Command not formatted correctly, this command just takes a channel id only as its argument")
         }
     }
 
