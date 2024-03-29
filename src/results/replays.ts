@@ -5,6 +5,7 @@ import * as axios from "axios"
 import {DB} from "../general/db";
 import {DiscordBot, MsgHelper} from "../general/discordBot";
 import {PermissionsSet} from "../general/permissions";
+import {Logs} from "../general/logs";
 
 const ax = axios.default;
 //todo maps - 2v2..., mode - brk, cqc, meet, maybe add to embed? (display only if not default?)
@@ -28,7 +29,6 @@ export class Replays {
             const g = GameParser.parseRaw(res.data);
 
 
-            //determine who won and lost, calculate ELO
             const winnerList: RawPlayer[] = []
             const loserList: RawPlayer[] = []
 
@@ -56,8 +56,8 @@ export class Replays {
         let result = "";
 
         players.forEach(p => {
-            //propably not the most optimal way to check for Ai, maybe AICount?
 
+            //propably not the most optimal way to check for Ai, maybe AICount?
             let name = '';
 
             if (p.name === "" && p.aiLevel < 5)
@@ -86,16 +86,30 @@ export class Replays {
     static async sendEmbed(message: Message, g: RawGameData, database: DB, winners: string, losers: string): Promise<void> {
 
         let map = misc.map[g.map_raw];
-        if (!map) {
-            //Pure guess, it's usually the name, but not always, better than nothing tho
-            map = g.map_raw.split('_')[2];
-            MsgHelper.say(message, "Map not found, please contact <@607962880154927113> to add it.");
-        }
 
-        // Create embed header
-        //temp, to make the debug easier
+        if (!map) {
+            const arr = g.map_raw.split('_');
+            map = arr[2];
+            let counter = 3;
+            while (counter < arr.length && isNaN(parseInt(arr[counter][0]))) {
+
+                if (arr[counter] === 'LD') {
+                    counter++;
+                    continue;
+                }
+
+                map += ' ' + arr[counter];
+                counter++;
+            }
+
+            if (!await Logs.addMap(g.map_raw)) {
+                console.log();
+                console.log('newMap:', g.map_raw);
+                console.log();
+            }
+        }
         let embed = new EmbedBuilder()
-            .setTitle(g.serverName || "Game")
+            .setTitle(g.serverName == 'undefined' ? "Game" : g.serverName)
             .setColor("#0099ff")
             .addFields(
                 [{name: "Winner", value: `||${winners}||`, inline: true},
@@ -112,10 +126,8 @@ export class Replays {
                     {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
                 ]);
 
-        const playerSeparator: string = "---------------------------------------------------";
-        const enemyTeamSeparator: string = "-------------------OPPOSING TEAM-------------------";
-
-        // g.players = Replays.sortPlayers(g.players, g.ingamePlayerId);
+        const playerSeparator: string = "-------------------------------------------";
+        const enemyTeamSeparator: string = "---------------OPPOSING TEAM---------------";
 
 
         let counter = 1;
@@ -127,17 +139,18 @@ export class Replays {
                     {name: "Player", value: player.name, inline: false},
                     {name: "Elo", value: player.elo.toString(), inline: false},
                     {name: "Division", value: player.deck!.division, inline: true},
-                    {name: "Income", value: player.deck!.income, inline: true},
-                    {name: "Deck Code", value: player.deck!.raw.code, inline: false}]
-            );
+                ]);
 
-            if (player.deck!.franchise === "WARNO") {
-                embed.addFields([{
+            player.deck!.franchise === "WARNO"
+                ? embed.addFields([{
                     name: "Deck",
                     value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
                     inline: false
-                }]);
-            }
+                }])
+                :
+                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
+
+            embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
 
             //every fourth, in the beginning there can be only 2 players
             //I don't like this, could propably improve it somehow
