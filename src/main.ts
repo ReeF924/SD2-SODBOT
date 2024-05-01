@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import { MiscCommand} from "./commands/misc";
-import { HelpCommand} from "./commands/help";
-import { PlayerCommand } from "./commands/player";
-import { AdminCommand } from "./commands/admin";
+import { MiscCommand } from "./commands/misc";
+import { HelpCommand } from "./commands/help";
+// import { PlayerCommand } from "./commands/player";
+// import { AdminCommand } from "./commands/admin";
 import { MatchupCommand } from "./commands/matchup"
 
 import { CommonUtil } from "./general/common";
@@ -20,30 +20,33 @@ import { match } from 'assert';
 
 const p = require("../package.json")
 
-const database:DB = new DB(); 
-CommonUtil.init(database);
+CommonUtil.init();
 Logs.init();
 
 smp.install();
 Logs.log("Starting Bot");
-const bot = new DiscordBot(database);
-const adminCommand: AdminCommand = new AdminCommand(database);
-const miscCommand: MiscCommand = new MiscCommand(database);
-const playerCommand: PlayerCommand = new PlayerCommand(database);
+const bot = DiscordBot.getInstance();
+
+const database = new DB();
+
+
+// const adminCommand: AdminCommand = new AdminCommand(database);
+// const playerCommand: PlayerCommand = new PlayerCommand(database);
+const miscCommand: MiscCommand = new MiscCommand();
 const divCommand: DivisionCommand = new DivisionCommand();
-const mapCommand: MapCommand = new MapCommand(); 
+const mapCommand: MapCommand = new MapCommand();
 const helpCommand: HelpCommand = new HelpCommand();
 const matchCommand: MatchupCommand = new MatchupCommand();
 
-adminCommand.addCommands(bot);
+// adminCommand.addCommands(bot);
+// playerCommand.addCommands(bot);
 miscCommand.addCommands(bot);
-playerCommand.addCommands(bot);
 divCommand.addCommands(bot);
 mapCommand.addCommands(bot);
 helpCommand.addCommands(bot);
 matchCommand.addCommands(bot);
+bot.init(database);
 
-bot.login();
 const healthcheck = http.createServer(function (req, res) {
     Logs.log(req);
     res.write("pong");

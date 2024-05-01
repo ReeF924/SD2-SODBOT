@@ -1,11 +1,11 @@
-import {Message, EmbedBuilder, EmbedField} from "discord.js"
-import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
-import {misc, maps} from "sd2-data"
+import { Message, EmbedBuilder, EmbedField } from "discord.js"
+import { GameParser, RawGameData, RawPlayer } from "sd2-utilities/lib/parser/gameParser"
+import { misc, maps } from "sd2-data"
 import * as axios from "axios"
-import {DB} from "../general/db";
-import {DiscordBot, MsgHelper} from "../general/discordBot";
-import {PermissionsSet} from "../general/permissions";
-import {Logs} from "../general/logs";
+import { DB } from "../general/db";
+import { DiscordBot, MsgHelper } from "../general/discordBot";
+import { PermissionsSet } from "../general/permissions";
+import { Logs } from "../general/logs";
 
 const ax = axios.default;
 //todo maps - 2v2..., mode - brk, cqc, meet, maybe add to embed? (display only if not default?)
@@ -13,7 +13,7 @@ const ax = axios.default;
 //todo crases when there are multiple players? maybe something to do with db save?cd
 
 export class Replays {
-    private static readonly blankEmbedField: EmbedField = {name: '\u200b', value: '\u200b', inline: true};
+    private static readonly blankEmbedField: EmbedField = { name: '\u200b', value: '\u200b', inline: true };
 
     //todo delete, will be in sdData
     private static readonly AILevel = {
@@ -24,10 +24,9 @@ export class Replays {
         4: "Very Hard"
     }
 
-    static extractReplayInfo(message: Message, perms: PermissionsSet, database: DB, url: string): void {
+    static extractReplayInfo(message: Message, database: DB, url: string): void {
         ax.get(url).then(async (res) => {
             const g = GameParser.parseRaw(res.data);
-
 
             const winnerList: RawPlayer[] = []
             const loserList: RawPlayer[] = []
@@ -58,6 +57,11 @@ export class Replays {
         players.forEach(p => {
 
             //propably not the most optimal way to check for Ai, maybe AICount?
+
+            const regex = new RegExp("[Kk]oenig");
+
+            p.name.replace(regex, "Koneig")
+
             let name = '';
 
             if (p.name === "" && p.aiLevel < 5)
@@ -103,27 +107,25 @@ export class Replays {
             }
 
             if (!await Logs.addMap(g.map_raw)) {
-                console.log();
-                console.log('newMap:', g.map_raw);
-                console.log();
+                console.log('\nnewMap:', g.map_raw + '\n');
             }
         }
         let embed = new EmbedBuilder()
             .setTitle(g.serverName == 'undefined' ? "Game" : g.serverName)
             .setColor("#0099ff")
             .addFields(
-                [{name: "Winner", value: `||${winners}||`, inline: true},
-                    Replays.blankEmbedField,
-                    {name: "Loser", value: `||${losers}||`, inline: true},
-                    {name: "Map", value: map, inline: true},
-                    {name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true},
-                    {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
-                    {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
-                    Replays.blankEmbedField,
-                    {name: "Time Limit", value: g.timeLimit.toString(), inline: true},
-                    {name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true},
-                    {name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true},
-                    {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
+                [{ name: "Winner", value: `||${winners}||`, inline: true },
+                Replays.blankEmbedField,
+                { name: "Loser", value: `||${losers}||`, inline: true },
+                { name: "Map", value: map, inline: true },
+                { name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true },
+                { name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true },
+                { name: "Score Limit", value: g.scoreLimit.toString(), inline: true },
+                Replays.blankEmbedField,
+                { name: "Time Limit", value: g.timeLimit.toString(), inline: true },
+                { name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true },
+                { name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true },
+                { name: "Starting Points", value: `${g.initMoney} pts`, inline: true },
                 ]);
 
         const playerSeparator: string = "-------------------------------------------";
@@ -135,10 +137,10 @@ export class Replays {
             const sep = counter === g.players.length / 2 + 1 && g.players.length > 2 ? enemyTeamSeparator : playerSeparator;
 
             embed.addFields(
-                [{name: "\u200b", value: sep, inline: false},
-                    {name: "Player", value: player.name, inline: false},
-                    {name: "Elo", value: player.elo.toString(), inline: false},
-                    {name: "Division", value: player.deck!.division, inline: true},
+                [{ name: "\u200b", value: sep, inline: false },
+                { name: "Player", value: player.name, inline: false },
+                { name: "Elo", value: player.elo.toString(), inline: false },
+                { name: "Division", value: player.deck!.division, inline: true },
                 ]);
 
             player.deck!.franchise === "WARNO"
@@ -148,9 +150,9 @@ export class Replays {
                     inline: false
                 }])
                 :
-                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
+                embed.addFields([{ name: "Income", value: player.deck!.income, inline: true }]);
 
-            embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
+            embed.addFields([{ name: "Deck Code", value: player.deck!.raw.code, inline: false }]);
 
             //every fourth, in the beginning there can be only 2 players
             //I don't like this, could propably improve it somehow
@@ -158,14 +160,15 @@ export class Replays {
 
                 if (g.players.length === 2) break;
 
-                MsgHelper.sendEmbed(message, embed);
+                message.channel.send({ embeds: [embed] });
                 embed = new EmbedBuilder()
                     .setColor("#0099ff")
             }
             counter++;
         }
 
-        MsgHelper.sendEmbed(message, embed);
+        // MsgHelper.sendEmbed(message, embed);
+        message.channel.send({ embeds: [embed] });
     }
 
     static sortPlayers(players: RawPlayer[], winnerAl: number): RawPlayer[] {
@@ -194,7 +197,7 @@ export class Replays {
         }
 
 
-        return {winners: winners, losers: losers}
+        return { winners: winners, losers: losers }
     }
 
     static getGameMode(mapName: string): string {

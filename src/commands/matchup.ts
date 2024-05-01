@@ -1,11 +1,10 @@
-import {Embed, Message} from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
-import { CommonUtil } from "../general/common";
-import { Logs } from "../general/logs";
 import { EmbedBuilder } from "discord.js";
-import { log } from "console";
+import { match } from "assert";
+
 
 
 function pickRandomDiv(divs) {
@@ -15,9 +14,9 @@ function pickRandomDiv(divs) {
 }
 
 
-function createMatchup(divs) {
-    const divA = pickRandomDiv(divs)
-    const divB = pickRandomDiv(divs)
+function createMatchup(firstDivPool, secondDivPool) {
+    const divA = pickRandomDiv(firstDivPool)
+    const divB = pickRandomDiv(secondDivPool)
 
     const matchup = `${divA.name} vs ${divB.name}`
     return matchup
@@ -27,40 +26,35 @@ function createMatchup(divs) {
 export class MatchupCommand {
 
 
-    private randomMatchup(message: Message, input: string[]): void {
+    private randomMatchup(input: ChatInputCommandInteraction): void {
         let divs: DivisionStruct[] = [];
 
-        let [side = "sd2", count = 1] = input[0].toLowerCase().split(" ")
-        side = side || "sd2"
-        count = Math.min(parseInt(`${count}` || "1"), 20)
-        console.log({side, count})
+        const game = input.options.getString("game") ?? "sd2";
+        const count = input.options.getInteger("count") ?? 1;
 
-        if (input.length == 0) {
-            MsgHelper.reply(message, "Unknown game, please specify 'sd2' or 'warno'");
-            return;
+        if (game == "sd2") divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
+        if (game == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
+
+
+        let i = 1
+        let output = ""
+
+        for (let i = 0; i <= count; i++) {
+            const matchup = createMatchup(divs, divs)
+            output += `${i + 1}) \t ${matchup} \n`
         }
 
-        if (side == "sd2") divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
-        if (side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
- 
-        
-        let i = 0
-        let out = ""
-        while(i < count){
-            i++
-            const matchup = createMatchup(divs)
-            out += `${i}) \t ${matchup} \n`
-        }
-
-        let embed = new EmbedBuilder()
-        embed = embed.addFields(
-            { name: `Matchups ${side}`, value: out, inline: true },
-        )
-
-        message.channel.send({ embeds: [embed]});
-
+        MsgHelper.say(input, output);
     }
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("matchup", this.randomMatchup.bind(this));
+        const matchup = new SlashCommandBuilder().setName("matchup").setDescription("Random matchup generator");
+        matchup.addStringOption(option => option.setName("game").setDescription("Game to pick from. Default: 'sd2'")
+            .setRequired(false).setChoices({ name: "sd2", value: "sd2" }, { name: "warno", value: "warno" }))
+            .addIntegerOption(option => option.setName("count").setDescription("Number of matchups to generate. Default: 1")
+                .setRequired(false).setMinValue(1).setMaxValue(10))
+            .addBooleanOption(option => option.setName("oppositeFactions").setDescription("Specifies whether the matchups can be mirror sides.")
+                .setRequired(false));
+
+        bot.registerCommand(matchup, this.randomMatchup.bind(this));
     }
 }

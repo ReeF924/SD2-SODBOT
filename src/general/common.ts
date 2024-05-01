@@ -1,17 +1,15 @@
-import {Logs} from "./logs";
+import { Logs } from "./logs";
 import * as fs from 'fs';
 import * as Levenshtein from 'levenshtein';
-import {DB} from "./db";
+import { DB } from "./db";
 export class CommonUtil {
 
     static configData: Map<string, unknown> = new Map<string, unknown>();
-    static database: DB;
 
-    static init(database: DB): void {
-        CommonUtil.database = database;
+    static init(): void {
         //load config file;
         try {
-            const load = JSON.parse(fs.readFileSync("config.json", {encoding: "utf8"}));
+            const load = JSON.parse(fs.readFileSync("config.json", { encoding: "utf8" }));
             for (const key of Object.keys(load)) {
                 this.configData[key.toLocaleLowerCase()] = load[key];
             }
