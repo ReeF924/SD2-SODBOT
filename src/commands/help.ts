@@ -201,7 +201,7 @@ export class HelpCommand {
         ]);
         input.reply({ embeds: [embed], ephemeral: true });
     }
-    private helpReplays(message: ChatInputCommandInteraction) {
+    private helpReplays(input: ChatInputCommandInteraction) {
         const embed = this.createEmbed("Help - Replays", [
             {
                 name: "Uploading a game replay",
@@ -234,9 +234,9 @@ export class HelpCommand {
                 inline: false
             }
         ])
-        message.user.send({ embeds: [embed] });
+        input.reply({ embeds: [embed], ephemeral: true });
     }
-    private helpAdmins(message: ChatInputCommandInteraction) {
+    private helpAdmins(input: ChatInputCommandInteraction) {
         const embed = this.createEmbed("Help - Admin commands", [
             {
                 name: "/primarymode",
@@ -254,7 +254,7 @@ export class HelpCommand {
                 inline: false
             }
         ]);
-        message.user.send({ embeds: [embed] });
+        input.reply({ embeds: [embed], ephemeral: true });
     }
 
 
@@ -267,14 +267,14 @@ export class HelpCommand {
 
     public addCommands(bot: DiscordBot): void {
         const help = new SlashCommandBuilder()
-            .setName("foobartest")
+            .setName("help")
             .setDescription("Sends a DM with additional information about the commands");
 
 
         help.addStringOption(option => option.setName("category")
             .setDescription("The category of commands you want help with.")
             .setChoices({ name: "maps", value: "maps" }, { name: "divs", value: "divs" },
-                { name: "misc", value: "misc" }, { name: "player", value: "player" },
+                { name: "misc", value: "misc" },// { name: "player", value: "player" },
                 { name: "replays", value: "replays" }, { name: "admin", value: "admin" }));
 
         bot.registerCommand(help, this.help.bind(this));

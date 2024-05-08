@@ -53,16 +53,24 @@ export class DivisionCommand {
     private allDivs(input: ChatInputCommandInteraction): void {
         let alliedDivs = "";
         let axisDivs = "";
-        for (let i = 0; i < divisions.divisionsAllies.length; i++) {
-            if (divisions.divisionsAllies[i]) alliedDivs += divisions.divisionsAllies[i].name + '\n';
-            if (divisions.divisionsAxis[i]) axisDivs += divisions.divisionsAxis[i].name + '\n';
-        }
-        const alliedDivsEmbed = new EmbedBuilder()
-            .setTitle("-- All Divisions --");
-        alliedDivsEmbed.addFields({ name: 'Allied Divisions', value: alliedDivs, inline: true });
 
-        let axisDivsEmbed = new EmbedBuilder();
-        axisDivsEmbed = axisDivsEmbed.addFields({ name: "Axis Divisions", value: axisDivs, inline: true });
+
+        const alliedDivsEmbed = new EmbedBuilder().setTitle("-- All Divisions --");
+
+        alliedDivs = divisions.divisionsAllies.slice(0, divisions.divisionsAllies.length / 2).map(x => x.name).join('\n');
+        alliedDivsEmbed.addFields({ name: '\u200b', value: alliedDivs, inline: true });
+
+        alliedDivs = divisions.divisionsAllies.slice(divisions.divisionsAllies.length / 2).map(x => x.name).join('\n');
+        alliedDivsEmbed.addFields({ name: '\u200b', value: alliedDivs, inline: true });
+
+
+        const axisDivsEmbed = new EmbedBuilder();
+        axisDivs = divisions.divisionsAxis.slice(0, divisions.divisionsAxis.length / 2).map(x => x.name).join('\n');
+        axisDivsEmbed.addFields({ name: '\u200b', value: axisDivs, inline: true });
+
+        axisDivs = divisions.divisionsAxis.slice(divisions.divisionsAxis.length / 2).map(x => x.name).join('\n');
+        axisDivsEmbed.addFields({ name: '\u200b', value: axisDivs, inline: true });
+
         input.channel.send({ embeds: [alliedDivsEmbed, axisDivsEmbed] });
     }
 

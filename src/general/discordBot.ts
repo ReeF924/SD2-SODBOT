@@ -10,7 +10,9 @@ import {
     Collection,
     BaseInteraction, ChatInputCommandInteraction,
     REST,
-    Routes
+    Routes,
+    GuildManager,
+    Guild
 } from "discord.js";
 
 import { Logs } from "./logs";
@@ -47,26 +49,11 @@ export class DiscordBot {
 
         const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
 
-        // const client = new Client({intents: intents});
         this.DiscordClient = new DiscordClient(intents, new Collection());
 
         this.DiscordClient.on("ready", () => this.onReady(database));
-        // this.DiscordClient.on("messageCreate", (message) => this.onMessage(message));
-        this.DiscordClient.on("interactionCreate", (interaction: ChatInputCommandInteraction) => {
-            if (!interaction.isChatInputCommand()) return;
 
-            const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
-
-            //not sure if this is needed, but y not :D
-            if (!command) {
-                interaction.reply("unknown command");
-                return;
-            }
-
-            command.execute(interaction);
-
-            // interaction.reply("success");
-        });
+        this.DiscordClient.on("interactionCreate", (interaction: ChatInputCommandInteraction) => this.onInteraction(interaction));
 
         this.DiscordClient.on("messageCreate", (message: Message) => {
             if (message.author.bot) return;
@@ -76,28 +63,17 @@ export class DiscordBot {
 
 
     }
-    public init(database: DB): void {
+    public async init(database: DB, registerCommands: boolean = true): Promise<void> {
         this.database = database;
-        this.DiscordClient.login(process.env.DISCORD_TOKEN);
 
+        const token = process.env.DISCORD_TOKEN;
 
-        //registering commands
+        await this.DiscordClient.login(token);
+
+        if (!registerCommands) return;
+
         const rest = new REST().setToken(process.env.DISCORD_TOKEN);
-        (async () => {
-            try {
-                const commandsArray = this.DiscordClient.commands.map(command => command.data.toJSON());
-
-                const data = await rest.put(Routes.applicationCommands("1218688003262644334"), {
-                    body: commandsArray
-                });
-
-                Logs.log(`Successfully reloaded application (/) commands.`);
-            } catch (error) {
-                // And of course, make sure you catch and log any errors!
-                console.error(error);
-            }
-        })();
-
+        this.registerCommands(rest);
     }
 
     public static getInstance(): DiscordBot {
@@ -107,44 +83,53 @@ export class DiscordBot {
         return this.instance;
     }
 
-    registerCommand(slashCommand: SlashCommandBuilder, commandBody: (interaction: ChatInputCommandInteraction) => Promise<void>): void {
+    public registerCommand(slashCommand: SlashCommandBuilder, commandBody: (interaction: ChatInputCommandInteraction) => Promise<void>): void {
         this.DiscordClient.commands.set(slashCommand.name, { data: slashCommand, execute: commandBody });
-
     }
 
-    // removeCommand(command: string): void {
-    //     const index = this.DiscordClient.commands.findIndex((c) => c.name === command);
-    //     if (index >= 0) {
-    //         this.DiscordClient.commands.splice(index, 1);
-    //     }
-    // }
+    private async registerCommands(rest: REST): Promise<void> {
+        try {
+            const commandsArray = this.DiscordClient.commands.map(command => command.data.toJSON());
+
+            const data = await rest.put(Routes.applicationCommands("1218688003262644334"), {
+                body: commandsArray
+            });
+
+            Logs.log(`Successfully reloaded application (/) commands.`);
+        } catch (error) {
+            // And of course, make sure you catch and log any errors!
+            console.error(error);
+        }
+    }
+
 
     private onError(message: unknown) {
         Logs.error(message)
     }
+
+    private async onInteraction(interaction: ChatInputCommandInteraction) {
+        if (!interaction.isChatInputCommand()) return;
+
+        const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
+
+        //propably not needed, but y not :D
+        if (!command) {
+            interaction.reply("unknown command");
+            return;
+        }
+
+        command.execute(interaction);
+    }
+
     private async onMessage(message: Message) {
-        // let channel, guild;
-        // if (message.channel) channel = message.channel.id;
-        // if (message.guild) guild = message.guild.id;
-        // if (message.content.startsWith(CommonUtil.config("prefix"))) {
-        //     const perms = Permissions.getPermissions(channel, guild, this.database);
-
-        //     //he trimms the '$' here, watch out for that
-        //     if (!(await perms).areCommandsBlocked) {
-        //         const inputList = message.content
-        //             .substr(1, message.content.length)
-        //             .toLowerCase()
-        //             .replace(/\n/g, " ")
-        //             .split(" ");
-        //         const command = inputList[0];
-
-        //         // this.runCommand(message, command, (await perms));
-        //         Logs.log(`Command: "${command}" by ${message.author.username} in ${message.guild.name}`);
-        //     }
-        // }
         // const perms = await Permissions.getPermissions(channel, guild, this.database);
 
         // if (perms.areReplaysBlocked) return;
+
+        if (message.content.startsWith("$")) {
+            message.reply("Please use / instead of $ for commands");
+            return;
+        }
 
         const replays = [...message.attachments.values()].filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
@@ -163,7 +148,11 @@ export class DiscordBot {
         this.DiscordClient.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: 2
         });
+    }
 
+    public async getGuilds(): Promise<Collection<string, Guild>> {
+        const data = this.DiscordClient.guilds.cache;
+        return data;
     }
 }
 

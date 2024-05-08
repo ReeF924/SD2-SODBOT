@@ -109,10 +109,13 @@ export class MiscCommand {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private faction(input: ChatInputCommandInteraction): void {
+        const game = input.options.getString("game", false) ?? "sd2";
+
         if (Math.random() > 0.5) {
-            MsgHelper.reply(input, "Axis");
+            MsgHelper.reply(input, game == "sd2" ? "Axis" : "Pact");
+            return;
         }
-        MsgHelper.reply(input, "Allied");
+        MsgHelper.reply(input, game == "sd2" ? "Allies" : "Nato");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -225,7 +228,7 @@ export class MiscCommand {
         bot.registerCommand(flip, this.flip.bind(this));
 
         const faction = new SlashCommandBuilder().setName("faction").setDescription("Randomly select a faction");
-        faction.addStringOption(option => option.setName("faction").setDescription("Filter by faction. Default: sd2")
+        faction.addStringOption(option => option.setName("game").setDescription("Filter by game. Default: sd2")
             .setChoices({ name: "sd2", value: "sd2" }, { name: "warno", value: "warno" }).setRequired(false));
         bot.registerCommand(faction, this.faction.bind(this));
 

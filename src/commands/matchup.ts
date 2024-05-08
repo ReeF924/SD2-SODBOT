@@ -27,33 +27,59 @@ export class MatchupCommand {
 
 
     private randomMatchup(input: ChatInputCommandInteraction): void {
-        let divs: DivisionStruct[] = [];
+        let firstDivPool: DivisionStruct[] = [];
+        let secondDivPool: DivisionStruct[] = [];
 
         const game = input.options.getString("game") ?? "sd2";
         const count = input.options.getInteger("count") ?? 1;
+        const mirrors = input.options.getBoolean("mirrors") ?? false;
 
-        if (game == "sd2") divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
-        if (game == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
-
-
-        let i = 1
-        let output = ""
-
-        for (let i = 0; i <= count; i++) {
-            const matchup = createMatchup(divs, divs)
-            output += `${i + 1}) \t ${matchup} \n`
+        //I think I threw up writing this
+        if (game == "sd2") {
+            if (!mirrors) {
+                firstDivPool = divisions.divisionsAllies
+                secondDivPool = divisions.divisionsAxis
+            }
+            else {
+                firstDivPool = [...divisions.divisionsAllies, ...divisions.divisionsAxis]
+                secondDivPool = firstDivPool;
+            }
         }
 
-        MsgHelper.say(input, output);
+        if (game == "warno") {
+            if (!mirrors) {
+                firstDivPool = divisions.divisionsNato
+                secondDivPool = divisions.divisionsPact
+            }
+            else {
+                firstDivPool = [...divisions.divisionsNato, ...divisions.divisionsPact]
+                secondDivPool = firstDivPool;
+            }
+        }
+
+        let output = ""
+
+        for (let i = 0; i < count; i++) {
+            const matchup = createMatchup(firstDivPool, secondDivPool);
+            output += `${i + 1}) \t ${matchup} \n`;
+        }
+
+        MsgHelper.reply(input, output);
     }
     public addCommands(bot: DiscordBot): void {
-        const matchup = new SlashCommandBuilder().setName("matchup").setDescription("Random matchup generator");
+        const matchup = new SlashCommandBuilder()
+        matchup.setName("matchup").setDescription("Random matchup generator");
+
         matchup.addStringOption(option => option.setName("game").setDescription("Game to pick from. Default: 'sd2'")
-            .setRequired(false).setChoices({ name: "sd2", value: "sd2" }, { name: "warno", value: "warno" }))
-            .addIntegerOption(option => option.setName("count").setDescription("Number of matchups to generate. Default: 1")
-                .setRequired(false).setMinValue(1).setMaxValue(10))
-            .addBooleanOption(option => option.setName("oppositeFactions").setDescription("Specifies whether the matchups can be mirror sides.")
-                .setRequired(false));
+            .setRequired(false).setChoices({ name: "sd2", value: "sd2" }, { name: "warno", value: "warno" }));
+
+        matchup.addIntegerOption(option => option.setName("count")
+            .setDescription("Number of matchups to generate. Default: 1")
+            .setRequired(false).setMinValue(1).setMaxValue(10));
+
+        matchup.addBooleanOption(option => option.setName("mirrors")
+            .setDescription("Specifies whether the matchups can be mirror sides. Default: False")
+            .setRequired(false));
 
         bot.registerCommand(matchup, this.randomMatchup.bind(this));
     }
