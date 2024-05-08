@@ -10,6 +10,7 @@
     "inspect": "npm run build && node --inspect dist/main.js",
     "dev": "npm run build && npm run start",
     "start": "node dist/main.js",
+    "broadcast": "tsc && node dist/scripts/broadcast.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 1"

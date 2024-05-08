@@ -26,9 +26,9 @@ export class HelpCommand {
             case "replays":
                 this.helpReplays(input);
                 break;
-            case "admin":
-                this.helpAdmins(input);
-                break;
+            // case "admin":
+            //     this.helpAdmins(input);
+            //     break;
 
             default:
                 const embed = this.createEmbed("Help Commands", [
@@ -52,22 +52,31 @@ export class HelpCommand {
                         value: 'Gives help info about all of the misc commands.',
                         inline: false
                     },
-                    {
-                        name: "/help player",
-                        value: 'Gives help info about all of the commands that relate to the player.',
-                        inline: false
-                    },
+                    // {
+                    //     name: "/help player",
+                    //     value: 'Gives help info about all of the commands that relate to the player.',
+                    //     inline: false
+                    // },
                     {
                         name: "/help replays",
                         value: 'Gives help info about the submitting of match replay files.',
                         inline: false
                     },
+                    // {
+                    //     name: "/help admin",
+                    //     value: 'Gives help info about commands for admins.',
+                    //     inline: false
+                    // }
                     {
-                        name: "/help admin",
-                        value: 'Gives help info about commands for admins.',
+                        name: "Commands usage",
+                        value: "Commands might have additional arguments, some are optional some not. Discord will show you possible options when typing the command. Using Tab will autocomplete the command or the arguments for you.",
+                        inline: false
+                    },
+                    {
+                        name: "Warning",
+                        value: "Bans and some other commands are either temporarily disabled or they have no effect (bans for instance), they will be restored hopefully soon.",
                         inline: false
                     }
-
                 ]);
                 input.reply({ embeds: [embed], ephemeral: true });
         }
@@ -83,12 +92,7 @@ export class HelpCommand {
                 inline: false
             },
             {
-                name: "/rmap XXX",
-                value: "In addition to /rmap you can also add the following arguments, 1v1, 2v2, 3v3 or 4v4 to return a random map from the list of maps within those size categories.",
-                inline: false
-            },
-            {
-                name: "/maps  or  /allmaps",
+                name: "/allmaps",
                 value: "Returns a list of all the current sd2 maps\nIf a map is currently banned this will be indicated by its name being struck out.",
                 inline: false
             },
@@ -120,7 +124,7 @@ export class HelpCommand {
                 inline: false
             },
             {
-                name: "/divs or /alldivs",
+                name: "/alldivs",
                 value: "Returns a list of all divisions, it includes the division name and its alias.",
                 inline: false
             },
@@ -152,8 +156,8 @@ export class HelpCommand {
     private helpMisc(input: ChatInputCommandInteraction) {
         const embed = this.createEmbed("Help - Misc Commands", [
             {
-                name: "/piat or /ptrd or /laws",
-                value: "FIRE the Piat, PTRD or LAWS.   Can you get a Hit, find the secret messages?",
+                name: "/piat",
+                value: "FIRE the Piat Can you get a Hit, find the secret messages?",
                 inline: false
             },
             {
@@ -201,7 +205,7 @@ export class HelpCommand {
         ]);
         input.reply({ embeds: [embed], ephemeral: true });
     }
-    private helpReplays(message: ChatInputCommandInteraction) {
+    private helpReplays(input: ChatInputCommandInteraction) {
         const embed = this.createEmbed("Help - Replays", [
             {
                 name: "Uploading a game replay",
@@ -211,11 +215,6 @@ export class HelpCommand {
             {
                 name: "\u200b",
                 value: "This includes information about the match (eg. Winner, Loser, VictoryState, Duration, Map etc as well as information about the players themselves (eg Discord and Eugen Names, Lvl, Rating, Deck and Income used)",
-                inline: false
-            },
-            {
-                name: "\u200b",
-                value: "If the game has been submitted via a channel that also allows rating, the match will be rated by the BOT and updates to the player ratings added to the player database.",
                 inline: false
             },
             {
@@ -234,9 +233,9 @@ export class HelpCommand {
                 inline: false
             }
         ])
-        message.user.send({ embeds: [embed] });
+        input.reply({ embeds: [embed], ephemeral: true });
     }
-    private helpAdmins(message: ChatInputCommandInteraction) {
+    private helpAdmins(input: ChatInputCommandInteraction) {
         const embed = this.createEmbed("Help - Admin commands", [
             {
                 name: "/primarymode",
@@ -254,7 +253,7 @@ export class HelpCommand {
                 inline: false
             }
         ]);
-        message.user.send({ embeds: [embed] });
+        input.reply({ embeds: [embed], ephemeral: true });
     }
 
 
@@ -267,15 +266,15 @@ export class HelpCommand {
 
     public addCommands(bot: DiscordBot): void {
         const help = new SlashCommandBuilder()
-            .setName("foobartest")
+            .setName("help")
             .setDescription("Sends a DM with additional information about the commands");
 
 
         help.addStringOption(option => option.setName("category")
             .setDescription("The category of commands you want help with.")
             .setChoices({ name: "maps", value: "maps" }, { name: "divs", value: "divs" },
-                { name: "misc", value: "misc" }, { name: "player", value: "player" },
-                { name: "replays", value: "replays" }, { name: "admin", value: "admin" }));
+                { name: "misc", value: "misc" },// { name: "player", value: "player" },
+                { name: "replays", value: "replays" }/*, { name: "admin", value: "admin" }*/));
 
         bot.registerCommand(help, this.help.bind(this));
 

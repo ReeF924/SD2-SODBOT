@@ -38,6 +38,7 @@ export class Replays {
                 (result ? player.alliance === 1 : player.alliance === 0) ? winnerList.push(player) : loserList.push(player);
             }
 
+            //randomly chooses which team goes first (so you cannot tell who win from it)
             g.players.splice(0, g.players.length);
             Math.random() < 0.5 ? g.players.push(...winnerList, ...loserList) : g.players.push(...loserList, ...winnerList);
 
@@ -55,19 +56,17 @@ export class Replays {
         let result = "";
 
         players.forEach(p => {
-
             //propably not the most optimal way to check for Ai, maybe AICount?
 
             const regex = new RegExp("[Kk]oenig");
+            p.name = p.name.replace(/[Kk]oenig/g, "Koneig")
 
-            p.name.replace(regex, "Koneig")
 
-            let name = '';
-
-            if (p.name === "" && p.aiLevel < 5)
+            if (p.name === "" && p.aiLevel < 5) {
                 p.name = "AI " + Replays.AILevel[p.aiLevel];
+            }
 
-            name = p.name;
+            let name = p.name;
             const maxLength = Math.min(longestName, 20);
             name = name.substring(0, maxLength);
             name = name.padEnd(maxLength, '-');
@@ -91,6 +90,7 @@ export class Replays {
 
         let map = misc.map[g.map_raw];
 
+        //if the map's not in sd2-data, this tries to guess it's name
         if (!map) {
             const arr = g.map_raw.split('_');
             map = arr[2];
@@ -110,22 +110,25 @@ export class Replays {
                 console.log('\nnewMap:', g.map_raw + '\n');
             }
         }
+
+
         let embed = new EmbedBuilder()
-            .setTitle(g.serverName == 'undefined' ? "Game" : g.serverName)
+            .setTitle(!g.serverName ? "Game" : g.serverName)
             .setColor("#0099ff")
             .addFields(
-                [{ name: "Winner", value: `||${winners}||`, inline: true },
-                Replays.blankEmbedField,
-                { name: "Loser", value: `||${losers}||`, inline: true },
-                { name: "Map", value: map, inline: true },
-                { name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true },
-                { name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true },
-                { name: "Score Limit", value: g.scoreLimit.toString(), inline: true },
-                Replays.blankEmbedField,
-                { name: "Time Limit", value: g.timeLimit.toString(), inline: true },
-                { name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true },
-                { name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true },
-                { name: "Starting Points", value: `${g.initMoney} pts`, inline: true },
+                [
+                    { name: "Winner", value: `||${winners}||`, inline: true },
+                    Replays.blankEmbedField,
+                    { name: "Loser", value: `||${losers}||`, inline: true },
+                    { name: "Map", value: map, inline: true },
+                    { name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true },
+                    { name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true },
+                    { name: "Score Limit", value: g.scoreLimit.toString(), inline: true },
+                    Replays.blankEmbedField,
+                    { name: "Time Limit", value: g.timeLimit.toString(), inline: true },
+                    { name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true },
+                    { name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true },
+                    { name: "Starting Points", value: `${g.initMoney} pts`, inline: true },
                 ]);
 
         const playerSeparator: string = "-------------------------------------------";
@@ -141,18 +144,13 @@ export class Replays {
                 { name: "Player", value: player.name, inline: false },
                 { name: "Elo", value: player.elo.toString(), inline: false },
                 { name: "Division", value: player.deck!.division, inline: true },
+                { name: "Deck Code", value: player.deck!.raw.code, inline: false }
                 ]);
 
-            player.deck!.franchise === "WARNO"
-                ? embed.addFields([{
-                    name: "Deck",
-                    value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
-                    inline: false
-                }])
-                :
-                embed.addFields([{ name: "Income", value: player.deck!.income, inline: true }]);
 
-            embed.addFields([{ name: "Deck Code", value: player.deck!.raw.code, inline: false }]);
+            if (player.deck!.franchise === "SD2") {
+                embed.addFields([{ name: "Income", value: player.deck!.income, inline: true }]);
+            }
 
             //every fourth, in the beginning there can be only 2 players
             //I don't like this, could propably improve it somehow
@@ -177,27 +175,6 @@ export class Replays {
             ...players.filter(p => p.alliance !== winnerAl)
         ];
 
-    }
-
-    static getWinnersAndLosers(players: RawPlayer[], winnerAl: number): { winners: RawPlayer[], losers: RawPlayer[] } {
-        const winners: RawPlayer[] = [];
-        const losers: RawPlayer[] = [];
-
-
-        for (const player of players) {
-            const n = players.length;
-
-            if (player.alliance >= n / 2) {
-                winnerAl === 1 ? winners.push(player) : losers.push(player);
-            } else {
-                winnerAl === 0 ? winners.push(player) : losers.push(player);
-            }
-
-
-        }
-
-
-        return { winners: winners, losers: losers }
     }
 
     static getGameMode(mapName: string): string {

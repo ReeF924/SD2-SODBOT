@@ -58,7 +58,7 @@ export class MapCommand {
     private randomMap(input: ChatInputCommandInteraction): void {
 
 
-        function getRandomMaps(mapList: String[], count = 1): String[] {
+        function getRandomMaps(mapList: String[], count: number): String[] {
             let availableMaps = [...mapList];
             let maps: String[] = [];
 
@@ -95,9 +95,7 @@ export class MapCommand {
             case "3v3": maplist = importedMapData.mapData.byPlayerSize[6]; break;
             case "4v4": maplist = importedMapData.mapData.byPlayerSize[8]; break;
 
-            case "warno": maplist = this.warnoMaps; break;
             case "warno 1v1": maplist = this.warnoMaps; break;
-            case "warno 2v2": maplist = this.warnoMaps; break;
             case "warno 2v2": maplist = this.warnoMapsWaryes2v2; break;
             case "warno 3v3": maplist = this.warnoMaps3v3; break;
             case "warno 4v4": maplist = this.warnoMaps4v4; break;
@@ -176,7 +174,7 @@ export class MapCommand {
         // embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
         embed = embed.setFooter({ text: "Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)" });
 
-        input.channel.send({ embeds: [embed] });
+        MsgHelper.sendEmbed(input, [embed]);
     }
 
 
@@ -267,7 +265,7 @@ export class MapCommand {
 
         bot.registerCommand(rmap, this.randomMap.bind(this));
 
-        const maps = new SlashCommandBuilder().setName("maps").setDescription("List all maps");
+        const maps = new SlashCommandBuilder().setName("allmaps").setDescription("List all maps");
         bot.registerCommand(maps, this.allMaps.bind(this));
 
         //@todo I don't even know if warno is somehow implemented..
