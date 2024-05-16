@@ -122,7 +122,7 @@ export class MiscCommand {
     private piat(input: ChatInputCommandInteraction): void {
         const i = Math.random();
 
-        if (message.author.id === '607962880154927113') { //I had to...
+        if (input.user.id === '607962880154927113') { //I had to...
             const replies = this.piatReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
             MsgHelper.reply(
                 input,

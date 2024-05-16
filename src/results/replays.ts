@@ -28,7 +28,6 @@ export class Replays {
         ax.get(url).then(async (res) => {
             const g = GameParser.parseRaw(res.data);
 
-
             const winnerList: RawPlayer[] = []
             const loserList: RawPlayer[] = []
 
@@ -49,7 +48,7 @@ export class Replays {
             let winners = Replays.joinPlayersToString(winnerList, longestName);
             let losers = Replays.joinPlayersToString(loserList, longestName);
 
-            await Replays.sendEmbed(message, g, winners, losers);
+            await Replays.sendEmbed(message, g, database, winners, losers);
         });
     }
 
@@ -57,9 +56,11 @@ export class Replays {
         let result = "";
 
         players.forEach(p => {
-
             //propably not the most optimal way to check for Ai, maybe AICount?
-            let name = '';
+
+            const regex = new RegExp("[Kk]oenig");
+            p.name = p.name.replace(/[Kk]oenig/g, "Koneig")
+
 
             if (p.name === "" && p.aiLevel < 5) {
                 p.name = "AI " + Replays.AILevel[p.aiLevel];
@@ -68,7 +69,7 @@ export class Replays {
             let name = p.name;
             const maxLength = Math.min(longestName, 20);
             name = name.substring(0, maxLength);
-            name = name.padEnd(maxLength, '-');
+            name = name.padEnd(maxLength, '/');
 
             result += name + "\n";
         });
@@ -79,15 +80,17 @@ export class Replays {
         if (g.players.length != 2) return "playerLength";
         if (g.aiCount > 0) return "aiCount";
         if (g.players[0]?.deck?.franchise != "SD2") return "franchise";
-        if (g.gameMode != 1) return "gameMode";
+        if (g.gameMode != 1) return "gameMode"; //Check misc.js after
         if (g.incomeRate != 3) return "incomeRate";
         if (g.scoreLimit != 2000) return "scoreLimit";
         return null;
     }
 
-    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string): Promise<void> {
+    static async sendEmbed(message: Message, g: RawGameData, database: DB, winners: string, losers: string): Promise<void> {
+
         let map = misc.map[g.map_raw];
 
+        //if the map's not in sd2-data, this tries to guess it's name
         if (!map) {
             const arr = g.map_raw.split('_');
             map = arr[2];
@@ -104,19 +107,17 @@ export class Replays {
             }
 
             if (!await Logs.addMap(g.map_raw)) {
-                console.log();
-                console.log('newMap:', g.map_raw);
-                console.log();
+                console.log('\nnewMap:', g.map_raw + '\n');
             }
         }
 
+
         let embed = new EmbedBuilder()
             .setTitle(!g.serverName ? "Game" : g.serverName)
-            // .setTitle("Game")
             .setColor("#0099ff")
             .addFields(
                 [
-                    {name: "Winner", value: `||${winners}||`, inline: true},
+                    { name: "Winner", value: `||${winners}||`, inline: true },
                     Replays.blankEmbedField,
                     { name: "Loser", value: `||${losers}||`, inline: true },
                     { name: "Map", value: map, inline: true },
@@ -146,16 +147,10 @@ export class Replays {
                 { name: "Deck Code", value: player.deck!.raw.code, inline: false }
                 ]);
 
-            player.deck!.franchise === "WARNO"
-                ? embed.addFields([{
-                    name: "Deck",
-                    value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
-                    inline: false
-                }])
-                :
-                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
 
-            embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
+            if (player.deck!.franchise === "SD2") {
+                embed.addFields([{ name: "Income", value: player.deck!.income, inline: true }]);
+            }
 
             //every fourth, in the beginning there can be only 2 players
             //I don't like this, could propably improve it somehow
