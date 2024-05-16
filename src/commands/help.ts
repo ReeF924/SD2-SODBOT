@@ -69,7 +69,7 @@ export class HelpCommand {
                     // }
                     {
                         name: "Commands usage",
-                        value: "Commands might have additional arguments, some are optional some not. Discord will show you possible options when typing the command. Using Tab will autocomplete the command or the arguments for you.",
+                        value: "Commands might have additional arguments, some are optional some not. Discord will show you possible options when typing the command. Using Tab will autocomplete the command or the arguments for you. If you cannot see the commands use Ctrl + R to refresh discord.",
                         inline: false
                     },
                     {

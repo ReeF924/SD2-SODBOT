@@ -91,7 +91,7 @@ export class DiscordBot {
         try {
             const commandsArray = this.DiscordClient.commands.map(command => command.data.toJSON());
 
-            const data = await rest.put(Routes.applicationCommands("1218688003262644334"), {
+            const data = await rest.put(Routes.applicationCommands(this.DiscordClient.user.id), {
                 body: commandsArray
             });
 
@@ -127,7 +127,7 @@ export class DiscordBot {
         // if (perms.areReplaysBlocked) return;
 
         if (message.content.startsWith("$")) {
-            message.reply("Please use / instead of $ for commands");
+            message.reply("Please use / instead of $ for commands. For more information, use /help");
             return;
         }
 
