@@ -19,6 +19,7 @@ import { Logs } from "./logs";
 import { Replays } from "../results/replays";
 import { Permissions, PermissionsSet } from "./permissions"
 import { DB } from "./db";
+import brc from "../scripts/broadcast";
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
@@ -38,11 +39,10 @@ export class SodbotCommand {
 
 export class DiscordBot {
     public DiscordClient: DiscordClient;
-    private static instance: DiscordBot;
     // private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
     private database: DB;
 
-    private constructor(database: DB) {
+    constructor(database: DB, broadcast: boolean = false) {
         //this.loadBlacklist();
         this.database = database;
 
@@ -51,7 +51,7 @@ export class DiscordBot {
 
         this.DiscordClient = new DiscordClient(intents, new Collection());
 
-        this.DiscordClient.on("ready", () => this.onReady(database));
+        this.DiscordClient.on("ready", () => this.onReady(broadcast));
 
         this.DiscordClient.on("interactionCreate", (interaction: ChatInputCommandInteraction) => this.onInteraction(interaction));
 
@@ -60,7 +60,18 @@ export class DiscordBot {
             this.onMessage(message);
         });
 
+        this.database = database;
 
+        const token = process.env.DISCORD_TOKEN;
+
+        (async () => {
+            await this.DiscordClient.login(token);
+
+            if (broadcast) return;
+
+            const rest = new REST().setToken(process.env.DISCORD_TOKEN);
+            this.registerCommands(rest);
+        })();
 
     }
     public async init(database: DB, registerCommands: boolean = true): Promise<void> {
@@ -74,13 +85,6 @@ export class DiscordBot {
 
         const rest = new REST().setToken(process.env.DISCORD_TOKEN);
         this.registerCommands(rest);
-    }
-
-    public static getInstance(): DiscordBot {
-        if (!this.instance) {
-            this.instance = new DiscordBot(new DB());
-        }
-        return this.instance;
     }
 
     public registerCommand(slashCommand: SlashCommandBuilder, commandBody: (interaction: ChatInputCommandInteraction) => Promise<void>): void {
@@ -143,11 +147,14 @@ export class DiscordBot {
         });
     }
 
-    private async onReady(database: DB) {
+    private async onReady(broadcast: boolean) {
         Logs.log(`Bot Online!`);
         this.DiscordClient.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: 2
         });
+
+        if (!broadcast) return;
+        await brc();
     }
 
     public async getGuilds(): Promise<Collection<string, Guild>> {

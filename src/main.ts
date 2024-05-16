@@ -24,10 +24,11 @@ CommonUtil.init();
 Logs.init();
 
 smp.install();
-Logs.log("Starting Bot");
-const bot = DiscordBot.getInstance();
 
+Logs.log("Starting Bot");
 const database = new DB();
+const bot = new DiscordBot(database);
+
 
 
 // const adminCommand: AdminCommand = new AdminCommand(database);
