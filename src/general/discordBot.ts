@@ -64,17 +64,10 @@ export class DiscordBot {
 
         const token = process.env.DISCORD_TOKEN;
 
-        (async () => {
-            await this.DiscordClient.login(token);
-
-            if (broadcast) return;
-
-            const rest = new REST().setToken(process.env.DISCORD_TOKEN);
-            this.registerCommands(rest);
-        })();
+        this.initBot(database, !broadcast);
 
     }
-    public async init(database: DB, registerCommands: boolean = true): Promise<void> {
+    private async initBot(database: DB, registerCommands: boolean = true): Promise<void> {
         this.database = database;
 
         const token = process.env.DISCORD_TOKEN;
@@ -154,7 +147,8 @@ export class DiscordBot {
         });
 
         if (!broadcast) return;
-        await brc();
+
+        await brc(this);
     }
 
     public async getGuilds(): Promise<Collection<string, Guild>> {

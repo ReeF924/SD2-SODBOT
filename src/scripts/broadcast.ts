@@ -1,22 +1,8 @@
-import 'dotenv/config'
 
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { Logs } from '../general/logs';
-import { DB, Player } from "../general/db";
 import { Collection, Guild, GuildBasedChannel, GuildMember, NonThreadGuildBasedChannel, TextChannel, channelMention } from 'discord.js';
 import { readFileSync } from 'fs';
 import * as readLine from 'readline';
-
-const p = require("../package.json")
-
-
-//bot ID:1218688003262644334
-const database = new DB();
-const bot = new DiscordBot(database, true);
-
-
-Logs.init();
-Logs.log(`Started to broadcast to servers`);
+import { DiscordBot } from "../general/discordBot";
 
 
 //sends a message to all channels where the bot has sent a message in the last 30 messages
@@ -25,9 +11,8 @@ Logs.log(`Started to broadcast to servers`);
 //this executes in discordBot in onReady(), I dunno how else I'd await the bot startup
 //maybe events are a better way, but I dunno how they work here, so it's like this for now
 
-async function broadcast() {
 
-    await bot.init(database, false);
+async function broadcast(bot: DiscordBot) {
 
     const guilds: Collection<string, Guild> = await bot.getGuilds();
 
@@ -38,6 +23,7 @@ async function broadcast() {
     const path = process.argv[2];
     const message = readFileSync(path, 'utf8');
     console.log(`Message: ${message}`);
+
 
     channels.forEach(channel => {
         console.log(`Guild: ${channel.guild.name}; Channel: ${channel.name}`);

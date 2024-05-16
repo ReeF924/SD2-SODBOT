@@ -29,8 +29,6 @@ Logs.log("Starting Bot");
 const database = new DB();
 const bot = new DiscordBot(database);
 
-
-
 // const adminCommand: AdminCommand = new AdminCommand(database);
 // const playerCommand: PlayerCommand = new PlayerCommand(database);
 const miscCommand: MiscCommand = new MiscCommand();
@@ -46,7 +44,6 @@ divCommand.addCommands(bot);
 mapCommand.addCommands(bot);
 helpCommand.addCommands(bot);
 matchCommand.addCommands(bot);
-bot.init(database);
 
 const healthcheck = http.createServer(function (req, res) {
     Logs.log(req);
