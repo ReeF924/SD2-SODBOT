@@ -1,103 +1,142 @@
 `use strict`
 
-import {CommonUtil} from "./common";
-import {Client, Message, IntentsBitField, EmbedBuilder, Collection, SlashCommandBuilder} from "discord.js";
-import {Logs} from "./logs";
-import {Replays} from "../results/replays";
-import {Permissions, PermissionsSet} from "./permissions"
-import {DB} from "./db";
+import { CommonUtil } from "./common";
+import {
+    Client,
+    Message,
+    IntentsBitField,
+    EmbedBuilder,
+    SlashCommandBuilder,
+    Collection,
+    BaseInteraction, ChatInputCommandInteraction,
+    REST,
+    Routes,
+    GuildManager,
+    Guild
+} from "discord.js";
 
-const {GatewayIntentBits} = require('discord.js');
+import { Logs } from "./logs";
+import { Replays } from "../results/replays";
+import { Permissions, PermissionsSet } from "./permissions"
+import { DB } from "./db";
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
-export class DiscordBot {
+class DiscordClient extends Client {
+    public commands: Collection<string, SodbotCommand>;
 
-    static bot: Client;
-    private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
+    constructor(intents: IntentsBitField, commands: Collection<string, SlashCommandBuilder>) {
+        super({ intents: intents });
+        this.commands = new Collection();
+    }
+}
+
+export class SodbotCommand {
+    data: SlashCommandBuilder;
+    execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+}
+
+export class DiscordBot {
+    public DiscordClient: DiscordClient;
+    private static instance: DiscordBot;
+    // private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
     private database: DB;
 
-    constructor(database: DB) {
+    private constructor(database: DB) {
         //this.loadBlacklist();
         this.database = database;
 
+
         const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
 
-        DiscordBot.bot = new Client({intents: intents});
+        this.DiscordClient = new DiscordClient(intents, new Collection());
 
-        DiscordBot.bot.on("messageCreate", this.onMessage.bind(this));
-        DiscordBot.bot.on("ready", async () => {
-            await this.onReady(database);
+        this.DiscordClient.on("ready", () => this.onReady(database));
+
+        this.DiscordClient.on("interactionCreate", (interaction: ChatInputCommandInteraction) => this.onInteraction(interaction));
+
+        this.DiscordClient.on("messageCreate", (message: Message) => {
+            if (message.author.bot) return;
+            this.onMessage(message);
         });
-        DiscordBot.bot.on("error", this.onError.bind(this));
-        // DiscordBot.bot.on('', this.onError.bind(this));
+
+
+
+    }
+    public async init(database: DB, registerCommands: boolean = true): Promise<void> {
+        this.database = database;
+
+        const token = process.env.DISCORD_TOKEN;
+
+        await this.DiscordClient.login(token);
+
+        if (!registerCommands) return;
+
+        const rest = new REST().setToken(process.env.DISCORD_TOKEN);
+        this.registerCommands(rest);
     }
 
-    login(): void {
-        DiscordBot.bot.login(process.env.DISCORD_TOKEN);
+    public static getInstance(): DiscordBot {
+        if (!this.instance) {
+            this.instance = new DiscordBot(new DB());
+        }
+        return this.instance;
     }
 
-    registerCommand(command: string, funct: BotCommand): void {
-        this.commands[command] = funct;
+    public registerCommand(slashCommand: SlashCommandBuilder, commandBody: (interaction: ChatInputCommandInteraction) => Promise<void>): void {
+        this.DiscordClient.commands.set(slashCommand.name, { data: slashCommand, execute: commandBody });
     }
 
-    removeCommand(command: string): void {
-        this.commands.delete(command);
+    private async registerCommands(rest: REST): Promise<void> {
+        try {
+            const commandsArray = this.DiscordClient.commands.map(command => command.data.toJSON());
+
+            const data = await rest.put(Routes.applicationCommands("1218688003262644334"), {
+                body: commandsArray
+            });
+
+            Logs.log(`Successfully reloaded application (/) commands.`);
+        } catch (error) {
+            // And of course, make sure you catch and log any errors!
+            console.error(error);
+        }
     }
+
 
     private onError(message: unknown) {
         Logs.error(message)
     }
 
-    private runCommand(message: Message, command: string, perms: PermissionsSet) {
-        let input: string[] = [];
-        const ii = message.content.indexOf(" ");
-        if (ii > 0) {
-            const i = message.content.substr(ii + 1);
-            input = i.split(/,/);
-            for (const index in input) {
-                input[index] = input[index]
-                    //.replace(/&/g, "&amp;")
-                    //.replace(/"/g, "&quot;") //why we do this?
-                    .trim();
-            }
+    private async onInteraction(interaction: ChatInputCommandInteraction) {
+        if (!interaction.isChatInputCommand()) return;
+
+        const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
+
+        //propably not needed, but y not :D
+        if (!command) {
+            interaction.reply("unknown command");
+            return;
         }
-        if (this.commands[command]) {
-            this.commands[command](message, input, perms);
-        } else {
-            MsgHelper.reply(message, "Unknown Command. Did you mean " + CommonUtil.config("prefix") + CommonUtil.lexicalGuesser(command, Object.keys(this.commands)))
-        }
+
+        command.execute(interaction);
     }
 
     private async onMessage(message: Message) {
-        let channel, guild;
-        if (message.channel) channel = message.channel.id;
-        if (message.guild) guild = message.guild.id;
-        if (message.content.startsWith(CommonUtil.config("prefix"))) {
-            const perms = Permissions.getPermissions(channel, guild, this.database);
-            if (!(await perms).areCommandsBlocked) {
-                const inputList = message.content
-                    .substr(1, message.content.length)
-                    .toLowerCase()
-                    .replace(/\n/g, " ")
-                    .split(" ");
-                const command = inputList[0];
+        // const perms = await Permissions.getPermissions(channel, guild, this.database);
 
-                this.runCommand(message, command, (await perms));
-                Logs.log(`Command: "${command}" by ${message.author.username} in ${message.guild.name}`);
-            }
+        // if (perms.areReplaysBlocked) return;
+
+        if (message.content.startsWith("$")) {
+            message.reply("Please use / instead of $ for commands");
+            return;
         }
-        const perms = await Permissions.getPermissions(channel, guild, this.database);
-
-        if (perms.areReplaysBlocked) return;
 
         const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
             Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
             try {
-                Replays.extractReplayInfo(message, perms, this.database, r.url);
-            }
-            catch (e){
+                Replays.extractReplayInfo(message, this.database, r.url);
+            } catch (e) {
                 Logs.error(e);
                 message.reply('Error processing replay, contact <@607962880154927113>');
             }
@@ -106,34 +145,37 @@ export class DiscordBot {
 
     private async onReady(database: DB) {
         Logs.log(`Bot Online!`);
-        DiscordBot.bot.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
+        this.DiscordClient.user.setActivity("Use " + CommonUtil.config("prefix") + "help to see commands!", {
             type: 2
         });
-
     }
-}
 
-export interface DiscordCommand {
-    data: SlashCommandBuilder;
-    execute: (message: Message) => Promise<void>;
+    public async getGuilds(): Promise<Collection<string, Guild>> {
+        const data = this.DiscordClient.guilds.cache;
+        return data;
+    }
 }
 
 export class MsgHelper {
 
-    static reply(message: Message, content: string): void {
-        message.reply(`${message.author} ${content}`);
+    static reply(interaction: ChatInputCommandInteraction, content: string): void {
+        interaction.reply(content);
     }
 
-    static say(message: Message, content: string): void {
-        message.channel.send(content);
+    static replySecret(interaction: ChatInputCommandInteraction, content: string): void {
+        interaction.reply({ content: content, ephemeral: true });
     }
 
-    static sendEmbed(message: Message, content: EmbedBuilder): void {
-        message.channel.send({embeds: [content]});
+    static say(interaction: ChatInputCommandInteraction, content: string): void {
+        interaction.channel.send(content);
     }
 
-    static dmUser(message: Message, content: string): void {
-        message.author.send(content);
+    static sendEmbed(interaction: ChatInputCommandInteraction, content: EmbedBuilder[]): void {
+        interaction.reply({ embeds: content });
+    }
+
+    static dmUser(interaction: ChatInputCommandInteraction, content: string): void {
+        interaction.user.send(content);
     }
 
 }
