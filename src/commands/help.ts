@@ -73,6 +73,11 @@ export class HelpCommand {
                         inline: false
                     },
                     {
+                        name: "Arguments",
+                        value: "To use an argument you need to specify it. For instance /rmap count:5, /rmap 5 is not enough and bot will not understand it and return only one map instead.",
+                        inline: false
+                    },
+                    {
                         name: "Warning",
                         value: "Bans and some other commands are either temporarily disabled or they have no effect (bans for instance), they will be restored hopefully soon.",
                         inline: false
