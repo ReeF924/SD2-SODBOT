@@ -1,5 +1,5 @@
 
-import { Collection, Guild, GuildBasedChannel, GuildMember, NonThreadGuildBasedChannel, TextChannel, channelMention } from 'discord.js';
+import { Collection, Guild, TextChannel} from 'discord.js';
 import { readFileSync } from 'fs';
 import * as readLine from 'readline';
 import { DiscordBot } from "../general/discordBot";
@@ -60,7 +60,7 @@ declare type guildChannel = {
     botMessages: number
 }
 
-async function getChannelsWithMessages(guilds: Guild[]): Promise<TextChannel[]> {
+export async function getChannelsWithMessages(guilds: Guild[]): Promise<TextChannel[]> {
     const output: TextChannel[] = [];
 
 

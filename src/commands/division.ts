@@ -5,6 +5,7 @@ import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { EmbedBuilder } from "discord.js";
+import { join } from "path";
 
 
 //@todo clean up array mess in this file created by addition of divsion alias names.
@@ -14,16 +15,29 @@ export class DivisionCommand {
     private randomDiv(input: ChatInputCommandInteraction): void {
 
         let divCount = input.options.getInteger("count") ?? 1;
-        let divs: DivisionStruct[] = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
+        let divs: DivisionStruct[];
 
+        const side = input.options.getString("side");
 
-        const side = input.options.getString("side") ?? "allies";
-
-        if (side == "allies") divs = divisions.divisionsAllies;
-        if (side == "axis") divs = divisions.divisionsAxis;
-        if (side == "nato") divs = divisions.divisionsNato;
-        if (side == "pact") divs = divisions.divisionsPact;
-        if (side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
+        switch (side) {
+            case "allies":
+                divs = divisions.divisionsAllies;
+                break;
+            case "axis":
+                divisions.divisionsAxis;
+                break;
+            case "nato":
+                divs = divisions.divisionsNato;
+                break;
+            case "pact":
+                divs = divisions.divisionsPact;
+                break;
+            case "warno":
+                divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
+                break;
+            default:
+                divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
+        }
 
 
         if (divs.length < divCount) {
@@ -198,10 +212,10 @@ export class DivisionCommand {
     public addCommands(bot: DiscordBot): void {
         const rdiv = new SlashCommandBuilder().setName("rdiv").setDescription("Returns random division");
         rdiv.addStringOption(option => option.setName("side").addChoices(
-            { name: "sd2", value: "sd" }, { name: "warno", value: "warno" },
+            { name: "sd2", value: "sd2" }, { name: "warno", value: "warno" },
             { name: "axis", value: "axis" }, { name: "allies", value: "allies" },
             { name: "nato", value: "nato" }, { name: "pact", value: "pact" })
-            .setRequired(false).setDescription("Choose side or game to choose divisions from. Default: 'sd'"))
+            .setRequired(false).setDescription("Choose side or game to choose divisions from. Default: 'sd2'"))
 
             .addIntegerOption(option =>
                 option.setName('count').setDescription("Number of divisions to get. Default: 1")

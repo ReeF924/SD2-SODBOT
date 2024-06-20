@@ -23,6 +23,8 @@ import brc from "../scripts/broadcast";
 
 export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
+export const admins: string[] = ["607962880154927113"];
+
 class DiscordClient extends Client {
     public commands: Collection<string, SodbotCommand>;
 
@@ -45,7 +47,6 @@ export class DiscordBot {
     constructor(database: DB, broadcast: boolean = false) {
         //this.loadBlacklist();
         this.database = database;
-
 
         const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
 
@@ -132,7 +133,7 @@ export class DiscordBot {
         replays.forEach((r) => {
             Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
             try {
-                Replays.extractReplayInfo(message, this.database, r.url);
+                Replays.extractReplayInfo(message, r.url);
             } catch (e) {
                 Logs.error(e);
                 message.reply('Error processing replay, contact <@607962880154927113>');
@@ -159,24 +160,20 @@ export class DiscordBot {
 
 export class MsgHelper {
 
-    static reply(interaction: ChatInputCommandInteraction, content: string): void {
-        interaction.reply(content);
+    static reply(interaction: ChatInputCommandInteraction, content: string, secret: boolean = false) {
+        return interaction.reply({ content: content, ephemeral: secret });
     }
 
-    static replySecret(interaction: ChatInputCommandInteraction, content: string): void {
-        interaction.reply({ content: content, ephemeral: true });
+    static say(interaction: ChatInputCommandInteraction, content: string) {
+        return interaction.channel.send(content);
     }
 
-    static say(interaction: ChatInputCommandInteraction, content: string): void {
-        interaction.channel.send(content);
+    static sendEmbed(interaction: ChatInputCommandInteraction, content: EmbedBuilder[], secret: boolean = false) {
+        return interaction.reply({ embeds: content, ephemeral: secret });
     }
 
-    static sendEmbed(interaction: ChatInputCommandInteraction, content: EmbedBuilder[]): void {
-        interaction.reply({ embeds: content });
-    }
-
-    static dmUser(interaction: ChatInputCommandInteraction, content: string): void {
-        interaction.user.send(content);
+    static dmUser(interaction: ChatInputCommandInteraction, content: string)  {
+        return interaction.user.send(content);
     }
 
 }

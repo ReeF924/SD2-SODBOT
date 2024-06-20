@@ -28,8 +28,10 @@ export class Logs {
             Logs.logger.log("error", message);
     }
 
-    static async addMap(mapName: string): Promise<boolean> {
-        const filePath = path.join(__dirname, '..', '..', 'toAddMaps.log');
+    static async logToFile(mapName: string, filePath: string = undefined): Promise<boolean> {
+
+
+        filePath = filePath ?? path.join(__dirname, '..', '..', 'toAddMaps.log');
 
         if(fs.existsSync(filePath) === false) {
             fs.writeFileSync(filePath, '');

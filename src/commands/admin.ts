@@ -1,74 +1,18 @@
-import { GuildChannel, Message, SlashCommandBuilder } from "discord.js";
-import { DiscordBot, MsgHelper, SodbotCommand } from "../general/discordBot";
-import { Logs } from "../general/logs";
-import { DB } from "../general/db";
-import { CommandsCollection } from "./Command";
-export class AdminCommand extends CommandsCollection {
-    //Only RoguishTiger or Kuriosly can set Admin rights 
-    //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
-    public constructor(database: DB) {
-        super(database);
-    }
-    // private admins: string[] = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
-    // private async setAdmin(interaction: Message, input: string[]) {
-    //     if (this.admins.some(adminId => interaction.author.id == adminId)) {
-    //         //Check for argument
-    //         if (input.length === 1) {
-    //             await (async () => {
-    //                 //Get user from the DiscordUsers Table
-    //                 let user = await this.database.getDiscordUser(input[0])
-    //                 const discordUser = await DiscordBot.bot.users.fetch(String(input[0]))
-    //                 //If user is already registered up their Admin permisson
-    //                 if (user) {
-    //                     if (user.globalAdmin == false) {
-    //                         user.globalAdmin = (true)
-    //                         await this.database.setDiscordUser(user);
-    //                         MsgHelper.replyPing(interaction, "Discord account " + discordUser.username + " has been updated with global admin access")
-    //                         Logs.log("Changed globalAdmin access to user " + discordUser.username + " to true")
-    //                         return
-    //                     }
-    //                     else if (user.globalAdmin == true) {
-    //                         console.log("User's GlobalAdmin setting is already set to " + user.globalAdmin)
-    //                         MsgHelper.replyPing(interaction, "The user already has global admin access!")
-    //                         return
-    //                     }
-    //                 }
-    //                 //If user is not registered
-    //                 else {
-    //                     MsgHelper.replyPing(interaction, "This user is not currently registered to the bot, they must first register before you can add them as a admin")
-    //                     return
-    //                 }
-    //             })()
-    //         }
-    //     }
-    // }
-    private async adjustElo(interaction: Message, input: string[]) {
-        let user = await this.database.getDiscordUser(interaction.author.id)
-        //Check if requestor has admin access
-        if (user.globalAdmin === true) {
-            //Check that the command is correctly formatted
-            if (input.length < 3) {
-                console.log("Not enough arguments")
-                interaction.reply("This command requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
-                return
-            }
-            else if (input.length === 3) {
-                let eugenId = input[0]
-                let newLeagueElo = input[1]
-                let newGlobalElo = input[2]
-                //await this.database.setPlayer(eugenId, newLeagueElo, newGlobalElo);
-                //interaction.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
-                return
-            }
-            else {
-                interaction.reply("This command is not correctly formatted, it requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
-            }
-        }
-        else {
-            interaction.reply("You do not have the admin access to use this command")
+import {ChatInputCommandInteraction, Message, SlashCommandBuilder, TextChannel} from "discord.js";
+import {admins, DiscordBot, MsgHelper} from "../general/discordBot";
+import {getChannel, postChannel} from '../db/admins/adminsService';
+import {mapStringToEnum} from '../db/dbService';
+import {MapType, SkillLevel} from "../db/replays/replaysModels";
+import {Replays} from "../results/replays";
 
-        }
+
+export class AdminCommand {
+
+    public constructor() {
+
     }
+
+
     // private async setChannelPrems(interaction: Message, input: string[]) {
     //     let user = await this.database.getDiscordUser(interaction.user.id)
     //     let prem = {
@@ -179,42 +123,184 @@ export class AdminCommand extends CommandsCollection {
     //     }
     // }
 
-    // private async setReplayChannel(interaction: Message, input: string[]) {
-    //     //Check if requestor has admin access
-    //     if (!this.checkAccess(interaction)) {
-    //         interaction.reply("You do not have the admin access to use this command");
-    //         return;
-    //     }
-    //     // Check if formatted correctly
-    //     if (input.length != 1) {
-    //         interaction.reply("Try channel <replays Type>");
-    //         return
-    //     }
-    //
-    //     let server: DiscordServer = await this.database.getServer(interaction.guild.id) ?? new DiscordServer(interaction.guild.id);
-    //
-    //     this.addChannel(interaction, input, server);
-    //     // this.database.putServer(server);
-    // }
+    private async setReplayType(interaction: ChatInputCommandInteraction) {
 
-    // private addChannel(interaction: Message, input: string[], server: DiscordServer): void {
-    //     if (this.defaultReplayTypes.includes(input[0])) {
-    //         server.channels.set(interaction.channel.id, { defaultRules: true, tournamentType: input[0] });
-    //     }
-    //     else {
-    //         server.channels.set(interaction.channel.id, { defaultRules: false, tournamentType: "other" });
-    //     }
-    // }
+        const type = interaction.options.getString("type");
 
-    // private checkAccess(interaction: Message): boolean {
-    //     return this.admins.some(adminID => interaction.author.id === adminID);
-    // }
-    public addCommands(bot: DiscordBot): void {
-        // bot.registerCommand(new SlashCommandBuilder().setName("setChanne"))
+        try {
+            if (type === null) {
+                const channel = await getChannel(parseInt(interaction.channel.id));
+
+                if (channel === null) {
+                    MsgHelper.reply(interaction, "Replays in this channel are considered others level.", true);
+                    return;
+                }
+
+                MsgHelper.reply(interaction, `Replays in this channel are considered ${SkillLevel[channel.skillLevel]} level.`, true);
+                return;
+            }
+        } catch (e) {
+            MsgHelper.reply(interaction, "Error getting replay type for channel", true);
+            return;
+        }
+
+        if (!this.checkAccess(interaction)) {
+            MsgHelper.reply(interaction, "You do not have the admin access to use this command", true);
+            return;
+        }
+
+        let replayType: SkillLevel = SkillLevel[type as keyof typeof SkillLevel];
+
+        const response = await postChannel({
+            Id: parseInt(interaction.guild.id),
+            Name: interaction.guild.name,
+            Channel: {
+                Id: parseInt(interaction.channel.id),
+                Name: interaction.channel.name,
+                SkillLevel: replayType,
+                PrimaryMode: 0
+            }
+        });
+
+        if (typeof response === "string") {
+            MsgHelper.reply(interaction, "Error setting replay type for channel", true);
+            return;
+        }
+        MsgHelper.reply(interaction, `Replay type set to ${SkillLevel[replayType]} for this channel.`, true);
+    }
+
+    private async yoink(interaction: ChatInputCommandInteraction): Promise<void> {
+
+        if (!this.checkAccess(interaction)) {
+            MsgHelper.reply(interaction, "You do not have the admin access to use this command", true);
+            return;
+        }
+
+        const dateString = interaction.options.getString("date");
+
+        // const version = interaction.options.getNumber("version");
         //
-        // bot.registerCommand("adjustelo", { data:  this.adjustElo.bind(this));
-        // bot.registerCommand("setadmin", this.setAdmin.bind(this));
-        // bot.registerCommand("setchannel", this.setChannelPrems.bind(this));
-        // bot.registerCommand("resetchannel", this.resetChannelPrems.bind(this));
+        // let count = interaction.options.getInteger("count");
+
+        const channel: TextChannel = interaction.channel as TextChannel;
+
+        const date = new Date(parseInt(dateString.substring(0, 4)), parseInt(dateString.substring(4, 6)) - 1, parseInt(dateString.substring(6, 8)));
+
+        interaction.reply("starting to yoink messages");
+
+        const messages = await this.getMessages(channel, date, undefined);
+
+        let counter = 0;
+        let failed = 0;
+
+
+        for (let i = 0; i < messages.length; i++) {
+
+            let message = messages[i];
+
+            if (!message || !message.attachments) {
+                continue;
+            }
+
+            const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
+
+            for (let j = 0; j < replays.length; j++) {
+                const r = replays[j];
+
+                try {
+                    await Replays.extractReplayInfo(message, r.url, false);
+                    counter++;
+
+                } catch (e) {
+                    console.error(`Failed to upload a replay ${message.createdAt.toDateString()}`);
+                    failed++;
+                }
+            }
+
+
+            if (counter % 10 === 0 - replays.length + 1) {
+                interaction.editReply(`Processing. Already yoinked ${counter} replays. Failed ${failed}`);
+            }
+
+        }
+        interaction.editReply(`Yoinked ${counter} replays. Failed ${failed}`);
+        console.log("Mischief achieved")
+
+    }
+
+    private async getMessages(channel: TextChannel, date: Date, lastMessageId: string): Promise<Message[]> {
+
+        // let messages = await channel.messages.fetch({limit: 1});
+        // messages.clear();
+
+        const messages: Message<true>[] = [];
+        let done = false;
+        let counter = 0;
+
+        while (!done && counter < 5) {
+            const options = {limit: 100, before: lastMessageId};
+
+            let fetched = await channel.messages.fetch(options);
+
+            if (fetched.size === 0) {
+                break;
+            }
+
+            const fetchSize = fetched.size;
+            let lastFetched = fetched.last();
+
+            fetched = fetched.filter(message => message.createdTimestamp > date.getTime() && message.attachments.size > 0);
+
+            console.log(`fetched: ${fetchSize}, filtered: ${fetched.size}`);
+
+            if (fetched.size > 0) {
+                lastFetched = fetched.last();
+            }
+
+            lastMessageId = lastFetched.id;
+
+            if (lastFetched.createdTimestamp < date.getTime()) {
+                done = true;
+                fetched = fetched.filter(message => message.createdTimestamp < date.getTime());
+            }
+
+            fetched.forEach(message => messages.push(message));
+
+            counter++;
+        }
+
+        return messages;
+    }
+
+
+    private checkAccess(interaction: ChatInputCommandInteraction): boolean {
+        return admins.includes(interaction.user.id);
+    }
+
+    public addCommands(bot: DiscordBot): void {
+        const setReplayType = new SlashCommandBuilder()
+            .setName("replaytype").setDescription("Sets the channel to be a replay channel");
+
+        setReplayType.addStringOption(option =>
+            option.setName("type").setDescription("The type of replay channel to set")
+                .addChoices(
+                    {name: "div1", value: "div1"}, {name: "div2", value: "div2"},
+                    {name: "div3", value: "div3"}, {name: "div4", value: "div4"},
+                    {name: "div5", value: "div5"}, {name: "others", value: "others"}
+                ).setRequired(false))
+
+        bot.registerCommand(setReplayType, this.setReplayType.bind(this));
+
+        const yoink = new SlashCommandBuilder()
+            .setName("yoink").setDescription("Sneaky bot sneaky bot");
+
+        // yoink.addNumberOption(option => option.setName("version")
+        //     .setDescription("Oldest version to accept.").setRequired(false))
+        yoink.addStringOption(option => option.setName("date").setDescription("Oldest possible date. Format yyyyMMdd").setRequired(true))
+        // .addIntegerOption(option =>
+        //     option.setName("count").setDescription("Max count of messages to go through. Default: If date is set - Unlimited. Otherwise 100").setRequired(false));
+
+
+        bot.registerCommand(yoink, this.yoink.bind(this));
     }
 }

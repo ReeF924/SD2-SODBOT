@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { MiscCommand } from "./commands/misc";
 import { HelpCommand } from "./commands/help";
 // import { PlayerCommand } from "./commands/player";
-// import { AdminCommand } from "./commands/admin";
+import { AdminCommand } from "./commands/admin";
 import { MatchupCommand } from "./commands/matchup"
 
 import { CommonUtil } from "./general/common";
@@ -29,7 +29,7 @@ Logs.log("Starting Bot");
 const database = new DB();
 const bot = new DiscordBot(database);
 
-// const adminCommand: AdminCommand = new AdminCommand(database);
+const adminCommand: AdminCommand = new AdminCommand();
 // const playerCommand: PlayerCommand = new PlayerCommand(database);
 const miscCommand: MiscCommand = new MiscCommand();
 const divCommand: DivisionCommand = new DivisionCommand();
@@ -37,7 +37,7 @@ const mapCommand: MapCommand = new MapCommand();
 const helpCommand: HelpCommand = new HelpCommand();
 const matchCommand: MatchupCommand = new MatchupCommand();
 
-// adminCommand.addCommands(bot);
+adminCommand.addCommands(bot);
 // playerCommand.addCommands(bot);
 miscCommand.addCommands(bot);
 divCommand.addCommands(bot);
