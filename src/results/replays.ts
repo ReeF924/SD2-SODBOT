@@ -15,70 +15,75 @@ export class Replays {
     private static readonly blankEmbedField: EmbedField = {name: '\u200b', value: '\u200b', inline: true};
 
     //gets data out of replay and prepares them for the embed
-    static async extractReplayInfo(message: Message, url: string, sendEmbed: boolean = true): Promise<void> {
-        
-        ax.get(url).then(async (res) => {
-            const g: RawGameData = GameParser.parseRaw(res.data);
+    static async extractReplayInfo(message: Message, url: string, sendEmbed: boolean = true): Promise<RawGameData | null> {
+
+        const gres = await ax.get(url);
+
+        const g: RawGameData = GameParser.parseRaw(gres.data);
 
 
-            const winnerList: RawPlayer[] = []
-            const loserList: RawPlayer[] = []
+        const winnerList: RawPlayer[] = []
+        const loserList: RawPlayer[] = []
 
-            //decides if a player lost or won
-            const result = g.result.victory > 3 ? g.ingamePlayerId >= g.players.length / 2 : g.ingamePlayerId < g.players.length / 2;
+        //decides if a player lost or won
+        const result = g.result.victory > 3 ? g.ingamePlayerId >= g.players.length / 2 : g.ingamePlayerId < g.players.length / 2;
 
-            for (const player of g.players) {
-                (result ? player.alliance === 1 : player.alliance === 0) ? winnerList.push(player) : loserList.push(player);
+        for (const player of g.players) {
+            (result ? player.alliance === 1 : player.alliance === 0) ? winnerList.push(player) : loserList.push(player);
+        }
+
+
+        //randomly chooses which team goes first (so you cannot tell who win from it)
+        g.players.splice(0, g.players.length);
+        Math.random() < 0.5 ? g.players.push(...winnerList, ...loserList) : g.players.push(...loserList, ...winnerList);
+
+
+        let longestName = Math.max(...winnerList.map(p => p.name.length), ...loserList.map(p => p.name.length));
+
+        let winners = Replays.joinPlayersToString(winnerList, longestName);
+        let losers = Replays.joinPlayersToString(loserList, longestName);
+
+        const map = await Replays.getMapName(g);
+
+        if (sendEmbed)
+            Replays.sendEmbed(message, g, winners, losers, map);
+
+
+        const valid = Replays.isValidReplay(g);
+        //checks if the replay is valid to be uploaded to the db
+        //todo this is only half of the job
+        if (valid !== null) {
+            console.log(`Invalid replay: ${valid}`);
+            return null;
+        }
+
+        //uploads replay to the database
+        try {
+            Replays.uploadReplay(g, winnerList, loserList, message, map);
+        } catch (e) {
+
+            if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
+                console.log("API offline");
+                return null;
             }
 
+            console.log(e);
+        }
 
-            //randomly chooses which team goes first (so you cannot tell who win from it)
-            g.players.splice(0, g.players.length);
-            Math.random() < 0.5 ? g.players.push(...winnerList, ...loserList) : g.players.push(...loserList, ...winnerList);
+    }
 
+    private static async uploadReplay(g:RawGameData, winnerList:RawPlayer[], loserList:RawPlayer[], message:Message, map:string):Promise<void>{
+        const response = await uploadReplay(g, winnerList, loserList,
+            {
+                uploadedAt: message.createdAt,
+                uploadedBy: parseInt(message.author.id),
+                uploadedIn: parseInt(message.channel!.id)
+            }, map);
 
-            let longestName = Math.max(...winnerList.map(p => p.name.length), ...loserList.map(p => p.name.length));
+        if (typeof response === 'string') {
+            console.log(response);
+        }
 
-            let winners = Replays.joinPlayersToString(winnerList, longestName);
-            let losers = Replays.joinPlayersToString(loserList, longestName);
-
-            const map = await Replays.getMapName(g);
-
-            if (sendEmbed)
-                Replays.sendEmbed(message, g, winners, losers, map);
-
-
-            const valid = Replays.isValidReplay(g);
-            //checks if the replay is valid to be uploaded to the db
-            //todo this is only half of the job
-            if (valid !== null) {
-                console.log(`Invalid replay: ${valid}`);
-                return;
-            }
-
-            //uploads replay to the database
-            try {
-                const response = await uploadReplay(g, winnerList, loserList,
-                    {
-                        uploadedAt: message.createdAt,
-                        uploadedBy: parseInt(message.author.id),
-                        uploadedIn: parseInt(message.channel!.id)
-                    }, map);
-                if (typeof response === 'string') {
-                    console.log(response);
-                }
-
-            } catch (e) {
-
-                if(e.cause.code === "ECONNREFUSED" && e instanceof TypeError){
-                    console.log("API offline");
-                    return;
-                }
-
-                console.log(e);
-            }
-
-        });
     }
 
     private static joinPlayersToString(players: RawPlayer[], longestName: number): string {
@@ -134,7 +139,7 @@ export class Replays {
         return map;
     }
 
-    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string, mapName:string): Promise<void> {
+    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string, mapName: string): Promise<void> {
 
 
         let embed = new EmbedBuilder()

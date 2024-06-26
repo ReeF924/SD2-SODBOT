@@ -29,7 +29,7 @@ Logs.log("Starting Bot");
 const database = new DB();
 const bot = new DiscordBot(database);
 
-const adminCommand: AdminCommand = new AdminCommand();
+const adminCommand: AdminCommand = new AdminCommand(bot);
 // const playerCommand: PlayerCommand = new PlayerCommand(database);
 const miscCommand: MiscCommand = new MiscCommand();
 const divCommand: DivisionCommand = new DivisionCommand();

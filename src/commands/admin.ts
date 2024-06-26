@@ -1,15 +1,14 @@
 import {ChatInputCommandInteraction, Message, SlashCommandBuilder, TextChannel} from "discord.js";
 import {admins, DiscordBot, MsgHelper} from "../general/discordBot";
 import {getChannel, postChannel} from '../db/admins/adminsService';
-import {mapStringToEnum} from '../db/dbService';
-import {MapType, SkillLevel} from "../db/replays/replaysModels";
+import {SkillLevel} from "../db/replays/replaysModels";
 import {Replays} from "../results/replays";
+import {Franchise} from "../db/admins/adminsModels";
 
 
 export class AdminCommand {
 
-    public constructor() {
-
+    public constructor(private bot: DiscordBot) {
     }
 
 
@@ -127,20 +126,12 @@ export class AdminCommand {
 
         const type = interaction.options.getString("type");
 
-        try {
-            if (type === null) {
-                const channel = await getChannel(parseInt(interaction.channel.id));
+        if (type === null) {
+            await interaction.deferReply({ephemeral: true});
 
-                if (channel === null) {
-                    MsgHelper.reply(interaction, "Replays in this channel are considered others level.", true);
-                    return;
-                }
+            const response = await this.GetReplayType(parseInt(interaction.channel.id));
 
-                MsgHelper.reply(interaction, `Replays in this channel are considered ${SkillLevel[channel.skillLevel]} level.`, true);
-                return;
-            }
-        } catch (e) {
-            MsgHelper.reply(interaction, "Error getting replay type for channel", true);
+            interaction.followUp({content: response, ephemeral: true});
             return;
         }
 
@@ -149,6 +140,7 @@ export class AdminCommand {
             return;
         }
 
+        await interaction.deferReply({ephemeral: true});
         let replayType: SkillLevel = SkillLevel[type as keyof typeof SkillLevel];
 
         const response = await postChannel({
@@ -158,23 +150,43 @@ export class AdminCommand {
                 Id: parseInt(interaction.channel.id),
                 Name: interaction.channel.name,
                 SkillLevel: replayType,
-                PrimaryMode: 0
+                PrimaryMode: Franchise.sd2
             }
         });
 
         if (typeof response === "string") {
-            MsgHelper.reply(interaction, "Error setting replay type for channel", true);
+            interaction.followUp({content: "Error setting replay type for channel", ephemeral: true});
             return;
         }
-        MsgHelper.reply(interaction, `Replay type set to ${SkillLevel[replayType]} for this channel.`, true);
+        interaction.followUp({
+            content: `Replay type set to ${SkillLevel[replayType]} for this channel.`,
+            ephemeral: true
+        });
+    }
+
+    private async GetReplayType(channelId: number): Promise<string> {
+
+        try {
+            const channel = await getChannel(channelId);
+
+            if (channel === null) {
+                return "Replays in this channel are considered others level."
+            }
+
+            return `Replays in this channel are considered ${SkillLevel[channel.skillLevel]} level.`;
+        } catch (e) {
+            return "Error getting replay type for channel";
+        }
     }
 
     private async yoink(interaction: ChatInputCommandInteraction): Promise<void> {
+        const reefy = await this.bot.getAdmin();
 
         if (!this.checkAccess(interaction)) {
             MsgHelper.reply(interaction, "You do not have the admin access to use this command", true);
             return;
         }
+
 
         const dateString = interaction.options.getString("date");
 
@@ -186,17 +198,20 @@ export class AdminCommand {
 
         const date = new Date(parseInt(dateString.substring(0, 4)), parseInt(dateString.substring(4, 6)) - 1, parseInt(dateString.substring(6, 8)));
 
-        interaction.reply("starting to yoink messages");
+        MsgHelper.reply(interaction, "starting to yoink messages", true);
+
 
         const messages = await this.getMessages(channel, date, undefined);
+        const n = messages.length;
+        const tenPercent = ~~(52 / 10);
 
         let counter = 0;
         let failed = 0;
 
-
         for (let i = 0; i < messages.length; i++) {
 
             let message = messages[i];
+            console.log('for i', i);
 
             if (!message || !message.attachments) {
                 continue;
@@ -205,10 +220,17 @@ export class AdminCommand {
             const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
 
             for (let j = 0; j < replays.length; j++) {
-                const r = replays[j];
 
+                const r = replays[j];
                 try {
-                    await Replays.extractReplayInfo(message, r.url, false);
+                    //makes it a bit faster
+                    if (i % 3 === 0) {
+                        await Replays.extractReplayInfo(message, r.url, false);
+                    }
+                    else{
+                        Replays.extractReplayInfo(message, r.url, false);
+                    }
+
                     counter++;
 
                 } catch (e) {
@@ -218,14 +240,19 @@ export class AdminCommand {
             }
 
 
-            if (counter % 10 === 0 - replays.length + 1) {
-                interaction.editReply(`Processing. Already yoinked ${counter} replays. Failed ${failed}`);
+            if (i % tenPercent === 0) {
+                console.log('Progress: ', i / n * 100 + '%');
+                reefy.send(`Progress: ${i / n * 100}%`);
             }
 
         }
-        interaction.editReply(`Yoinked ${counter} replays. Failed ${failed}`);
-        console.log("Mischief achieved")
+        console.log("Mischief managed!");
+        reefy.send("Yoinked " + counter + " replays, failed to yoink " + failed + " replays");
 
+    }
+
+    private async delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     private async getMessages(channel: TextChannel, date: Date, lastMessageId: string): Promise<Message[]> {
@@ -236,8 +263,14 @@ export class AdminCommand {
         const messages: Message<true>[] = [];
         let done = false;
         let counter = 0;
+        const started = new Date();
 
-        while (!done && counter < 5) {
+        while (!done) {
+            //to not get banned by DiscordAPI (fetch limit)
+            if (counter % 40 === 0) {
+                this.delay(started.getTime() - new Date().getTime());
+            }
+
             const options = {limit: 100, before: lastMessageId};
 
             let fetched = await channel.messages.fetch(options);
@@ -268,6 +301,7 @@ export class AdminCommand {
 
             counter++;
         }
+        console.log(`Total messages: ${messages.length}`);
 
         return messages;
     }

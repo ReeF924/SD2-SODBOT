@@ -6,7 +6,7 @@ import { DB } from '../general/db'
 export class API {
     private database: DB;
     express: Application = express()
-    public port = 8080
+    public port = 3000
     public constructor(database: DB) {
         this.database = database;
     }

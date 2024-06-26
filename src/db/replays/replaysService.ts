@@ -4,6 +4,7 @@ import {misc} from "sd2-data";
 import {getChannel} from "../admins/adminsService";
 import {Franchise} from "../admins/adminsModels";
 
+
 interface UploadInformation {
     uploadedIn: number;
     uploadedBy: number;
@@ -127,7 +128,7 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
         return replay;
     }
 
-    const url = "http://localhost:5278/replays";
+    const url = process.env.API_URL + "/replays";
 
     try {
         const response = await fetch(url, {
@@ -145,8 +146,8 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
 
         if (!response.ok) {
             const errorText = await response.text();
-            const errorMessage = `Failed to upload replay: ${errorText}`;
-            console.log(errorMessage);
+            const errorMessage = `Failed to upload replay try: ${errorText}`;
+            console.log(errorMessage, response);
 
             return "Failed to upload replay";
         }
@@ -154,7 +155,7 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
         return replay;
 
     } catch (e) {
-        console.log("Failed to upload replay, error: ", e)
+        console.log("Failed to upload replay catch, error: ", e)
 
         return "Failed to upload replay";
     }

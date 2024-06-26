@@ -1,6 +1,6 @@
 {
   "name": "sodbot_2",
-  "version": "2.0.0",
+  "version": "2.0.5",
   "description": "",
   "main": "src/main.ts",
   "scripts": {
@@ -11,6 +11,7 @@
     "dev": "npm run build && npm run start",
     "start": "node dist/main.js",
     "broadcast": "tsc && node dist/scripts/mainScript.js",
+    "uploadDivs": "tsc && node dist/scripts/uploadDivisions.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 1"

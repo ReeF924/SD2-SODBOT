@@ -12,7 +12,7 @@ import {
     REST,
     Routes,
     GuildManager,
-    Guild
+    Guild, TextChannel, User
 } from "discord.js";
 
 import { Logs } from "./logs";
@@ -100,6 +100,10 @@ export class DiscordBot {
         }
     }
 
+    public async getAdmin():Promise<User> {
+        return await this.DiscordClient.users.fetch(admins[0]);
+    }
+
 
     private onError(message: unknown) {
         Logs.error(message)
@@ -131,7 +135,8 @@ export class DiscordBot {
 
         const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
-            Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${message.channel.id}`);
+            const channel = message.channel as TextChannel;
+            Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${channel.name}`);
             try {
                 Replays.extractReplayInfo(message, r.url);
             } catch (e) {
