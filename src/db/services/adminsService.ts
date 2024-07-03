@@ -1,21 +1,24 @@
-import {dbGuild, dbChannel, dbGuildPostDto, dbChannelPostDto} from "./adminsModels";
+import {dbGuild, dbChannel, dbGuildPostDto, dbChannelPostDto} from "../models/admin";
+import {apiErrorMessage} from "../db";
 
-export async function getChannel(id:number ):Promise<dbChannel | null>{
+export async function getChannel(id:string ):Promise<dbChannel | string>{
 
 
     const url = process.env.API_URL + "/guilds/channels/" + id;
 
     const response = await fetch(url);
 
+    
     if (response.ok){
         return await response.json();
     }
     if(response.status === 404){
-        return null;
+        const resMess:apiErrorMessage = await response.json();
+        return resMess.message;
     }
 
     console.log("Error getting channel: " + response.statusText);
-    return null;
+    return "Error when getting channel";
 }
 
 

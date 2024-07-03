@@ -19,9 +19,9 @@ export class HelpCommand {
                 this.helpMisc(input);
                 break;
 
-            // case "player":
-            //     this.helpPlayer(input);
-            //     break;
+            case "player":
+                this.helpPlayer(input);
+                break;
 
             case "replays":
                 this.helpReplays(input);
@@ -52,11 +52,11 @@ export class HelpCommand {
                         value: 'Gives help info about all of the misc commands.',
                         inline: false
                     },
-                    // {
-                    //     name: "/help player",
-                    //     value: 'Gives help info about all of the commands that relate to the player.',
-                    //     inline: false
-                    // },
+                    {
+                        name: "/help player",
+                        value: 'Gives help info about all of the commands that relate to the player.',
+                        inline: false
+                    },
                     {
                         name: "/help replays",
                         value: 'Gives help info about the submitting of match replay files.',
@@ -194,19 +194,19 @@ export class HelpCommand {
         const embed = this.createEmbed("Help - Player Commands", [
             {
                 name: "/register",
-                value: "This command will register (if they are unknown to the bot) or update (if they have previously registered) a player to the bot.\n The command makes a link between the Discord User submitting the request and the Eugen Player ID provided in the request.\nExample Usage: /register 123456 (where 123456 is the player's Eugen Player ID).",
+                value: "This command will register (if they are unknown to the bot)\n The command makes a link between the Discord User submitting the request and the Eugen Player ID provided in the request.\nExample Usage: /register 123456 (where 123456 is the player's Eugen Player ID). In case your Eugen or Discord Id is already registered contact sodbot admins.",
                 inline: false
             },
-            {
-                name: "/player",
-                value: "Provides a summary of the player. When submitted without an argument will return information about the submitter.  When used with the @player argument will return information about that player.\n Exmaple Usage: /player @ExamplePlayer (returns player information for ExamplePlayer)",
-                inline: false
-            },
-            {
-                name: "/allratings",
-                value: "Returns a list of the top 100 active players and their ratings.\nA active player is defined as a player who has been listed in a submitted rated match in the last 6 months.",
-                inline: false
-            }
+            // {
+            //     name: "/player",
+            //     value: "Provides a summary of the player. When submitted without an argument will return information about the submitter.  When used with the @player argument will return information about that player.\n Exmaple Usage: /player @ExamplePlayer (returns player information for ExamplePlayer)",
+            //     inline: false
+            // },
+            // {
+            //     name: "/allratings",
+            //     value: "Returns a list of the top 100 active players and their ratings.\nA active player is defined as a player who has been listed in a submitted rated match in the last 6 months.",
+            //     inline: false
+            // }
         ]);
         input.reply({ embeds: [embed], ephemeral: true });
     }
@@ -278,7 +278,7 @@ export class HelpCommand {
         help.addStringOption(option => option.setName("category")
             .setDescription("The category of commands you want help with.")
             .setChoices({ name: "maps", value: "maps" }, { name: "divs", value: "divs" },
-                { name: "misc", value: "misc" },// { name: "player", value: "player" },
+                { name: "misc", value: "misc" }, { name: "player", value: "player" },
                 { name: "replays", value: "replays" }/*, { name: "admin", value: "admin" }*/));
 
         bot.registerCommand(help, this.help.bind(this));

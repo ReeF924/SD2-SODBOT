@@ -48,7 +48,8 @@ export class DiscordBot {
         //this.loadBlacklist();
         this.database = database;
 
-        const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent]);
+        const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages,
+            IntentsBitField.Flags.GuildMembers ,IntentsBitField.Flags.MessageContent]);
 
         this.DiscordClient = new DiscordClient(intents, new Collection());
 

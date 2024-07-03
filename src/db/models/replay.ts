@@ -1,9 +1,9 @@
-import {Franchise} from "../admins/adminsModels";
+import {Franchise} from "./admin";
 
 export interface ReplayDto {
     sessionId: string;
-    uploadedIn: number;
-    uploadedBy: number;
+    uploadedIn: string;
+    uploadedBy: string;
     uploadedAt: Date;
     franchise: Franchise;
     version: number;
@@ -26,6 +26,29 @@ export interface ReplayPlayerDto {
     faction: boolean; //false - axis, pact
     income: Income | null;
     deckCode: string;
+}
+
+export interface ReplayWithOldEloDto{
+    id: number;
+    sessionId: string;
+    uploadedIn: string;
+    uploadedBy: string;
+    uploadedAt: Date;
+    franchise: Franchise;
+    version: number;
+    isTeamGame: boolean;
+    map: string;
+    mapType: MapType | null;
+    victoryCondition: VictoryCondition;
+    durationSec: number;
+    replayType?: SkillLevel | null;
+    replayPlayers: ReplayPlayerWithEloDto[];
+}
+
+export interface ReplayPlayerWithEloDto extends ReplayPlayerDto {
+    discordId: string;
+    sodbotElo: number;
+    oldSodbotElo: number;
 }
 
 export enum MapType {

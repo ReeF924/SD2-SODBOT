@@ -1,13 +1,14 @@
-import {MapType, ReplayDto, ReplayPlayerDto, VictoryCondition} from "./replaysModels";
+import {MapType, ReplayDto, ReplayPlayerDto, ReplayWithOldEloDto, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
-import {getChannel} from "../admins/adminsService";
-import {Franchise} from "../admins/adminsModels";
+import {getChannel} from "./adminsService";
+import {Franchise} from "../models/admin";
+import {apiErrorMessage} from "../db";
 
 
 interface UploadInformation {
-    uploadedIn: number;
-    uploadedBy: number;
+    uploadedIn: string;
+    uploadedBy: string;
     uploadedAt: Date;
 }
 
@@ -15,7 +16,6 @@ async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], loser
 
     let victoryCondition: VictoryCondition;
 
-    //todo add DRAW!!!!!!!
     switch (misc.victory[data.result.victory].substring(0, 2)) {
         case "Dr":
             victoryCondition = VictoryCondition.draw;
@@ -74,12 +74,13 @@ async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], loser
 
     }
 
-    const channel = await getChannel(uploadInfo.uploadedIn);
+    //no need to send more requests, can just find the channel on API
+    // const channel = await getChannel(uploadInfo.uploadedIn);
+    //
+    // const replayType = typeof channel === "string" ? null: channel.skillLevel;
 
-    const replayType = channel ? channel.skillLevel : null;
 
-
-    const replay: ReplayDto = {
+    return {
         sessionId: data.uniqueSessionId,
         uploadedIn: uploadInfo.uploadedIn,
         uploadedBy: uploadInfo.uploadedBy,
@@ -91,16 +92,15 @@ async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], loser
         mapType: mapType,
         victoryCondition: victoryCondition,
         durationSec: data.result.duration,
-        replayType: replayType,
+        replayType: null,
         replayPlayers: [
             ...winners.map(player => convertToReplayPlayerDto(player, true)),
             ...losers.map(player => convertToReplayPlayerDto(player, false))
         ]
-    }
-    return replay;
+    };
 }
 
-function convertToReplayPlayerDto(player: RawPlayer, victory: boolean): ReplayPlayerDto {
+export function convertToReplayPlayerDto(player: RawPlayer, victory: boolean): ReplayPlayerDto {
     return {
         playerId: player.id,
         nickname: player.name,
@@ -113,10 +113,9 @@ function convertToReplayPlayerDto(player: RawPlayer, victory: boolean): ReplayPl
         deckCode: player.deck.raw.code
 
     }
-
 }
 
-export async function uploadReplay(data: RawGameData, winners: RawPlayer[], losers: RawPlayer[], uploadInfo: UploadInformation, mapName: string): Promise<ReplayDto | string> {
+export async function uploadReplay(data: RawGameData, winners: RawPlayer[], losers: RawPlayer[], uploadInfo: UploadInformation, mapName: string): Promise<ReplayWithOldEloDto | string> {
     if (winners.some(w => w.deck.division.startsWith("ERROR")) || losers.some(l => l.deck.division.startsWith("ERROR"))) {
         return "Unknown division";
     }
@@ -129,6 +128,7 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
     }
 
     const url = process.env.API_URL + "/replays";
+    
 
     try {
         const response = await fetch(url, {
@@ -145,14 +145,15 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
         }
 
         if (!response.ok) {
-            const errorText = await response.text();
-            const errorMessage = `Failed to upload replay try: ${errorText}`;
+            const errorText: apiErrorMessage = await response.json();
+            const errorMessage = `Failed to upload replay try: ${errorText.message}`;
             console.log(errorMessage, response);
 
             return "Failed to upload replay";
         }
         console.log("Succesfully uploaded replay");
-        return replay;
+
+        return await response.json() as ReplayWithOldEloDto;
 
     } catch (e) {
         console.log("Failed to upload replay catch, error: ", e)

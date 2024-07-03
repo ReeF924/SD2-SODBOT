@@ -1,9 +1,9 @@
 import {ChatInputCommandInteraction, Message, SlashCommandBuilder, TextChannel} from "discord.js";
 import {admins, DiscordBot, MsgHelper} from "../general/discordBot";
-import {getChannel, postChannel} from '../db/admins/adminsService';
-import {SkillLevel} from "../db/replays/replaysModels";
+import {getChannel, postChannel} from '../db/services/adminsService';
+import {SkillLevel} from "../db/models/replay";
 import {Replays} from "../results/replays";
-import {Franchise} from "../db/admins/adminsModels";
+import {dbChannel, Franchise} from "../db/models/admin";
 
 
 export class AdminCommand {
@@ -129,7 +129,7 @@ export class AdminCommand {
         if (type === null) {
             await interaction.deferReply({ephemeral: true});
 
-            const response = await this.GetReplayType(parseInt(interaction.channel.id));
+            const response = await this.GetReplayType(interaction.channel.id);
 
             interaction.followUp({content: response, ephemeral: true});
             return;
@@ -144,10 +144,10 @@ export class AdminCommand {
         let replayType: SkillLevel = SkillLevel[type as keyof typeof SkillLevel];
 
         const response = await postChannel({
-            Id: parseInt(interaction.guild.id),
+            Id: interaction.guild.id,
             Name: interaction.guild.name,
             Channel: {
-                Id: parseInt(interaction.channel.id),
+                Id: interaction.channel.id,
                 Name: interaction.channel.name,
                 SkillLevel: replayType,
                 PrimaryMode: Franchise.sd2
@@ -164,17 +164,19 @@ export class AdminCommand {
         });
     }
 
-    private async GetReplayType(channelId: number): Promise<string> {
+    private async GetReplayType(channelId: string): Promise<string> {
 
         try {
-            const channel = await getChannel(channelId);
+            let channel = await getChannel(channelId);
 
-            if (channel === null) {
+            if (typeof channel === "string") {
                 return "Replays in this channel are considered others level."
             }
 
+            channel = channel as dbChannel;
             return `Replays in this channel are considered ${SkillLevel[channel.skillLevel]} level.`;
         } catch (e) {
+            console.log('error', e);
             return "Error getting replay type for channel";
         }
     }
@@ -196,22 +198,24 @@ export class AdminCommand {
 
         const channel: TextChannel = interaction.channel as TextChannel;
 
-        const date = new Date(parseInt(dateString.substring(0, 4)), parseInt(dateString.substring(4, 6)) - 1, parseInt(dateString.substring(6, 8)));
+        const date = dateString
+            ? new Date(parseInt(dateString.substring(0, 4)), parseInt(dateString.substring(4, 6)) - 1, parseInt(dateString.substring(6, 8)))
+            : new Date(0);
 
         MsgHelper.reply(interaction, "starting to yoink messages", true);
 
 
         const messages = await this.getMessages(channel, date, undefined);
-        const n = messages.length;
-        const tenPercent = ~~(52 / 10);
+        const n = messages.length - 1;
+        const tenPercent = Math.round(n / 10);
 
         let counter = 0;
         let failed = 0;
 
-        for (let i = 0; i < messages.length; i++) {
+        for (let i = n; i >= 0; i--) {
 
             let message = messages[i];
-            console.log('for i', i);
+            console.log(`${n - i}/${n}: ${message.createdAt.getFullYear()}/${message.createdAt.getMonth()}/${message.createdAt.getDate()}`);
 
             if (!message || !message.attachments) {
                 continue;
@@ -224,7 +228,7 @@ export class AdminCommand {
                 const r = replays[j];
                 try {
                     //makes it a bit faster
-                    if (i % 3 === 0) {
+                    if ((i + j) % 3 === 0) {
                         await Replays.extractReplayInfo(message, r.url, false);
                     }
                     else{
@@ -239,10 +243,10 @@ export class AdminCommand {
                 }
             }
 
-
-            if (i % tenPercent === 0) {
-                console.log('Progress: ', i / n * 100 + '%');
-                reefy.send(`Progress: ${i / n * 100}%`);
+            if ((n-i) % tenPercent === 0) {
+                const percentage = 100 - Math.round(i / n * 100)
+                console.log('Progress: ', percentage + '%');
+                reefy.send(`Progress: ${percentage}% Date: ${message.createdAt.toDateString()}`);
             }
 
         }
@@ -311,7 +315,7 @@ export class AdminCommand {
         return admins.includes(interaction.user.id);
     }
 
-    public addCommands(bot: DiscordBot): void {
+    public addCommands(): void {
         const setReplayType = new SlashCommandBuilder()
             .setName("replaytype").setDescription("Sets the channel to be a replay channel");
 
@@ -323,18 +327,17 @@ export class AdminCommand {
                     {name: "div5", value: "div5"}, {name: "others", value: "others"}
                 ).setRequired(false))
 
-        bot.registerCommand(setReplayType, this.setReplayType.bind(this));
+        this.bot.registerCommand(setReplayType, this.setReplayType.bind(this));
 
         const yoink = new SlashCommandBuilder()
-            .setName("yoink").setDescription("Sneaky bot sneaky bot");
+            .setName("yoink").setDescription("Sneaky, sneaky bot");
 
         // yoink.addNumberOption(option => option.setName("version")
         //     .setDescription("Oldest version to accept.").setRequired(false))
-        yoink.addStringOption(option => option.setName("date").setDescription("Oldest possible date. Format yyyyMMdd").setRequired(true))
+        yoink.addStringOption(option => option.setName("date").setDescription("Oldest possible date. Format yyyyMMdd").setRequired(false))
         // .addIntegerOption(option =>
         //     option.setName("count").setDescription("Max count of messages to go through. Default: If date is set - Unlimited. Otherwise 100").setRequired(false));
 
-
-        bot.registerCommand(yoink, this.yoink.bind(this));
+        this.bot.registerCommand(yoink, this.yoink.bind(this));
     }
 }

@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { MiscCommand } from "./commands/misc";
 import { HelpCommand } from "./commands/help";
-// import { PlayerCommand } from "./commands/player";
+import { PlayerCommand } from "./commands/player";
 import { AdminCommand } from "./commands/admin";
 import { MatchupCommand } from "./commands/matchup"
 
@@ -30,15 +30,15 @@ const database = new DB();
 const bot = new DiscordBot(database);
 
 const adminCommand: AdminCommand = new AdminCommand(bot);
-// const playerCommand: PlayerCommand = new PlayerCommand(database);
+const playerCommand: PlayerCommand = new PlayerCommand();
 const miscCommand: MiscCommand = new MiscCommand();
 const divCommand: DivisionCommand = new DivisionCommand();
 const mapCommand: MapCommand = new MapCommand();
 const helpCommand: HelpCommand = new HelpCommand();
 const matchCommand: MatchupCommand = new MatchupCommand();
 
-adminCommand.addCommands(bot);
-// playerCommand.addCommands(bot);
+adminCommand.addCommands();
+playerCommand.addCommands(bot);
 miscCommand.addCommands(bot);
 divCommand.addCommands(bot);
 mapCommand.addCommands(bot);

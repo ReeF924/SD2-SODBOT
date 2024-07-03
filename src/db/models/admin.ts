@@ -1,26 +1,26 @@
-import {SkillLevel} from "../replays/replaysModels";
+import {SkillLevel} from "./replay";
 
 export interface dbGuild{
-    id: number;
+    id: string;
     name: string;
     channels: dbChannel[];
 }
 
 export interface dbChannel{
-    id: number;
+    id: string;
     name: string;
     skillLevel: SkillLevel;
     primaryMode: Franchise;
 }
 
 export interface dbGuildPostDto {
-    Id: number;
+    Id: string;
     Name: string;
     Channel: dbChannelPostDto;
 }
 
 export interface dbChannelPostDto{
-    Id: number;
+    Id: string;
     Name: string;
     SkillLevel: SkillLevel;
     PrimaryMode: Franchise;
