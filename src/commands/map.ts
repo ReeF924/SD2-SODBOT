@@ -174,7 +174,7 @@ export class MapCommand {
         // embed = embed.setFooter("Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)")
         embed = embed.setFooter({ text: "Maps are stike-through'd when banned\n* maps are not in the league pool (rmap without specifying 1v1)" });
 
-        MsgHelper.sendEmbed(input, [embed]);
+        MsgHelper.sendEmbeds(input, [embed]);
     }
 
 

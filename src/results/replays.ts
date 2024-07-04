@@ -5,7 +5,7 @@ import * as axios from "axios"
 import {convertToReplayPlayerDto, uploadReplay} from "../db/services/replaysService";
 import {getPlayersByIds} from "../db/services/playerService";
 import {Logs} from "../general/logs";
-import {player} from "../db/models/player";
+import {Player} from "../db/models/player";
 import {MsgHelper} from "../general/discordBot";
 import {ReplayPlayerWithEloDto, ReplayWithOldEloDto} from "../db/models/replay";
 
@@ -23,15 +23,11 @@ export class Replays {
 
         const g: RawGameData = GameParser.parseRaw(gres.data);
 
-
-
         const {winners, losers} = Replays.SplitWinnersLosers(g.players, g.result.victory, g.ingamePlayerId);
 
         //randomly chooses which team goes first (so you cannot tell who win from it)
         g.players.splice(0, g.players.length);
         Math.random() < 0.5 ? g.players.push(...winners, ...losers) : g.players.push(...losers, ...winners);
-
-
 
 
         const map = await Replays.getMapName(g);
@@ -86,25 +82,25 @@ export class Replays {
     }
 
     private static joinPlayersToString(players: RawPlayer[], longestName: number): string {
-        let result = "";
+        let result = "```\n";
 
         players.forEach(p => {
             //Fixes Koneig's name, he always gets it wrong
             p.name = p.name.replace(/[Kk]oenig/g, "Koneig");
 
             let name = p.name;
-            const maxLength = Math.min(longestName, 20);
+            const maxLength = Math.min(longestName, 23);
             name = name.substring(0, maxLength);
-            name = name.padEnd(maxLength, '/');
+            name = name.padEnd(maxLength, ' ');
 
             result += name + "\n";
         });
-        return result.substring(0, result.length - 1);
+        return result.substring(0, result.length - 1) + "```";
     }
 
     private static isValidReplay(g: RawGameData): string | null {
         if (g.aiCount > 0) return "aiCount";
-        if (g.gameMode != 1) return "gameMode"; //Check misc.js after
+        if (g.gameMode != 1) return "gameMode";
         if (g.incomeRate != 3 && g.players.length == 2) return "incomeRate"; //don't accept other for 1v1s
         if (g.scoreLimit != 2000) return "scoreLimit";
         return null;
@@ -130,8 +126,8 @@ export class Replays {
             }
 
 
-            if (!await Logs.logToFile(g.map_raw)) {
-                console.log('\nnewMap:', g.map_raw + '\n');
+            if (!await Logs.logToFile(g.map_raw + " : " + map)) {
+                console.log('\nnewMap:', g.map_raw + 'guess is ' + map + '\n');
             }
         }
 
@@ -255,7 +251,7 @@ export class Replays {
     }
 
     static async GetPlayerByIds(winners: RawPlayer[], losers: RawPlayer[], apiResponded: boolean): Promise<PlayerInfo[]> {
-        let response: player[] | string;
+        let response: Player[] | string;
         if(apiResponded){
             try {
 

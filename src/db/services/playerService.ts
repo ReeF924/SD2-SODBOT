@@ -1,9 +1,9 @@
-import {player, playerPutDto} from "../models/player";
+import {Player, PlayerPutDto, PlayerRank} from "../models/player";
 import {apiErrorMessage} from '../db';
 import axios from 'axios';
 
 
-export async function getPlayer(id: number): Promise<player | string> {
+export async function getPlayer(id: number): Promise<Player | string> {
 
     const url = process.env.API_URL + "/players/" + id;
 
@@ -21,7 +21,7 @@ export async function getPlayer(id: number): Promise<player | string> {
     return "Error when getting player";
 }
 
-export async function getPlayersByIds(ids: number[]): Promise<player[] | string> {
+export async function getPlayersByIds(ids: number[]): Promise<Player[] | string> {
 
     let url = process.env.API_URL + "/players/getPlayersByIds";
 
@@ -38,7 +38,7 @@ export async function getPlayersByIds(ids: number[]): Promise<player[] | string>
     const anwser = await response;
 
     if (anwser.ok) {
-        return await anwser.json() as Promise<player[]>;
+        return await anwser.json() as Promise<Player[]>;
     }
 
     if (anwser.status === 404) {
@@ -62,9 +62,9 @@ export async function getPlayersByIds(ids: number[]): Promise<player[] | string>
 }
 
 
-export async function updatePlayersDiscordId(id: number, input: playerPutDto): Promise<player | string> {
+export async function updatePlayersDiscordId(id: number , input: PlayerPutDto): Promise<Player | string> {
 
-    const url = process.env.API_URL + "/players/" + id;
+    const url = process.env.API_URL + "/players/" + id.toString();
 
     try {
         const response = await fetch(url, {
@@ -75,7 +75,7 @@ export async function updatePlayersDiscordId(id: number, input: playerPutDto): P
             body: JSON.stringify(input)
         });
         if (response.ok) {
-            return await response.json() as player;
+            return await response.json() as Player;
         }
         if (response.status === 400) {
             const errorMessage: apiErrorMessage = await response.json();
@@ -94,6 +94,50 @@ export async function updatePlayersDiscordId(id: number, input: playerPutDto): P
         console.log('Error while uploading player', e);
         return 'Failed to upload player';
     }
+}
 
+export async function getLeaderboard(eloType:string): Promise<PlayerRank[] | string> {
 
+    const url = process.env.API_URL + "/players/rank?pageNumber=1&pageSize=10&eloType=" + eloType;
+
+    try {
+        const response = await fetch(url);
+
+        if (response.ok) {
+            return await response.json() as PlayerRank[];
+        }
+
+        const errorMessage: apiErrorMessage = await response.json();
+
+        console.log("Failed to get leaderboard: " + errorMessage.message);
+        return "Failed to get leaderboard";
+    } catch (e) {
+        console.log('Error while getting leaderboard', e);
+        return 'Failed to get leaderboard';
+    }
+}
+
+export async function getPlayerRank(playerId:string, eloType: string): Promise<PlayerRank[] | string> {
+
+    const url = process.env.API_URL + "/players/rank/" + playerId + "?eloType=" + eloType;
+
+    try {
+        const response = await fetch(url);
+
+        if (response.ok) {
+            return await response.json() as PlayerRank[];
+        }
+
+        if(response.status === 404) {
+            const errorMessage: apiErrorMessage = await response.json();
+            console.log("Failed to get leaderboard: " + errorMessage.message);
+            return errorMessage.message;
+        }
+
+        return "Failed to get leaderboard";
+
+    } catch (e) {
+        console.log('Error while getting leaderboard', e);
+        return 'Failed to get leaderboard';
+    }
 }

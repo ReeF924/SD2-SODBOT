@@ -220,7 +220,7 @@ export class MiscCommand {
                         "SD Nerd HQ Team", inline: false
                 }
             ])
-        MsgHelper.sendEmbed(input, [embed]);
+        MsgHelper.sendEmbeds(input, [embed]);
     }
 
     public addCommands(bot: DiscordBot): void {

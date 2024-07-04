@@ -87,7 +87,7 @@ export class DivisionCommand {
             .map(x => "\u200b" + x.name).join('\n');
         axisDivsEmbed.addFields({ name: '\u200b', value: axisDivs, inline: true });
 
-        MsgHelper.sendEmbed(input, [alliedDivsEmbed, axisDivsEmbed]);
+        MsgHelper.sendEmbeds(input, [alliedDivsEmbed, axisDivsEmbed]);
     }
 
     private unbanDivision(chatInput: ChatInputCommandInteraction, input: string[]): void {

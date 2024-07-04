@@ -174,7 +174,7 @@ export class MsgHelper {
         return interaction.channel.send(content);
     }
 
-    static sendEmbed(interaction: ChatInputCommandInteraction, content: EmbedBuilder[], secret: boolean = false) {
+    static sendEmbeds(interaction: ChatInputCommandInteraction, content: EmbedBuilder[], secret: boolean = false) {
         return interaction.reply({ embeds: content, ephemeral: secret });
     }
 
