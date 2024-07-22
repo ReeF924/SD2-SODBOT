@@ -14,6 +14,8 @@ export class PlayerCommand  {
             return;
         }
 
+        interaction.deferReply();
+
         const input: PlayerPutDto = {
             discordId: interaction.user.id,
             nickname: interaction.user.username
@@ -22,20 +24,22 @@ export class PlayerCommand  {
         let response = await updatePlayersDiscordId(id, input);
 
         if(typeof response === 'string') {
-            interaction.reply(response);
+            interaction.editReply(response);
             return;
         }
 
-        interaction.reply(`Player ${id} registered.`);
+        interaction.editReply(`Player ${id} registered.`);
     }
 
     private async leaderboard(interaction: ChatInputCommandInteraction): Promise<void> {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
 
+        interaction.deferReply();
+
         const players = await getLeaderboard(eloType);
 
         if(typeof players === 'string') {
-            interaction.reply("Failed to get leaderboard.");
+            interaction.editReply("Failed to get leaderboard.");
             return;
         }
 
@@ -43,8 +47,8 @@ export class PlayerCommand  {
 
         if(players.length > 0) {
             value = "```\n";
-            const longestRank = players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
-            const longestName = Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 20);
+            const longestRank = this.getLongestRank(players);
+            const longestName = this.getLongestName(players);
 
             players.map((player, index) => {
                 value += `${player.rank.toString().padStart(longestRank)}. ${player.name.substring(0, longestName).padEnd(longestName)}   ${player.elo.toFixed(2)}\n`;
@@ -52,12 +56,14 @@ export class PlayerCommand  {
             value += "```";
         }
 
-        this.sendEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Top 10 players by ${eloType}`);
+        this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Top 10 players by ${eloType}`);
     }
 
     private async playerRank(interaction: ChatInputCommandInteraction): Promise<void> {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
         const id = interaction.user.id;
+
+        interaction.deferReply();
 
         const players = await getPlayerRank(id, eloType);
 
@@ -66,8 +72,8 @@ export class PlayerCommand  {
             return;
         }
 
-        const longestRank = players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
-        const longestName = Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 20);
+        const longestRank = this.getLongestRank(players);
+        const longestName = this.getLongestName(players);
 
         let value:string = "```\n";
         players.map((player, index) => {
@@ -75,10 +81,10 @@ export class PlayerCommand  {
         });
         value += "```";
 
-        this.sendEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Rank of <@${interaction.user.id}> ${eloType}`);
+        this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Rank of <@${interaction.user.id}> ${eloType}`);
     }
 
-    private async sendEmbed(interaction: ChatInputCommandInteraction, embeds: EmbedField[], description:string): Promise<void>{
+    private async editReplyEmbed(interaction: ChatInputCommandInteraction, embeds: EmbedField[], description:string): Promise<void>{
         const embed = new EmbedBuilder()
             .setTitle("Leaderboard")
             .setDescription(description)
@@ -87,7 +93,14 @@ export class PlayerCommand  {
 
         embed.addFields(embeds);
 
-        MsgHelper.sendEmbeds(interaction, [embed]);
+        interaction.editReply({embeds: [embed]});
+    }
+    private getLongestRank(players: PlayerRank[]): number {
+        return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
+    }
+
+    private getLongestName(players: PlayerRank[]): number {
+        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 20);
     }
 
     public addCommands(bot: DiscordBot): void {

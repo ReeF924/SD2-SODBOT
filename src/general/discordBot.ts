@@ -111,7 +111,12 @@ export class DiscordBot {
     }
 
     private async onInteraction(interaction: ChatInputCommandInteraction) {
-        if (!interaction.isChatInputCommand()) return;
+        if (!interaction.isChatInputCommand()){
+            console.log("Unknown command");
+            MsgHelper.reply(interaction, "Unknown command. Try /help", true);
+            return;
+        }
+
 
         const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
 

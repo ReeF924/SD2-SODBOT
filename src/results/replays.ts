@@ -60,6 +60,9 @@ export class Replays {
             return;
         }
 
+        if (sendEmbed)
+            await Replays.sendEmbed(message, g, winners, losers, map, apiResponded, null);
+
         console.log(`Invalid replay: ${valid}`);
         return null;
 
@@ -91,7 +94,7 @@ export class Replays {
             let name = p.name;
             const maxLength = Math.min(longestName, 23);
             name = name.substring(0, maxLength);
-            name = name.padEnd(maxLength, ' ');
+            // name = name.padEnd(maxLength, ' ');
 
             result += name + "\n";
         });
@@ -190,8 +193,6 @@ export class Replays {
                 : {name: "EugenId", value: player.player.id.toString(), inline: true};
 
 
-
-
             let eloText:string = "error";
             if(player.sodbotElo){
                 eloText = player.sodbotElo.toFixed(2);
@@ -200,7 +201,7 @@ export class Replays {
                     const eloDiff = player.sodbotElo - player.oldSodbotElo;
                     let char = "";
                     char = eloDiff > 0 ? "+" : "-";
-                    eloText += ` (${char}${Math.abs(eloDiff).toFixed(2)})`;
+                    eloText += ` ||(${char}${Math.abs(eloDiff).toFixed(2)})||`;
                 }
             }
 

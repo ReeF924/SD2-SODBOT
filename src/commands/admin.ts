@@ -131,7 +131,7 @@ export class AdminCommand {
 
             const response = await this.GetReplayType(interaction.channel.id);
 
-            interaction.followUp({content: response, ephemeral: true});
+            interaction.editReply({content: response});
             return;
         }
 
@@ -155,12 +155,11 @@ export class AdminCommand {
         });
 
         if (typeof response === "string") {
-            interaction.followUp({content: "Error setting replay type for channel", ephemeral: true});
+            interaction.editReply({content: "Error setting replay type for channel"});
             return;
         }
-        interaction.followUp({
+        interaction.editReply({
             content: `Replay type set to ${SkillLevel[replayType]} for this channel.`,
-            ephemeral: true
         });
     }
 

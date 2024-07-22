@@ -132,7 +132,7 @@ export class MiscCommand {
         }
 
 
-        if (i > 0.80) {
+        if (i > 0.9) {
             MsgHelper.reply(
                 input,
                 this.piatReplies[Math.floor(Math.random() * this.piatReplies.length)],
