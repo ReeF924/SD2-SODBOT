@@ -4,6 +4,7 @@ import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { map } from "mssql";
+import * as fs from "fs";
 
 export class MapCommand {
     private bans: Map<string, Map<string, boolean>> = new Map<string, Map<string, boolean>>(); // 2d array of playerIds to banned divisions.
@@ -18,7 +19,10 @@ export class MapCommand {
         "Black Forest",
         "Ripple",
         "Chemical",
-        "Loop"
+        "Loop",
+        "Airport",
+        "Hesse",
+        "Urban Frontlines"
     ]
 
     private warnoMaps3v3 = [
@@ -50,7 +54,8 @@ export class MapCommand {
         "Ripple",
         "Mount River 3v3",
         "Cyrus 3v3",
-        "Loop"
+        "Loop",
+        "Urban frontlines"
     ]
 
 
@@ -118,7 +123,9 @@ export class MapCommand {
         const pickIndex = Math.floor(Math.random() * maplist.length);
         const pick = maplist[pickIndex];
 
-        input.reply({ content: pick, files: ["./assets/images/" + pick + ".png"] });
+        fs.existsSync("./assets/images/" + pick + ".png")
+            ? input.reply({ content: pick, files: ["./assets/images/" + pick + ".png"] })
+            : input.reply(pick);
     }
     private allMaps(input: ChatInputCommandInteraction): void {
         const importedMapData = Data.maps;
@@ -255,7 +262,7 @@ export class MapCommand {
         //@todo check if it shows the options, otherwise show an example in description for warno
         rmap.addStringOption((option) => option.setName("type").setDescription("Map type. Default: 1v1").setRequired(false)
             .addChoices({ name: "1v1", value: "1v1" }, { name: "2v2", value: "2v2" }, { name: "3v3", value: "3v3" },
-                { name: "4v4", value: "4v4" }, { name: "warno", value: "warno" }, { name: "warno 1v1", value: "warno 1v1" },
+                { name: "4v4", value: "4v4" }, { name: "warno 1v1", value: "warno 1v1" },
                 { name: "warno 2v2", value: "warno 2v2" }, { name: "warno 3v3", value: "warno 3v3" },
                 { name: "warno 4v4", value: "warno 4v4" }))
             .addIntegerOption(option => option.setName("count").setDescription("Number of maps to pick. Default: 1")

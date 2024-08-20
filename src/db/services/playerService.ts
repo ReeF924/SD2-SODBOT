@@ -1,6 +1,7 @@
 import {Player, PlayerPutDto, PlayerRank} from "../models/player";
 import {apiErrorMessage} from '../db';
 import axios from 'axios';
+import {Logs} from "../../general/logs";
 
 
 export async function getPlayer(id: number): Promise<Player | string> {
@@ -17,7 +18,7 @@ export async function getPlayer(id: number): Promise<Player | string> {
         return "Player not found";
     }
 
-    console.log("Error getting player: " + response.statusText);
+    Logs.error("Error getting player: " + response.statusText);
     return "Error when getting player";
 }
 
@@ -33,7 +34,7 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
 
 
     const response = fetch(url);
-    response.catch(e => console.log('Error while getting player by ids', e));
+    response.catch(e => Logs.error(`Error while getting player by ids: ${e}`));
 
     const anwser = await response;
 
@@ -45,7 +46,7 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
         return "Player not found";
     }
 
-    console.log("Failed to get players: " + anwser.statusText);
+    Logs.log("Failed to get players: " + anwser.statusText);
     return "Error when getting player";
 
     // } catch (e) {
@@ -87,11 +88,11 @@ export async function updatePlayersDiscordId(id: number , input: PlayerPutDto): 
             return errorMessage.message;
         }
 
-        console.log("Bad response while uploading player: ", response.statusText);
+        Logs.error("Bad response while uploading player: " + response.statusText);
         return 'Failed to upload player';
 
     } catch (e) {
-        console.log('Error while uploading player', e);
+        Logs.error('Error while uploading player :' + e);
         return 'Failed to upload player';
     }
 }
@@ -109,10 +110,10 @@ export async function getLeaderboard(eloType:string): Promise<PlayerRank[] | str
 
         const errorMessage: apiErrorMessage = await response.json();
 
-        console.log("Failed to get leaderboard: " + errorMessage.message);
+        Logs.error("Failed to get leaderboard: " + errorMessage.message);
         return "Failed to get leaderboard";
     } catch (e) {
-        console.log('Error while getting leaderboard', e);
+        Logs.error('Error while getting leaderboard: ' + e);
         return 'Failed to get leaderboard';
     }
 }
@@ -130,14 +131,14 @@ export async function getPlayerRank(playerId:string, eloType: string): Promise<P
 
         if(response.status === 404) {
             const errorMessage: apiErrorMessage = await response.json();
-            console.log("Failed to get leaderboard: " + errorMessage.message);
+            Logs.error("Failed to get leaderboard: " + errorMessage.message);
             return errorMessage.message;
         }
 
         return "Failed to get leaderboard";
 
     } catch (e) {
-        console.log('Error while getting leaderboard', e);
+        Logs.error('Error while getting leaderboard: ' + e);
         return 'Failed to get leaderboard';
     }
 }

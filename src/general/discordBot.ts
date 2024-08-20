@@ -117,6 +117,10 @@ export class DiscordBot {
             return;
         }
 
+        //logs the commmand and its args (for debugging in production lmao (bro I swear people are able to fuck up the bot in ways I just can't imagine))
+        // console.log(`User ${interaction.user.username} used ${interaction.commandName} with args ${JSON.stringify(interaction.options)}`);
+
+        interaction.inRawGuild()
 
         const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
 
@@ -142,7 +146,9 @@ export class DiscordBot {
         const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
         replays.forEach((r) => {
             const channel = message.channel as TextChannel;
-            Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${channel.name}`);
+
+            // Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${channel.name}`);
+
             try {
                 Replays.extractReplayInfo(message, r.url);
             } catch (e) {

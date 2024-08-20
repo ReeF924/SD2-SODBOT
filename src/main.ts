@@ -13,10 +13,8 @@ import * as http from 'http';
 import { Logs } from "./general/logs";
 import { DB, Player } from "./general/db";
 import { API } from "./api/api";
-import { misc } from 'sd2-data';
 import { DivisionCommand } from './commands/division';
 import { MapCommand } from './commands/map';
-import { match } from 'assert';
 
 const p = require("../package.json")
 

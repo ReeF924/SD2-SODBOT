@@ -14,7 +14,7 @@ export class Logs {
                 new winston.transports.Console(),
                 new winston.transports.File({filename: "app.log", maxsize: 20000000, maxFiles: 3})
             ]
-        })
+        });
     }
 
     static log(message: unknown): void {

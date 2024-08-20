@@ -15,7 +15,7 @@ export class DivisionCommand {
     private randomDiv(input: ChatInputCommandInteraction): void {
 
         let divCount = input.options.getInteger("count") ?? 1;
-        let divs: DivisionStruct[];
+        let divs: DivisionStruct[] = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
 
         const side = input.options.getString("side");
 

@@ -10,11 +10,11 @@ export class PlayerCommand  {
         const id = interaction.options.getNumber("eugenid");
 
         if(!id) {
-            interaction.reply("Invalid player ID");
+            await interaction.reply("Invalid player ID");
             return;
         }
 
-        interaction.deferReply();
+        await interaction.deferReply();
 
         const input: PlayerPutDto = {
             discordId: interaction.user.id,
@@ -24,22 +24,22 @@ export class PlayerCommand  {
         let response = await updatePlayersDiscordId(id, input);
 
         if(typeof response === 'string') {
-            interaction.editReply(response);
+            await interaction.editReply(response);
             return;
         }
 
-        interaction.editReply(`Player ${id} registered.`);
+        await interaction.editReply(`Player ${id} registered.`);
     }
 
     private async leaderboard(interaction: ChatInputCommandInteraction): Promise<void> {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
 
-        interaction.deferReply();
+        await interaction.deferReply();
 
         const players = await getLeaderboard(eloType);
 
         if(typeof players === 'string') {
-            interaction.editReply("Failed to get leaderboard.");
+            await interaction.editReply("Failed to get leaderboard.");
             return;
         }
 
@@ -56,19 +56,19 @@ export class PlayerCommand  {
             value += "```";
         }
 
-        this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Top 10 players by ${eloType}`);
+        await this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Top 10 players by ${eloType}`);
     }
 
     private async playerRank(interaction: ChatInputCommandInteraction): Promise<void> {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
         const id = interaction.user.id;
 
-        interaction.deferReply();
+        await interaction.deferReply();
 
         const players = await getPlayerRank(id, eloType);
 
         if(typeof players === 'string') {
-            interaction.reply(players);
+            await interaction.reply(players);
             return;
         }
 
@@ -81,7 +81,7 @@ export class PlayerCommand  {
         });
         value += "```";
 
-        this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Rank of <@${interaction.user.id}> ${eloType}`);
+        await this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Rank of <@${interaction.user.id}> ${eloType}`);
     }
 
     private async editReplyEmbed(interaction: ChatInputCommandInteraction, embeds: EmbedField[], description:string): Promise<void>{
@@ -93,7 +93,7 @@ export class PlayerCommand  {
 
         embed.addFields(embeds);
 
-        interaction.editReply({embeds: [embed]});
+        await interaction.editReply({embeds: [embed]});
     }
     private getLongestRank(players: PlayerRank[]): number {
         return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;

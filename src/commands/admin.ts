@@ -214,7 +214,7 @@ export class AdminCommand {
         for (let i = n; i >= 0; i--) {
 
             let message = messages[i];
-            console.log(`${n - i}/${n}: ${message.createdAt.getFullYear()}/${message.createdAt.getMonth()}/${message.createdAt.getDate()}`);
+            console.log(`${n - i}/${n}: ${message.createdAt.getFullYear()}/${message.createdAt.getMonth() + 1}/${message.createdAt.getDate()}`);
 
             if (!message || !message.attachments) {
                 continue;
@@ -285,6 +285,9 @@ export class AdminCommand {
             const fetchSize = fetched.size;
             let lastFetched = fetched.last();
 
+            if (lastFetched.createdTimestamp < date.getTime()) {
+                done = true;
+            }
             fetched = fetched.filter(message => message.createdTimestamp > date.getTime() && message.attachments.size > 0);
 
             console.log(`fetched: ${fetchSize}, filtered: ${fetched.size}`);
@@ -295,12 +298,12 @@ export class AdminCommand {
 
             lastMessageId = lastFetched.id;
 
-            if (lastFetched.createdTimestamp < date.getTime()) {
-                done = true;
-                fetched = fetched.filter(message => message.createdTimestamp < date.getTime());
-            }
 
-            fetched.forEach(message => messages.push(message));
+            fetched.forEach(message => {
+                const d = new Date(message.createdTimestamp);
+                console.log('crt TimeStamp: ', message.createdAt.toDateString());
+                messages.push(message)
+            });
 
             counter++;
         }

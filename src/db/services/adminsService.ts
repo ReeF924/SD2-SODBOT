@@ -1,5 +1,6 @@
 import {dbGuild, dbChannel, dbGuildPostDto, dbChannelPostDto} from "../models/admin";
 import {apiErrorMessage} from "../db";
+import {Logs} from "../../general/logs";
 
 export async function getChannel(id:string ):Promise<dbChannel | string>{
 
@@ -17,7 +18,7 @@ export async function getChannel(id:string ):Promise<dbChannel | string>{
         return resMess.message;
     }
 
-    console.log("Error getting channel: " + response.statusText);
+    Logs.error("Error getting channel: " + response.statusText);
     return "Error when getting channel";
 }
 
@@ -35,7 +36,7 @@ export async function postChannel(guild: dbGuildPostDto):Promise<dbChannel | str
         body: JSON.stringify(guild)
     });
 
-    const channel: dbChannel = await response.json();
+    const channel = await response.json();
 
     if (response.ok){
         return channel;

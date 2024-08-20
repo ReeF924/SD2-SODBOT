@@ -92,8 +92,8 @@ export class Replays {
             p.name = p.name.replace(/[Kk]oenig/g, "Koneig");
 
             let name = p.name;
-            const maxLength = Math.min(longestName, 23);
-            name = name.substring(0, maxLength);
+            const maxLength = Math.min(longestName, 36);
+            name = name.substring(0, maxLength).padEnd(36, ' ');
             // name = name.padEnd(maxLength, ' ');
 
             result += name + "\n";
@@ -114,23 +114,34 @@ export class Replays {
 
         //if the map's not in sd2-data, this tries to guess it's name
         if (!map) {
+
+            if(!g.map_raw.includes('_')){
+                return g.map_raw;
+            }
+
             const arr = g.map_raw.split('_');
+
+            if(arr.length < 3){
+                return g.map_raw;
+            }
+
             map = arr[2];
             let counter = 3;
             while (counter < arr.length && isNaN(parseInt(arr[counter][0]))) {
 
                 if (arr[counter] === 'LD') {
-                    counter++;
-                    continue;
+                    break;
                 }
 
                 map += ' ' + arr[counter];
                 counter++;
             }
 
+            map = map.replace(/([A-Z])/g, ' $1').trim();
+
 
             if (!await Logs.logToFile(g.map_raw + " : " + map)) {
-                console.log('\nnewMap:', g.map_raw + 'guess is ' + map + '\n');
+                console.log('\nnewMap:', g.map_raw + ' : ' + map + '\n');
             }
         }
 
