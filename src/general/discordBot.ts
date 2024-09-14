@@ -118,7 +118,7 @@ export class DiscordBot {
         }
 
         //logs the commmand and its args (for debugging in production lmao (bro I swear people are able to fuck up the bot in ways I just can't imagine))
-        // console.log(`User ${interaction.user.username} used ${interaction.commandName} with args ${JSON.stringify(interaction.options)}`);
+        console.log(`User ${interaction.user.username} used ${interaction.commandName} with args ${JSON.stringify(interaction.options)}`);
 
         interaction.inRawGuild()
 

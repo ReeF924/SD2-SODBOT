@@ -12,7 +12,7 @@ interface UploadInformation {
     uploadedAt: Date;
 }
 
-async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], losers: RawPlayer[], uploadInfo: UploadInformation, mapName: string): Promise<ReplayDto | string> {
+async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformation): Promise<ReplayDto | string> {
 
     let victoryCondition: VictoryCondition;
 
@@ -34,51 +34,21 @@ async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], loser
     }
     const franchise = data.players[0].deck.franchise === "SD2" ? Franchise.sd2 : Franchise.warno;
 
-    //not a fan of this, but fuck Eugen for not being consistent
     let mapType: MapType;
 
     if (franchise === Franchise.sd2) {
-        const regex = /([0-9])v([0-9])/;
+        const regex = /([0-9]{1,2})v([0-9]{1,2})/;
 
-        const match = data.map_raw.match(regex);
-
-        //autobahn doesn't have the 2v2 in it's name (only sd one), Tannenberg has 10vs10...
-        if (match === null) {
-            if (mapName === ("Autobahn_Zur_Holle"))
-                mapType = MapType._2v2;
-            else if (mapName === "Tannenberg 10v10")
-                mapType = MapType._10v10;
-            else
-                mapType = null;
-        } else {
-            const type = match[0] === "0v0" ? "_10v10" : "_" + match[0];
-
-            mapType = MapType[type as keyof typeof MapType];
-        }
-    //now for warno, because Eugen don't even name their maps consistently
-    } else {
-        const match = data.map_raw.match(/([0-9])vs([0-9])/) ?? mapName.match(/([0-9])v([0-9])/);
+        const match = data.mapName.match(regex);
 
         if (match === null) {
-            if(data.players.length === 2)
-                mapType = MapType._1v1;
-            else
-                mapType = null;
-
-        } else {
-            const type = match[0] === "0vs0" || match[0] === "0v0" ? "_10v10" : "_" + match[0].replace("vs", "v");
-
+            mapType = null;
+        }
+        else {
+            const type = "_" + match[0];
             mapType = MapType[type as keyof typeof MapType];
         }
-
-
     }
-
-    //no need to send more requests, can just find the channel on API
-    // const channel = await getChannel(uploadInfo.uploadedIn);
-    //
-    // const replayType = typeof channel === "string" ? null: channel.skillLevel;
-
 
     return {
         sessionId: data.uniqueSessionId,
@@ -88,39 +58,37 @@ async function convertToReplayDto(data: RawGameData, winners: RawPlayer[], loser
         franchise: franchise,
         version: data.version,
         isTeamGame: data.players.length > 2,
-        map: mapName,
+        map: data.mapName,
         mapType: mapType,
         victoryCondition: victoryCondition,
         durationSec: data.result.duration,
         replayType: null,
         replayPlayers: [
-            ...winners.map(player => convertToReplayPlayerDto(player, true)),
-            ...losers.map(player => convertToReplayPlayerDto(player, false))
+            ...data.players.map(player => convertToReplayPlayerDto(player)),
         ]
     };
 }
 
-export function convertToReplayPlayerDto(player: RawPlayer, victory: boolean): ReplayPlayerDto {
+export function convertToReplayPlayerDto(player: RawPlayer): ReplayPlayerDto {
     return {
         playerId: player.id,
         nickname: player.name,
         elo: player.elo,
         mapSide: null,
-        victory: victory,
+        victory: player.winner,
         division: player.deck.raw.division,
         faction: player.deck.faction,
         income: player.deck.franchise === "SD2" ? player.deck.raw.income : null,
         deckCode: player.deck.raw.code
-
     }
 }
 
-export async function uploadReplay(data: RawGameData, winners: RawPlayer[], losers: RawPlayer[], uploadInfo: UploadInformation, mapName: string): Promise<ReplayWithOldEloDto | string> {
-    if (winners.some(w => w.deck.division.startsWith("ERROR")) || losers.some(l => l.deck.division.startsWith("ERROR"))) {
+export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformation): Promise<ReplayWithOldEloDto | string> {
+    if (data.players.some(w => w.deck.division.startsWith("ERROR"))) {
         return "Unknown division";
     }
 
-    const replay: ReplayDto | string = await convertToReplayDto(data, winners, losers, uploadInfo, mapName);
+    const replay: ReplayDto | string = await convertToReplayDto(data, uploadInfo);
 
 
     if (typeof replay === "string") {
@@ -128,7 +96,7 @@ export async function uploadReplay(data: RawGameData, winners: RawPlayer[], lose
     }
 
     const url = process.env.API_URL + "/replays";
-    
+
 
     try {
         const response = await fetch(url, {

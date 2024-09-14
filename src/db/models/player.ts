@@ -1,13 +1,12 @@
 
 export interface Player {
     id: number;
-    discordId: string;
-    sdElo: number;
-    SdTeamGameElo: number;
-    warnoElo: number;
-    warnoTeamGameElo: number;
+    discordId?: string;
     nickname: string;
-    alsoKnownAs: string[];
+    sdElo?: number;
+    SdTeamGameElo?: number;
+    warnoElo?: number;
+    warnoTeamGameElo?: number;
 }
 
 export interface PlayerPutDto {
@@ -21,4 +20,9 @@ export interface PlayerRank{
     name: string;
     elo: number;
     rank: number;
+}
+
+export interface PlayerAliases{
+    id: number;
+    aliases: string[];
 }

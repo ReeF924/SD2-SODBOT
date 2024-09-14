@@ -1,7 +1,7 @@
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import {ChatInputCommandInteraction, Embed, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
 import {Player, PlayerPutDto, PlayerRank} from "../db/models/player";
-import {getLeaderboard, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
+import {getLeaderboard, getPlayerAliases, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
 
 export class PlayerCommand  {
 
@@ -99,6 +99,36 @@ export class PlayerCommand  {
         return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
     }
 
+    private async Snitch(interaction: ChatInputCommandInteraction){
+        const id = interaction.options.getNumber("eugenid");
+
+        if(!id) {
+            await interaction.reply("Invalid player ID");
+            return;
+        }
+
+        await interaction.deferReply();
+
+        const response = await getPlayerAliases(id);
+
+        if(typeof response === 'string') {
+            await interaction.editReply(response);
+            return;
+        }
+
+
+        let value = 'The most used known aliases are: **';
+        response.aliases.forEach((alias) => {
+            value += alias + ', ';
+        });
+
+        value = value.slice(0, -1) + '**';
+
+        await interaction.editReply(value);
+    }
+
+
+
     private getLongestName(players: PlayerRank[]): number {
         return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 20);
     }
@@ -123,5 +153,11 @@ export class PlayerCommand  {
                 {name: "SD TeamGame", value: "SdTeamGameElo"}, {name: "Warno TeamGame", value: "WarnoTeamGameElo"}));
 
         bot.registerCommand(playerRank, this.playerRank.bind(this));
+
+        const snitch = new SlashCommandBuilder().setName("snitch").setDescription("Returns known aliases of given ID");
+        snitch.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(true));
+
+        bot.registerCommand(snitch, this.Snitch.bind(this));
+
     }
 }

@@ -333,13 +333,7 @@ export class AdminCommand {
 
         const yoink = new SlashCommandBuilder()
             .setName("yoink").setDescription("Sneaky, sneaky bot");
-
-        // yoink.addNumberOption(option => option.setName("version")
-        //     .setDescription("Oldest version to accept.").setRequired(false))
         yoink.addStringOption(option => option.setName("date").setDescription("Oldest possible date. Format yyyyMMdd").setRequired(false))
-        // .addIntegerOption(option =>
-        //     option.setName("count").setDescription("Max count of messages to go through. Default: If date is set - Unlimited. Otherwise 100").setRequired(false));
-
         this.bot.registerCommand(yoink, this.yoink.bind(this));
     }
 }

@@ -24,6 +24,8 @@ export class Logs {
     }
 
     static error(message: unknown): void {
+        console.log("error");
+
         if (message)
             Logs.logger.log("error", message);
     }

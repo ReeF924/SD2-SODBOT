@@ -1,4 +1,4 @@
-import {Player, PlayerPutDto, PlayerRank} from "../models/player";
+import {Player, PlayerAliases, PlayerPutDto, PlayerRank} from "../models/player";
 import {apiErrorMessage} from '../db';
 import axios from 'axios';
 import {Logs} from "../../general/logs";
@@ -142,3 +142,43 @@ export async function getPlayerRank(playerId:string, eloType: string): Promise<P
         return 'Failed to get leaderboard';
     }
 }
+
+export const getPlayerAliases = async (id: number): Promise<PlayerAliases | string> => {
+    const url = process.env.API_URL + "/players/aliases/" + id;
+
+    try{
+        const response = await fetch(url);
+
+        if(response.ok){
+            return await response.json() as PlayerAliases;
+        }
+
+        if(response.status === 404){
+            return "Player not found";
+        }
+
+        return "Failed to get player aliases";
+    }
+    catch (e){
+        Logs.error('Error while getting player aliases: ' + e);
+        return 'Failed to get player aliases';
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
