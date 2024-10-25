@@ -30,34 +30,4 @@ export class Logs {
             Logs.logger.log("error", message);
     }
 
-    static async logToFile(mapName: string, filePath: string = undefined): Promise<boolean> {
-
-
-        filePath = filePath ?? path.join(__dirname, '..', '..', 'toAddMaps.log');
-
-        if(fs.existsSync(filePath) === false) {
-            fs.writeFileSync(filePath, '');
-        }
-
-        const fileStream = fs.createReadStream(filePath);
-
-        const rl = readline.createInterface({
-            input: fileStream,
-            crlfDelay: Infinity
-        });
-
-        for await (const line of rl) {
-            if (line === mapName) {
-                return true;
-            }
-        }
-
-        fs.appendFile(filePath, mapName + '\n', (err) => {
-            if (err) {
-                Logs.error(err);
-                return false;
-            }
-        });
-        return false;
-    }
 }

@@ -9,7 +9,7 @@ export class PlayerCommand  {
 
         const id = interaction.options.getNumber("eugenid");
 
-        if(!id) {
+        if(!id || id < 0) {
             await interaction.reply("Invalid player ID");
             return;
         }
@@ -61,14 +61,31 @@ export class PlayerCommand  {
 
     private async playerRank(interaction: ChatInputCommandInteraction): Promise<void> {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
-        const id = interaction.user.id;
+        // const id = interaction.user.id;
+
+        let idInput = interaction.options.getNumber("eugenid");
+
+        let id: string;
+
+        if(!idInput){
+            id = interaction.user.id;
+        }
+        else{
+            if(idInput < 0){
+                await interaction.reply("Invalid player ID");
+
+                return;
+            }
+            id = idInput.toString();
+        }
+
 
         await interaction.deferReply();
 
         const players = await getPlayerRank(id, eloType);
 
         if(typeof players === 'string') {
-            await interaction.reply(players);
+            await interaction.editReply(players);
             return;
         }
 
@@ -130,7 +147,7 @@ export class PlayerCommand  {
 
 
     private getLongestName(players: PlayerRank[]): number {
-        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 20);
+        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 17);
     }
 
     public addCommands(bot: DiscordBot): void {
@@ -148,6 +165,9 @@ export class PlayerCommand  {
         bot.registerCommand(leaderBoard, this.leaderboard.bind(this));
 
         const playerRank = new SlashCommandBuilder().setName("rank").setDescription("Get player rank");
+
+        playerRank.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(false));
+
         playerRank.addStringOption(option => option.setName("elo_type").setDescription("Elo type. Default: SD 1v1").setRequired(false)
             .addChoices({name: "SD 1v1", value: "SdElo"}, {name: "Warno 1v1", value: "WarnoElo"},
                 {name: "SD TeamGame", value: "SdTeamGameElo"}, {name: "Warno TeamGame", value: "WarnoTeamGameElo"}));

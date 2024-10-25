@@ -10,61 +10,49 @@ import {MsgHelper} from "../general/discordBot";
 import {ReplayPlayerWithEloDto, ReplayWithOldEloDto} from "../db/models/replay";
 
 const ax = axios.default;
-//todo what if-else shit in retractPlayerInfo
-
-//todo CHANGED IN SD2-Utilities:
-//todo winners, losers (winner bool value in RawPlayer) --DONE -> TEST
-//todo getMapName in sd2-utils (map_raw in RawGameData mapRaw now) (map value in RawGame) (change mapType in replaysService, the mapType is included in mapName now) -> TEST
-//todo isValid in GameDataRaw type: string[] | null -> TEST
-//todo Player name not cut if > max value? -> TEST
 
 export class Replays {
     private static readonly blankEmbedField: EmbedField = {name: '\u200b', value: '\u200b', inline: true};
 
-    //gets data out of replay and prepares them for the embed
+    //gets data out of replay
     static async extractReplayInfo(message: Message, url: string, sendEmbed: boolean = true): Promise<RawGameData | null> {
 
         const gres = await ax.get(url);
 
         const g: RawGameData = GameParser.parseRaw(gres.data);
 
-        // const {winners, losers} = Replays.SplitWinnersLosers(g.players, g.result.victory, g.ingamePlayerId);
-
-        //randomly chooses which team goes first (so you cannot tell who win from it)
-        Math.random() < 0.5 ? g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? 1 : -1) : g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? -1 : 1);
-
         let apiResponded = true;
 
         //checks if the replay is valid to be uploaded to the db
-        //todo this is only half of the job
-        if (g.validForUpload === null) {
-            let replay: ReplayWithOldEloDto = null;
-            //uploads replay to the database
-            try {
-                replay = await Replays.uploadReplay(g, message);
+        //todo maybe make the checks more through, not that important, for later
+        if (!g.validForUpload) {
+            if (sendEmbed)
+                await Replays.sendEmbed(message, g, apiResponded, null);
 
-            } catch (e) {
-                if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
-                    console.log("API offline");
-                    apiResponded = false;
-                    return null;
-                }
+            console.log(`Invalid replay: ${g.validForUpload.reduce((a, b) => `${a}, ${b}`)}`);
 
-                console.log(e);
+            return null;
+        }
+
+        let replay: ReplayWithOldEloDto = null;
+        //uploads replay to the database
+        try {
+            replay = await Replays.uploadReplay(g, message);
+
+        } catch (e) {
+
+            if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
+                console.log("API offline");
+                apiResponded = false;
             }
 
-            if (sendEmbed)
-                await Replays.sendEmbed(message, g, apiResponded, replay);
-
-            return;
+            console.log(e);
         }
 
         if (sendEmbed)
-            await Replays.sendEmbed(message, g, apiResponded, null);
+            await Replays.sendEmbed(message, g, apiResponded, replay);
 
-        console.log(`Invalid replay: ${g.validForUpload.reduce((a,b) => `${a}, ${b}`)}`);
-        return null;
-
+        return apiResponded ? g : null;
     }
 
     private static async uploadReplay(g: RawGameData, message: Message): Promise<ReplayWithOldEloDto> {
@@ -90,9 +78,10 @@ export class Replays {
             //Fixes Koneig's name, he always gets it wrong
             p.name = p.name.replace(/[Kk]oenig/g, "Koneig");
 
+            //26 is the max to not wrap the line (padding because of phone (have to click on text to reveal spoiler))
             let name = p.name;
-            const maxLength = Math.min(longestName, 36);
-            name = name.substring(0, maxLength).padEnd(36, ' ');
+            const maxLength = Math.min(longestName, 26);
+            name = name.substring(0, maxLength).padEnd(26, ' ');
             // name = name.padEnd(maxLength, ' ');
 
             result += name + "\n";
@@ -101,29 +90,26 @@ export class Replays {
     }
 
 
-    static async sendEmbed(message: Message, g: RawGameData, apiResponded:boolean, replay: ReplayWithOldEloDto = null): Promise<void> {
-        let players:PlayerInfo[] = [];
+    static async sendEmbed(message: Message, g: RawGameData, apiResponded: boolean, replay: ReplayWithOldEloDto = null): Promise<void> {
+        let players: PlayerInfo[] = [];
 
 
-        if(!replay){
+        if (!replay) {
             players = await Replays.GetPlayerByIds(g.players, apiResponded);
-        }
-        else{
-
-            for(const player of replay.replayPlayers){
+        } else {
+            for (const player of replay.replayPlayers) {
                 const p = g.players.find(r => r.id === player.playerId);
 
-                players.push({player: p, discordId: player.discordId, sodbotElo: player.sodbotElo, oldSodbotElo: player.oldSodbotElo});
+                players.push({
+                    player: p,
+                    discordId: player.discordId,
+                    sodbotElo: player.sodbotElo,
+                    oldSodbotElo: player.oldSodbotElo
+                });
             }
         }
 
-        let longestName = Math.max(...g.players.map(p => p.name.length), 26);
-
-        const winner = g.players.filter(p => p.winner)[0];
-        console.log('winner',winner.name);
-
-        const loser = g.players.filter(p => !p.winner)[0];
-        console.log('loser', loser.name);
+        let longestName = Math.max(...g.players.map(p => p.name.length));
 
         let winnersJoined = Replays.joinPlayersToString(g.players.filter(p => p.winner), longestName);
         let losersJoined = Replays.joinPlayersToString(g.players.filter(p => !p.winner), longestName);
@@ -136,7 +122,11 @@ export class Replays {
                     {name: "Winner", value: `||${winnersJoined}||`, inline: true},
                     {name: "Loser", value: `||${losersJoined}||`, inline: true},
                     {name: "Map", value: g.mapName, inline: false},
-                    {name: "Duration", value: `||${Replays.formatSecondsToMinutesSeconds(g.result.duration)}||`, inline: true},
+                    {
+                        name: "Duration",
+                        value: `||${Replays.formatSecondsToMinutesSeconds(g.result.duration)}||`,
+                        inline: true
+                    },
                     {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
                     // {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
                     // {name: "Time Limit", value: g.timeLimit.toString(), inline: true},
@@ -148,6 +138,8 @@ export class Replays {
         const playerSeparator: string = "-------------------------------------------";
         const enemyTeamSeparator: string = "-------OPPOSING TEAM-------";
 
+        //randomly chooses which team goes first (so you cannot tell who win from it)
+        Math.random() < 0.5 ? g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? 1 : -1) : g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? -1 : 1);
 
         let counter = 1;
         for (const player of players) {
@@ -158,11 +150,12 @@ export class Replays {
                 : {name: "EugenId", value: player.player.id.toString(), inline: true};
 
 
-            let eloText:string = "error";
-            if(player.sodbotElo){
+            let eloText: string = "error";
+            console.log(player)
+            if (player.sodbotElo) {
                 eloText = player.sodbotElo.toFixed(2);
 
-                if(player.oldSodbotElo){
+                if (player.oldSodbotElo) {
                     const eloDiff = player.sodbotElo - player.oldSodbotElo;
                     let char = "";
                     char = eloDiff > 0 ? "+" : "-";
@@ -204,7 +197,7 @@ export class Replays {
 
     static async GetPlayerByIds(players: RawPlayer[], apiResponded: boolean): Promise<PlayerInfo[]> {
         let response: Player[] | string;
-        if(apiResponded){
+        if (apiResponded) {
             try {
 
                 response = await getPlayersByIds(players.map(p => p.id));
@@ -223,14 +216,13 @@ export class Replays {
                 console.log('logPlayers', response);
                 response = [];
             }
-        }
-        else{
+        } else {
             response = [];
         }
 
         //decides which elo to return
         const rp = players[0];
-        const elo = rp.deck.franchise === "SD2" ? players.length > 2 ? "SdTeamGameElo" : "sdElo"
+        const elo = rp.deck.franchise === "SD2" ? players.length > 2 ? "sdTeamGameElo" : "sdElo"
             : players.length > 2 ? "warnoTeamGameElo" : "warnoElo";
 
 
@@ -240,11 +232,10 @@ export class Replays {
         players.forEach(rp => {
             const player = response.filter(p => p.id === rp.id)[0];
 
-            if(player){
-                output.push({player:rp, discordId: player.discordId, sodbotElo: player[elo], oldSodbotElo: null});
-            }
-            else{
-                output.push({player:rp, discordId: null, sodbotElo: null, oldSodbotElo: null});
+            if (player) {
+                output.push({player: rp, discordId: player.discordId, sodbotElo: player[elo], oldSodbotElo: null});
+            } else {
+                output.push({player: rp, discordId: null, sodbotElo: null, oldSodbotElo: null});
             }
         })
 
@@ -256,7 +247,7 @@ export class Replays {
     }
 }
 
-declare interface PlayerInfo{
+declare interface PlayerInfo {
     player: RawPlayer;
     discordId?: string;
     sodbotElo?: number;

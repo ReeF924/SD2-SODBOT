@@ -34,17 +34,14 @@ async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformati
     }
     const franchise = data.players[0].deck.franchise === "SD2" ? Franchise.sd2 : Franchise.warno;
 
-    let mapType: MapType;
+    let mapType: MapType | null = null;
 
     if (franchise === Franchise.sd2) {
         const regex = /([0-9]{1,2})v([0-9]{1,2})/;
 
         const match = data.mapName.match(regex);
 
-        if (match === null) {
-            mapType = null;
-        }
-        else {
+        if (match !== null) {
             const type = "_" + match[0];
             mapType = MapType[type as keyof typeof MapType];
         }
@@ -109,7 +106,9 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
 
 
         if (response.status === 409) {
-            return "Replay is a duplicate.";
+
+            console.log("Replay is a duplicate")
+            return await response.json() as ReplayWithOldEloDto;
         }
 
         if (!response.ok) {
@@ -119,7 +118,7 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
 
             return "Failed to upload replay";
         }
-        console.log("Succesfully uploaded replay");
+        console.log("Successfully uploaded replay");
 
         return await response.json() as ReplayWithOldEloDto;
 
