@@ -25,7 +25,7 @@ export class Replays {
 
         //checks if the replay is valid to be uploaded to the db
         //todo maybe make the checks more through, not that important, for later
-        if (!g.validForUpload) {
+        if (g.validForUpload) {
             if (sendEmbed)
                 await Replays.sendEmbed(message, g, apiResponded, null);
 
