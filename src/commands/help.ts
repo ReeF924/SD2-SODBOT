@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { DiscordBot, MsgHelper } from "../general/discordBot";
+import { DiscordBot } from "../general/discordBot";
 import { EmbedBuilder } from "discord.js";
 
 export class HelpCommand {

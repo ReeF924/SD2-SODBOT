@@ -29,6 +29,10 @@ export enum Nation {
     new_zealand,
     yugoslavia,
     czechoslovakia,
-    ddr,
-    rfa
+    germany_east,
+    germany_west,
+    netherlands,
+    belgium,
+    spain,
+    sweden
 }

@@ -3,7 +3,6 @@ import { DiscordBot, MsgHelper } from "../general/discordBot";
 import * as Data from "sd2-data"
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
-import { map } from "mssql";
 import * as fs from "fs";
 
 export class MapCommand {
@@ -67,15 +66,15 @@ export class MapCommand {
             let availableMaps = [...mapList];
             let maps: String[] = [];
 
-            const includeBanned = input.options.getBoolean("banned") ?? true;
+            // const includeBanned = input.options.getBoolean("banned") ?? true;
 
-            if (!includeBanned) {
-                const bannedMaps = this.bans[input.user.id];
-
-                if (bannedMaps) {
-                    availableMaps = availableMaps.filter(map => !bannedMaps.includes(map));
-                }
-            }
+            // if (!includeBanned) {
+            //     const bannedMaps = this.bans[input.user.id];
+            //
+            //     if (bannedMaps) {
+            //         availableMaps = availableMaps.filter(map => !bannedMaps.includes(map));
+            //     }
+            // }
 
             for (count; count > 0; count--) {
                 const pickIndex = Math.floor(Math.random() * availableMaps.length)

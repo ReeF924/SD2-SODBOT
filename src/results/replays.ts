@@ -1,13 +1,11 @@
 import {Message, EmbedBuilder, EmbedField} from "discord.js"
 import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
-import {misc, maps} from "sd2-data"
+import {misc} from "sd2-data"
 import * as axios from "axios"
-import {convertToReplayPlayerDto, uploadReplay} from "../db/services/replaysService";
+import {uploadReplay} from "../db/services/replaysService";
 import {getPlayersByIds} from "../db/services/playerService";
-import {Logs} from "../general/logs";
 import {Player} from "../db/models/player";
-import {MsgHelper} from "../general/discordBot";
-import {ReplayPlayerWithEloDto, ReplayWithOldEloDto} from "../db/models/replay";
+import {ReplayWithOldEloDto} from "../db/models/replay";
 
 const ax = axios.default;
 
@@ -25,6 +23,7 @@ export class Replays {
 
         //checks if the replay is valid to be uploaded to the db
         //todo maybe make the checks more through, not that important, for later
+        //todo definitely rename so it's not confusing af
         if (g.validForUpload) {
             if (sendEmbed)
                 await Replays.sendEmbed(message, g, apiResponded, null);
@@ -151,7 +150,6 @@ export class Replays {
 
 
             let eloText: string = "error";
-            console.log(player)
             if (player.sodbotElo) {
                 eloText = player.sodbotElo.toFixed(2);
 

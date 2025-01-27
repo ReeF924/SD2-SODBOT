@@ -2,8 +2,6 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
-import { EmbedBuilder } from "discord.js";
-import { match } from "assert";
 
 
 

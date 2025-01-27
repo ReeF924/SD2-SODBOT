@@ -1,6 +1,6 @@
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import {ChatInputCommandInteraction, Embed, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
-import {Player, PlayerPutDto, PlayerRank} from "../db/models/player";
+import { DiscordBot, } from "../general/discordBot";
+import {ChatInputCommandInteraction, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
+import { PlayerPutDto, PlayerRank} from "../db/models/player";
 import {getLeaderboard, getPlayerAliases, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
 
 export class PlayerCommand  {
