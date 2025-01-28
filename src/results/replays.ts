@@ -29,7 +29,6 @@ export class Replays {
                 await Replays.sendEmbed(message, g, apiResponded, null);
 
             console.log(`Invalid replay: ${g.validForUpload.reduce((a, b) => `${a}, ${b}`)}`);
-
             return null;
         }
 
@@ -101,6 +100,7 @@ export class Replays {
 
                 players.push({
                     player: p,
+                    mostUsedNickname: player.mostUsedNickname,
                     discordId: player.discordId,
                     sodbotElo: player.sodbotElo,
                     oldSodbotElo: player.oldSodbotElo
@@ -123,7 +123,7 @@ export class Replays {
                     {name: "Map", value: g.mapName, inline: false},
                     {
                         name: "Duration",
-                        value: `||${Replays.formatSecondsToMinutesSeconds(g.result.duration)}||`,
+                        value: `||${Replays.formatDuration(g.result.duration)}||`,
                         inline: true
                     },
                     {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
@@ -140,16 +140,21 @@ export class Replays {
         //randomly chooses which team goes first (so you cannot tell who win from it)
         Math.random() < 0.5 ? g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? 1 : -1) : g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? -1 : 1);
 
+        //adds players to embed
+        //the fields in embeds are limit, so for more players it splits it into more
         let counter = 1;
         for (const player of players) {
             const sep = counter === g.players.length / 2 + 1 && g.players.length > 2 ? enemyTeamSeparator : playerSeparator;
 
-            const embedPlayerField = player.discordId
-                ? {name: "Discord", value: `<@${player.discordId}>`, inline: true}
-                : {name: "EugenId", value: player.player.id.toString(), inline: true};
+            //show discord if he has one or show most used name (if it's different)
+            let embedPlayerField = this.blankEmbedField;
+            if (player.discordId) {
+                embedPlayerField = {name: "Discord", value: `<@${player.discordId}>`, inline: false};
+            } else if (player.player.name.trim().toLowerCase() != player.mostUsedNickname.trim().toLowerCase()) {
+                embedPlayerField = {name: "Most used name", value: player.mostUsedNickname, inline: false};
+            }
 
-
-            let eloText: string = "error";
+            let eloText: string = "Unknown";
             if (player.sodbotElo) {
                 eloText = player.sodbotElo.toFixed(2);
 
@@ -165,8 +170,8 @@ export class Replays {
                 [{name: "\u200b", value: sep, inline: false},
                     {name: "Player", value: player.player.name, inline: true},
                     embedPlayerField,
-                    {name: "EugenElo", value: player.player.elo.toFixed(2), inline: false},
-                    {name: "SodbotElo", value: eloText, inline: false},
+                    {name: "EugenElo\tSodbotElo", value: `${player.player.elo.toFixed(2)}  \t${eloText}`, inline: true},
+                    {name: "EugenId", value: player.player.id.toString(), inline: true},
                     {name: "Division", value: player.player.deck!.division, inline: false},
                     {name: "Deck Code", value: player.player.deck.raw.code, inline: false}
                 ]);
@@ -197,11 +202,9 @@ export class Replays {
         let response: Player[] | string;
         if (apiResponded) {
             try {
-
                 response = await getPlayersByIds(players.map(p => p.id));
 
             } catch (e) {
-
                 if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
                     console.log("API offline");
                 } else {
@@ -231,22 +234,35 @@ export class Replays {
             const player = response.filter(p => p.id === rp.id)[0];
 
             if (player) {
-                output.push({player: rp, discordId: player.discordId, sodbotElo: player[elo], oldSodbotElo: null});
+                output.push({
+                    player: rp,
+                    mostUsedNickname: player.nickname,
+                    discordId: player.discordId,
+                    sodbotElo: player[elo],
+                    oldSodbotElo: null
+                });
             } else {
-                output.push({player: rp, discordId: null, sodbotElo: null, oldSodbotElo: null});
+                output.push({
+                    player: rp,
+                    mostUsedNickname: player.nickname,
+                    discordId: null,
+                    sodbotElo: null,
+                    oldSodbotElo: null
+                });
             }
-        })
+        });
 
         return output;
     }
 
-    static formatSecondsToMinutesSeconds(seconds: number): string {
+    static formatDuration(seconds: number): string {
         return `${Math.floor(seconds / 60)} Minutes and ${seconds % 60} Seconds`
     }
 }
 
 declare interface PlayerInfo {
     player: RawPlayer;
+    mostUsedNickname: string | null;
     discordId?: string;
     sodbotElo?: number;
     oldSodbotElo?: number;

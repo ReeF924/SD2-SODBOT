@@ -1,10 +1,13 @@
 import {MapType, ReplayDto, ReplayPlayerDto, ReplayWithOldEloDto, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
-import {getChannel} from "./adminsService";
 import {Franchise} from "../models/admin";
 import {apiErrorMessage} from "../db";
 
+interface UploadReplayResult{
+    message: string;
+    replay: ReplayWithOldEloDto;
+}
 
 interface UploadInformation {
     uploadedIn: string;
@@ -104,27 +107,22 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
             body: JSON.stringify(replay)
         });
 
+        const res: UploadReplayResult = await response.json();
 
-        if (response.status === 409) {
-
-            console.log("Replay is a duplicate")
-            return await response.json() as ReplayWithOldEloDto;
-        }
-
-        if (!response.ok) {
+        if (!response.ok && response.status !== 409) {
             const errorText: apiErrorMessage = await response.json();
             const errorMessage = `Failed to upload replay try: ${errorText.message}`;
             console.log(errorMessage, response);
 
-            return "Failed to upload replay";
+            return "Failed to upload replay (API Error)";
         }
-        console.log("Successfully uploaded replay");
 
-        return await response.json() as ReplayWithOldEloDto;
+        //Successfully uploaded or duplicate
+        return res.replay;
 
     } catch (e) {
         console.log("Failed to upload replay catch, error: ", e)
 
-        return "Failed to upload replay";
+        return "Failed to upload replay (Bot Error";
     }
 }

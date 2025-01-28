@@ -46,6 +46,7 @@ export interface ReplayWithOldEloDto{
 }
 
 export interface ReplayPlayerWithEloDto extends ReplayPlayerDto {
+    mostUsedNickname: string;
     discordId: string;
     sodbotElo: number;
     oldSodbotElo: number;
