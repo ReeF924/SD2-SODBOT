@@ -139,12 +139,11 @@ export class PlayerCommand  {
             value += alias + ', ';
         });
 
-        value = value.slice(0, -1) + '**';
+
+        value = value.slice(0, value.length-1) + '**';
 
         await interaction.editReply(value);
     }
-
-
 
     private getLongestName(players: PlayerRank[]): number {
         return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 17);
