@@ -26,8 +26,6 @@ json/
 node_modules/
 
 src/Output.txt
-src/resultsDB.db
-src/config.json
 dist
 dist/
 data/
@@ -37,9 +35,6 @@ toAddMaps.log
 packege.json.copy
 
 coverage/
-config.json
 app.log
 
 .env
-
-.package-lock.json

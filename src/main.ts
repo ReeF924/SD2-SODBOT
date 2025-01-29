@@ -9,14 +9,10 @@ import { CommonUtil } from "./general/common";
 import { DiscordBot } from "./general/discordBot";
 
 import * as smp from 'source-map-support';
-import * as http from 'http';
 import { Logs } from "./general/logs";
-import { DB, Player } from "./general/db";
-import { API } from "./api/api";
+import { DB } from "./general/db";
 import { DivisionCommand } from './commands/division';
 import { MapCommand } from './commands/map';
-
-const p = require("../package.json")
 
 CommonUtil.init();
 Logs.init();
@@ -42,14 +38,3 @@ divCommand.addCommands(bot);
 mapCommand.addCommands(bot);
 helpCommand.addCommands(bot);
 matchCommand.addCommands(bot);
-
-const healthcheck = http.createServer(function (req, res) {
-    Logs.log(req);
-    res.write("pong");
-    res.end();
-});
-Logs.log(`Starting healthcheck server on 8080, version ${p.version}`)
-//healthcheck.listen(8080);
-const api = new API(database);
-
-api.start();
