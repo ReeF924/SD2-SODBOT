@@ -34,6 +34,7 @@
     "jsonfile": "^6.1.0",
     "levenshtein": "~1.0",
     "lodash": "^4.17.21",
+
     "nedb-promises": "^6.2.3",
     "sd2-data": "^0.8.11",
     "sd2-utilities": "^0.2.3",
