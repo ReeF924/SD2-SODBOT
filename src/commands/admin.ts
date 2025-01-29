@@ -1,215 +1,339 @@
-import { Client, Message, GuildChannel, GuildMember, Guild, Channel } from "discord.js";
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { Logs } from "../general/logs";
-import { DB } from "../general/db";
-import { CommandDB } from "./Command";
-export class AdminCommand extends CommandDB {
-    //Only RoguishTiger or Kuriosly can set Admin rights 
-    //ReeF: added myself for the tests, maybe for later use, dunno how active is Kuriosly
-    public constructor(database: DB) {
-        super(database);
-    }
-    private admins: string[] = ["687898043005272096", "271792666910392325", "607962880154927113", "477889434642153482"];
-    private async setAdmin(message: Message, input: string[]) {
-        if (this.admins.some(adminId => message.author.id == adminId)) {
-            //Check for argument
-            if (input.length === 1) {
-                await (async () => {
-                    //Get user from the DiscordUsers Table
-                    let user = await this.database.getDiscordUser(input[0])
-                    const discordUser = await DiscordBot.bot.users.fetch(String(input[0]))
-                    //If user is already registered up their Admin permisson
-                    if (user) {
-                        if (user.globalAdmin == false) {
-                            user.globalAdmin = (true)
-                            await this.database.setDiscordUser(user);
-                            MsgHelper.reply(message, "Discord account " + discordUser.username + " has been updated with global admin access")
-                            Logs.log("Changed globalAdmin access to user " + discordUser.username + " to true")
-                            return
-                        }
-                        else if (user.globalAdmin == true) {
-                            console.log("User's GlobalAdmin setting is already set to " + user.globalAdmin)
-                            MsgHelper.reply(message, "The user already has global admin access!")
-                            return
-                        }
-                    }
-                    //If user is not registered
-                    else {
-                        MsgHelper.reply(message, "This user is not currently registered to the bot, they must first register before you can add them as a admin")
-                        return
-                    }
-                })()
-            }
-        }
-    }
-    private async adjustElo(message: Message, input: string[]) {
-        let user = await this.database.getDiscordUser(message.author.id)
-        //Check if requestor has admin access
-        if (user.globalAdmin === true) {
-            //Check that the command is correctly formatted
-            if (input.length < 3) {
-                console.log("Not enough arguments")
-                message.reply("This command requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
-                return
-            }
-            else if (input.length === 3) {
-                let eugenId = input[0]
-                let newLeagueElo = input[1]
-                let newGlobalElo = input[2]
-                //await this.database.setPlayer(eugenId, newLeagueElo, newGlobalElo);
-                //message.reply("Eugen Acct "+eugenId+ " has been updated with LeagueELO "+newLeagueElo+" and GlobalELO "+newGlobalElo)
-                return
-            }
-            else {
-                message.reply("This command is not correctly formatted, it requires three arguments EugenID, New League ELO, New Global ELO.  All seperated by commas")
-            }
-        }
-        else {
-            message.reply("You do not have the admin access to use this command")
+import {ChatInputCommandInteraction, Message, SlashCommandBuilder, TextChannel} from "discord.js";
+import {admins, DiscordBot, MsgHelper} from "../general/discordBot";
+import {getChannel, postChannel} from '../db/services/adminsService';
+import {SkillLevel} from "../db/models/replay";
+import {Replays} from "../results/replays";
+import {dbChannel, Franchise} from "../db/models/admin";
 
-        }
-    }
-    private async setChannelPrems(message: Message, input: string[]) {
-        let user = await this.database.getDiscordUser(message.author.id)
-        let prem = {
-            id: "",
-            name: "",
-            blockElo: 0,
-            blockCommands: 0,
-            blockReplay: 0,
-            blockChannelElo: 0,
-            blockServerElo: 0,
-            blockGlobalElo: 0
-        }
-        //Check if requestor has admin access
-        if (user.globalAdmin == true) {
-            // Check if formatted correctly
-            if (input.length == 1) {
-                message.reply("This command requires a channel id and one or more premission commands to be correctly formatted")
-                return
-            }
-            else if (input.length > 1) {
-                // Check if server is already in ChannelBlacklist table
-                prem = await this.database.getChannelPermissions(input[0])
-                console.log(prem)
-                let channel = DiscordBot.bot.channels.cache.get(input[0])
-                // If it isn't create a default
-                if (prem == null) {
-                    prem = {
-                        id: input[0],
-                        name: (channel as GuildChannel).name,
-                        blockElo: -1,
-                        blockCommands: -1,
-                        blockReplay: -1,
-                        blockChannelElo: -1,
-                        blockServerElo: -1,
-                        blockGlobalElo: -1
-                    }
-                }
-                // Update the settings
-                for (let x = 1; x < input.length; x++) {
-                    let command = input[x]
-                    switch (command) {
-                        case "blockElo":
-                            prem.blockElo = 1
-                            break;
-                        case "blockCommands":
-                            prem.blockCommands = 1
-                            break;
-                        case "blockReplay":
-                            prem.blockReplay = 1
-                            break;
-                        case "blockChannelElo":
-                            prem.blockChannelElo = 1
-                            break;
-                        case "blockServerElo":
-                            prem.blockServerElo = 1
-                            break;
-                        case "blockGlobalElo":
-                            prem.blockGlobalElo = 1
-                            break;
-                        case "blockall":
-                            prem.blockElo = 1
-                            prem.blockCommands = 1
-                            prem.blockReplay = 1
-                            prem.blockChannelElo = 1
-                            prem.blockServerElo = 1
-                            prem.blockGlobalElo = 1
-                            break;
-                        default:
-                            console.log("we in in default of the case statement" + command);
-                            message.reply("One of the permission settings is not a valid command");
-                    }
-                }
-                await this.database.setChannelPermissions(prem);
-                MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been updated ")
-            }
-            else {
-                message.reply("This command is not correctly formatted, it requires one channel as a argument");
-                return
-            }
 
-        }
-        else {
-            message.reply("You do not have the admin access to use this command")
-            return
-        }
-    }
-    private async resetChannelPrems(message: Message, input: string[]) {
-        let channel = DiscordBot.bot.channels.cache.get(input[0])
-        if (input.length === 1) {
-            let prem = {
-                id: input[0],
-                name: (channel as GuildChannel).name,
-                blockElo: -1,
-                blockCommands: -1,
-                blockReplay: -1,
-                blockChannelElo: -1,
-                blockServerElo: -1,
-                blockGlobalElo: -1
-            }
-            await this.database.setChannelPermissions(prem);
-            MsgHelper.reply(message, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been reset back to default settings.")
-        }
-        else {
-            MsgHelper.reply(message, "Command not formatted corresctly, this command just takes a channel id only as its argument")
-        }
+export class AdminCommand {
+
+    public constructor(private bot: DiscordBot) {
     }
 
-    // private async setReplayChannel(message: Message, input: string[]) {
+
+    // private async setChannelPrems(interaction: Message, input: string[]) {
+    //     let user = await this.database.getDiscordUser(interaction.user.id)
+    //     let prem = {
+    //         id: "",
+    //         name: "",
+    //         blockElo: 0,
+    //         blockCommands: 0,
+    //         blockReplay: 0,
+    //         blockChannelElo: 0,
+    //         blockServerElo: 0,
+    //         blockGlobalElo: 0
+    //     }
+
+    //     const bot = DiscordBot.getInstance();
+
     //     //Check if requestor has admin access
-    //     if (!this.checkAccess(message)) {
-    //         message.reply("You do not have the admin access to use this command");
-    //         return;
-    //     }
-    //     // Check if formatted correctly
-    //     if (input.length != 1) {
-    //         message.reply("Try channel <replays Type>");
-    //         return
-    //     }
-    //
-    //     let server: DiscordServer = await this.database.getServer(message.guild.id) ?? new DiscordServer(message.guild.id);
-    //
-    //     this.addChannel(message, input, server);
-    //     // this.database.putServer(server);
-    // }
+    //     if (user.globalAdmin == true) {
+    //         // Check if formatted correctly
+    //         if (input.length == 1) {
+    //             interaction.reply("This command requires a channel id and one or more premission commands to be correctly formatted")
+    //             return
+    //         }
+    //         else if (input.length > 1) {
+    //             // Check if server is already in ChannelBlacklist table
+    //             prem = await this.database.getChannelPermissions(input[0])
+    //             console.log(prem)
+    //             let channel = bot.channels.cache.get(input[0])
+    //             // If it isn't create a default
+    //             if (prem == null) {
+    //                 prem = {
+    //                     id: input[0],
+    //                     name: (channel as GuildChannel).name,
+    //                     blockElo: -1,
+    //                     blockCommands: -1,
+    //                     blockReplay: -1,
+    //                     blockChannelElo: -1,
+    //                     blockServerElo: -1,
+    //                     blockGlobalElo: -1
+    //                 }
+    //             }
+    //             // Update the settings
+    //             for (let x = 1; x < input.length; x++) {
+    //                 let command = input[x]
+    //                 switch (command) {
+    //                     case "blockElo":
+    //                         prem.blockElo = 1
+    //                         break;
+    //                     case "blockCommands":
+    //                         prem.blockCommands = 1
+    //                         break;
+    //                     case "blockReplay":
+    //                         prem.blockReplay = 1
+    //                         break;
+    //                     case "blockChannelElo":
+    //                         prem.blockChannelElo = 1
+    //                         break;
+    //                     case "blockServerElo":
+    //                         prem.blockServerElo = 1
+    //                         break;
+    //                     case "blockGlobalElo":
+    //                         prem.blockGlobalElo = 1
+    //                         break;
+    //                     case "blockall":
+    //                         prem.blockElo = 1
+    //                         prem.blockCommands = 1
+    //                         prem.blockReplay = 1
+    //                         prem.blockChannelElo = 1
+    //                         prem.blockServerElo = 1
+    //                         prem.blockGlobalElo = 1
+    //                         break;
+    //                     default:
+    //                         console.log("we in in default of the case statement" + command);
+    //                         interaction.reply("One of the permission settings is not a valid command");
+    //                 }
+    //             }
+    //             await this.database.setChannelPermissions(prem);
+    //             MsgHelper.replyPing(interaction, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been updated ")
+    //         }
+    //         else {
+    //             interaction.reply("This command is not correctly formatted, it requires one channel as a argument");
+    //             return
+    //         }
 
-    // private addChannel(message: Message, input: string[], server: DiscordServer): void {
-    //     if (this.defaultReplayTypes.includes(input[0])) {
-    //         server.channels.set(message.channel.id, { defaultRules: true, tournamentType: input[0] });
     //     }
     //     else {
-    //         server.channels.set(message.channel.id, { defaultRules: false, tournamentType: "other" });
+    //         interaction.reply("You do not have the admin access to use this command")
+    //         return
+    //     }
+    // }
+    // private async resetChannelPrems(interaction: Message, input: string[]) {
+    //     let channel = DiscordBot.bot.channels.cache.get(input[0])
+    //     if (input.length === 1) {
+    //         let prem = {
+    //             id: input[0],
+    //             name: (channel as GuildChannel).name,
+    //             blockElo: -1,
+    //             blockCommands: -1,
+    //             blockReplay: -1,
+    //             blockChannelElo: -1,
+    //             blockServerElo: -1,
+    //             blockGlobalElo: -1
+    //         }
+    //         await this.database.setChannelPermissions(prem);
+    //         MsgHelper.replyPing(interaction, "The permission settings of Discord channel " + (channel as GuildChannel).name + " has been reset back to default settings.")
+    //     }
+    //     else {
+    //         MsgHelper.replyPing(interaction, "Command not formatted correctly, this command just takes a channel id only as its argument")
     //     }
     // }
 
-    private checkAccess(message: Message): boolean {
-        return this.admins.some(adminID => message.member.id === adminID);
+    private async setReplayType(interaction: ChatInputCommandInteraction) {
+
+        const type = interaction.options.getString("type");
+
+        if (type === null) {
+            await interaction.deferReply({ephemeral: true});
+
+            const response = await this.GetReplayType(interaction.channel.id);
+
+            interaction.editReply({content: response});
+            return;
+        }
+
+        if (!this.checkAccess(interaction)) {
+            MsgHelper.reply(interaction, "You do not have the admin access to use this command", true);
+            return;
+        }
+
+        await interaction.deferReply({ephemeral: true});
+        let replayType: SkillLevel = SkillLevel[type as keyof typeof SkillLevel];
+
+        const response = await postChannel({
+            Id: interaction.guild.id,
+            Name: interaction.guild.name,
+            Channel: {
+                Id: interaction.channel.id,
+                Name: interaction.channel.name,
+                SkillLevel: replayType,
+                PrimaryMode: Franchise.sd2
+            }
+        });
+
+        if (typeof response === "string") {
+            interaction.editReply({content: "Error setting replay type for channel"});
+            return;
+        }
+        interaction.editReply({
+            content: `Replay type set to ${SkillLevel[replayType]} for this channel.`,
+        });
     }
-    public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("adjustelo", this.adjustElo.bind(this));
-        bot.registerCommand("setadmin", this.setAdmin.bind(this));
-        bot.registerCommand("setchannel", this.setChannelPrems.bind(this));
-        bot.registerCommand("resetchannel", this.resetChannelPrems.bind(this));
+
+    private async GetReplayType(channelId: string): Promise<string> {
+
+        try {
+            let channel = await getChannel(channelId);
+
+            if (typeof channel === "string") {
+                return "Replays in this channel are considered others level."
+            }
+
+            channel = channel as dbChannel;
+            return `Replays in this channel are considered ${SkillLevel[channel.skillLevel]} level.`;
+        } catch (e) {
+            console.log('error', e);
+            return "Error getting replay type for channel";
+        }
+    }
+
+    private async yoink(interaction: ChatInputCommandInteraction): Promise<void> {
+        const reefy = await this.bot.getAdmin();
+
+        if (!this.checkAccess(interaction)) {
+            MsgHelper.reply(interaction, "You do not have the admin access to use this command", true);
+            return;
+        }
+
+
+        const dateString = interaction.options.getString("date");
+
+        // const version = interaction.options.getNumber("version");
+        //
+        // let count = interaction.options.getInteger("count");
+
+        const channel: TextChannel = interaction.channel as TextChannel;
+
+        const date = dateString
+            ? new Date(parseInt(dateString.substring(0, 4)), parseInt(dateString.substring(4, 6)) - 1, parseInt(dateString.substring(6, 8)))
+            : new Date(0);
+
+        MsgHelper.reply(interaction, "starting to yoink messages", true);
+
+
+        const messages = await this.getMessages(channel, date, undefined);
+        const n = messages.length - 1;
+        const tenPercent = Math.round(n / 10);
+
+        let counter = 0;
+        let failed = 0;
+
+        for (let i = n; i >= 0; i--) {
+
+            let message = messages[i];
+            console.log(`${n - i}/${n}: ${message.createdAt.getFullYear()}/${message.createdAt.getMonth() + 1}/${message.createdAt.getDate()}`);
+
+            if (!message || !message.attachments) {
+                continue;
+            }
+
+            const replays = Array.from(message.attachments.values()).filter((a) => a.url.includes(".rpl3"));
+
+            for (let j = 0; j < replays.length; j++) {
+
+                const r = replays[j];
+                try {
+                    //makes it a bit faster
+                    if ((i + j) % 3 === 0) {
+                        await Replays.extractReplayInfo(message, r.url, false);
+                    }
+                    else{
+                        Replays.extractReplayInfo(message, r.url, false);
+                    }
+
+                    counter++;
+
+                } catch (e) {
+                    console.error(`Failed to upload a replay ${message.createdAt.toDateString()}`);
+                    failed++;
+                }
+            }
+
+            if ((n-i) % tenPercent === 0) {
+                const percentage = 100 - Math.round(i / n * 100)
+                console.log('Progress: ', percentage + '%');
+                reefy.send(`Progress: ${percentage}% Date: ${message.createdAt.toDateString()}`);
+            }
+
+        }
+        console.log("Mischief managed!");
+        reefy.send("Yoinked " + counter + " replays, failed to yoink " + failed + " replays");
+
+    }
+
+    private async delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    private async getMessages(channel: TextChannel, date: Date, lastMessageId: string): Promise<Message[]> {
+
+        // let messages = await channel.messages.fetch({limit: 1});
+        // messages.clear();
+
+        const messages: Message<true>[] = [];
+        let done = false;
+        let counter = 0;
+        const started = new Date();
+
+        while (!done) {
+            //to not get banned by DiscordAPI (fetch limit)
+            if (counter % 40 === 0) {
+                this.delay(started.getTime() - new Date().getTime());
+            }
+
+            const options = {limit: 100, before: lastMessageId};
+
+            let fetched = await channel.messages.fetch(options);
+
+            if (fetched.size === 0) {
+                break;
+            }
+
+            const fetchSize = fetched.size;
+            let lastFetched = fetched.last();
+
+            if (lastFetched.createdTimestamp < date.getTime()) {
+                done = true;
+            }
+            fetched = fetched.filter(message => message.createdTimestamp > date.getTime() && message.attachments.size > 0);
+
+            console.log(`fetched: ${fetchSize}, filtered: ${fetched.size}`);
+
+            if (fetched.size > 0) {
+                lastFetched = fetched.last();
+            }
+
+            lastMessageId = lastFetched.id;
+
+
+            fetched.forEach(message => {
+                const d = new Date(message.createdTimestamp);
+                console.log('crt TimeStamp: ', message.createdAt.toDateString());
+                messages.push(message)
+            });
+
+            counter++;
+        }
+        console.log(`Total messages: ${messages.length}`);
+
+        return messages;
+    }
+
+
+    private checkAccess(interaction: ChatInputCommandInteraction): boolean {
+        return admins.includes(interaction.user.id);
+    }
+
+    public addCommands(): void {
+        const setReplayType = new SlashCommandBuilder()
+            .setName("replaytype").setDescription("Sets the channel to be a replay channel");
+
+        setReplayType.addStringOption(option =>
+            option.setName("type").setDescription("The type of replay channel to set")
+                .addChoices(
+                    {name: "div1", value: "div1"}, {name: "div2", value: "div2"},
+                    {name: "div3", value: "div3"}, {name: "div4", value: "div4"},
+                    {name: "div5", value: "div5"}, {name: "others", value: "others"}
+                ).setRequired(false))
+
+        this.bot.registerCommand(setReplayType, this.setReplayType.bind(this));
+
+        const yoink = new SlashCommandBuilder()
+            .setName("yoink").setDescription("Sneaky, sneaky bot");
+        yoink.addStringOption(option => option.setName("date").setDescription("Oldest possible date. Format yyyyMMdd").setRequired(false))
+        this.bot.registerCommand(yoink, this.yoink.bind(this));
     }
 }

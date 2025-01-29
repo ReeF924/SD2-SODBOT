@@ -1,219 +1,277 @@
 import {Message, EmbedBuilder, EmbedField} from "discord.js"
 import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser"
-import {misc, maps} from "sd2-data"
+import {misc} from "sd2-data"
 import * as axios from "axios"
-import {DB} from "../general/db";
-import {DiscordBot, MsgHelper} from "../general/discordBot";
-import {PermissionsSet} from "../general/permissions";
-import {Logs} from "../general/logs";
+import {uploadReplay} from "../db/services/replaysService";
+import {getPlayersByIds, isPlayerAI} from "../db/services/playerService";
+import {Player} from "../db/models/player";
+import {UploadReplayResponse} from "../db/models/replay";
 
 const ax = axios.default;
-//todo maps - 2v2..., mode - brk, cqc, meet, maybe add to embed? (display only if not default?)
-//todo what if-else shit in retractPlayerInfo
-//todo crases when there are multiple players? maybe something to do with db save?cd
 
 export class Replays {
     private static readonly blankEmbedField: EmbedField = {name: '\u200b', value: '\u200b', inline: true};
 
-    //todo delete, will be in sdData
-    private static readonly AILevel = {
-        0: "Very Easy",
-        1: "Easy",
-        2: "Medium",
-        3: "Hard",
-        4: "Very Hard"
-    }
+    //gets data out of replay
+    static async extractReplayInfo(message: Message, url: string, sendEmbed: boolean = true): Promise<RawGameData | null> {
 
-    static extractReplayInfo(message: Message, perms: PermissionsSet, database: DB, url: string): void {
-        ax.get(url).then(async (res) => {
-            const g = GameParser.parseRaw(res.data);
+        const gres = await ax.get(url);
 
+        const g: RawGameData = GameParser.parseRaw(gres.data);
 
-            const winnerList: RawPlayer[] = []
-            const loserList: RawPlayer[] = []
+        let apiResponded = true;
 
-            const result = g.result.victory > 3 ? g.ingamePlayerId >= g.players.length / 2 : g.ingamePlayerId < g.players.length / 2;
+        //checks if the replay is valid to be uploaded to the db
+        //todo maybe make the checks more through, not that important, for later
+        //todo definitely rename so it's not confusing af
+        if (g.validForUpload) {
+            if (sendEmbed)
+                await Replays.sendEmbed(message, g, apiResponded, null);
 
+            console.log(`Invalid replay: ${g.validForUpload.reduce((a, b) => `${a}, ${b}`)}`);
+            return null;
+        }
 
-            for (const player of g.players) {
-                (result ? player.alliance === 1 : player.alliance === 0) ? winnerList.push(player) : loserList.push(player);
+        let replay: UploadReplayResponse = null;
+        //uploads replay to the database
+        try {
+            replay = await Replays.uploadReplay(g, message);
+
+        } catch (e) {
+
+            if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
+                console.log("API offline");
+                apiResponded = false;
             }
 
-            g.players.splice(0, g.players.length);
-            Math.random() < 0.5 ? g.players.push(...winnerList, ...loserList) : g.players.push(...loserList, ...winnerList);
+            console.log(e);
+        }
 
+        if (sendEmbed)
+            await Replays.sendEmbed(message, g, apiResponded, replay);
 
-            let longestName = Math.max(...winnerList.map(p => p.name.length), ...loserList.map(p => p.name.length));
+        return apiResponded ? g : null;
+    }
 
-            let winners = Replays.joinPlayersToString(winnerList, longestName);
-            let losers = Replays.joinPlayersToString(loserList, longestName);
+    private static async uploadReplay(g: RawGameData, message: Message): Promise<UploadReplayResponse> {
+        const response = await uploadReplay(g,
+            {
+                uploadedAt: message.createdAt,
+                uploadedBy: message.author.id,
+                uploadedIn: message.channel!.id
+            });
 
-            await Replays.sendEmbed(message, g, winners, losers);
-        });
+        if (typeof response === 'string') {
+            console.log(response);
+            return null;
+        }
+
+        return response;
     }
 
     private static joinPlayersToString(players: RawPlayer[], longestName: number): string {
-        let result = "";
+        let result = "```\n";
 
         players.forEach(p => {
+            //Fixes Koneig's name, he always gets it wrong
+            p.name = p.name.replace(/[Kk]oenig/g, "Koneig");
 
-            //propably not the most optimal way to check for Ai, maybe AICount?
-            let name = '';
-
-            if (p.name === "" && p.aiLevel < 5)
-                p.name = "AI " + Replays.AILevel[p.aiLevel];
-
-            name = p.name;
-            const maxLength = Math.min(longestName, 20);
-            name = name.substring(0, maxLength);
-            name = name.padEnd(maxLength, '-');
+            //26 is the max to not wrap the line (padding because of phone (have to click on text to reveal spoiler))
+            let name = p.name;
+            const maxLength = Math.min(longestName, 26);
+            name = name.substring(0, maxLength).padEnd(26, ' ');
+            // name = name.padEnd(maxLength, ' ');
 
             result += name + "\n";
         });
-        return result.substring(0, result.length - 1);
+        return result.substring(0, result.length - 1) + "```";
     }
 
-    private static isValidReplay(g: RawGameData): string | null {
-        if (g.players.length != 2) return "playerLength";
-        if (g.aiCount > 0) return "aiCount";
-        if (g.players[0]?.deck?.franchise != "SD2") return "franchise";
-        if (g.gameMode != 1) return "gameMode";
-        if (g.incomeRate != 3) return "incomeRate";
-        if (g.scoreLimit != 2000) return "scoreLimit";
-        return null;
-    }
 
-    static async sendEmbed(message: Message, g: RawGameData, winners: string, losers: string): Promise<void> {
-        let map = misc.map[g.map_raw];
+    static async sendEmbed(message: Message, g: RawGameData, apiResponded: boolean, replay: UploadReplayResponse = null): Promise<void> {
+        let players: PlayerInfo[] = [];
+        const containsAIs = g.aiCount != 0;
 
-        if (!map) {
-            const arr = g.map_raw.split('_');
-            map = arr[2];
-            let counter = 3;
-            while (counter < arr.length && isNaN(parseInt(arr[counter][0]))) {
+        if (!replay) {
+            players = await Replays.GetPlayerByIds(g.players, containsAIs, apiResponded);
+        } else {
+            for (const player of replay.replayPlayers) {
+                const p = g.players.find(r => r.id === player.playerId);
 
-                if (arr[counter] === 'LD') {
-                    counter++;
-                    continue;
-                }
-
-                map += ' ' + arr[counter];
-                counter++;
-            }
-
-            if (!await Logs.addMap(g.map_raw)) {
-                console.log();
-                console.log('newMap:', g.map_raw);
-                console.log();
+                players.push({
+                    player: p,
+                    mostUsedNickname: player.mostUsedNickname,
+                    discordId: player.discordId,
+                    sodbotElo: player.sodbotElo,
+                    oldSodbotElo: player.oldSodbotElo
+                });
             }
         }
 
+        let longestName = Math.max(...g.players.map(p => p.name.length));
+
+        let winnersJoined = Replays.joinPlayersToString(g.players.filter(p => p.winner), longestName);
+        let losersJoined = Replays.joinPlayersToString(g.players.filter(p => !p.winner), longestName);
+
         let embed = new EmbedBuilder()
             .setTitle(!g.serverName ? "Game" : g.serverName)
-            // .setTitle("Game")
             .setColor("#0099ff")
             .addFields(
                 [
-                    {name: "Winner", value: `||${winners}||`, inline: true},
-                    Replays.blankEmbedField,
-                    {name: "Loser", value: `||${losers}||`, inline: true},
-                    {name: "Map", value: map, inline: true},
-                    {name: "Duration", value: `||${Replays.duration(g.result.duration)}||`, inline: true},
+                    {name: "Winner", value: `||${winnersJoined}||`, inline: true},
+                    {name: "Loser", value: `||${losersJoined}||`, inline: true},
+                    {name: "Map", value: g.mapName, inline: false},
+                    {
+                        name: "Duration",
+                        value: `||${Replays.formatDuration(g.result.duration)}||`,
+                        inline: true
+                    },
                     {name: "Victory State", value: `||${misc.victory[g.result.victory]}||`, inline: true},
-                    {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
-                    Replays.blankEmbedField,
-                    {name: "Time Limit", value: g.timeLimit.toString(), inline: true},
-                    {name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true},
-                    {name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true},
-                    {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
+                    // {name: "Score Limit", value: g.scoreLimit.toString(), inline: true},
+                    // {name: "Time Limit", value: g.timeLimit.toString(), inline: true},
+                    // {name: "Income Rate", value: misc.incomeLevel[g.incomeRate], inline: true},
+                    // {name: "Game Mode", value: Replays.getGameMode(g.map_raw), inline: true},
+                    // {name: "Starting Points", value: `${g.initMoney} pts`, inline: true},
                 ]);
 
         const playerSeparator: string = "-------------------------------------------";
-        const enemyTeamSeparator: string = "---------------OPPOSING TEAM---------------";
+        const enemyTeamSeparator: string = "-------OPPOSING TEAM-------";
 
+        //randomly chooses which team goes first (so you cannot tell who win from it)
+        Math.random() < 0.5 ? g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? 1 : -1) : g.players.sort((a, b) => a.winner === b.winner ? 0 : a.winner ? -1 : 1);
 
+        //adds players to embed
+        //the fields in embeds are limit, so for more players it splits it into more
         let counter = 1;
-        for (const player of g.players) {
+        for (const player of players) {
             const sep = counter === g.players.length / 2 + 1 && g.players.length > 2 ? enemyTeamSeparator : playerSeparator;
+
+            //show discord if he has one or show most used name (if it's different)
+            let embedPlayerField = this.blankEmbedField;
+            if (player.discordId) {
+                embedPlayerField = {name: "Discord", value: `<@${player.discordId}>`, inline: true};
+            } else if (player.player.name.trim().toLowerCase() != player.mostUsedNickname.trim().toLowerCase()) {
+                embedPlayerField = {name: "Most used name", value: player.mostUsedNickname, inline: true};
+            }
+
+            let eloText: string = "Unknown";
+            if (player.sodbotElo) {
+                eloText = player.sodbotElo.toFixed(2);
+
+                if (player.oldSodbotElo) {
+                    const eloDiff = player.sodbotElo - player.oldSodbotElo;
+                    let char = "";
+                    char = eloDiff > 0 ? "+" : "-";
+                    eloText += ` ||(${char}${Math.abs(eloDiff).toFixed(2)})||`;
+                }
+            }
+
+            let embedDivIncome: EmbedField = {name: "Division", value: player.player.deck!.division, inline: false};
+            if (player.player.deck!.franchise === "SD2") {
+                embedDivIncome = {name: "Division + Income", value: player.player.deck!.division + " + " + player.player.deck.income, inline: false};
+            }
+
+            const playerIsAI = isPlayerAI(player.player);
 
             embed.addFields(
                 [{name: "\u200b", value: sep, inline: false},
-                    {name: "Player", value: player.name, inline: false},
-                    {name: "Elo", value: player.elo.toString(), inline: false},
-                    {name: "Division", value: player.deck!.division, inline: true},
+                    {name: "Player", value: player.player.name, inline: true},
+                    embedPlayerField,
+                    !playerIsAI ? {name: "EugenId", value: player.player.id.toString(), inline: true} : this.blankEmbedField,
+                    {name: "EugenElo", value: player.player.elo.toFixed(2), inline: false},
+                    !playerIsAI ? {name: "SodbotElo", value: eloText, inline: false} : {name: "\u200b", value: "\u200b", inline: false},
+                    embedDivIncome,
+                    {name: "Deck Code", value: player.player.deck.raw.code, inline: false}
                 ]);
 
-            player.deck!.franchise === "WARNO"
-                ? embed.addFields([{
-                    name: "Deck",
-                    value: `[VIEW](https://war-yes.com/deck-builder?code=${player.deck!.raw.code} 'view on war-yes.com')`,
-                    inline: false
-                }])
-                :
-                embed.addFields([{name: "Income", value: player.deck!.income, inline: true}]);
 
-            embed.addFields([{name: "Deck Code", value: player.deck!.raw.code, inline: false}]);
-
-            //every fourth, in the beginning there can be only 2 players
+            //every third player, but in the beginning there can be only 2 players (basic info)
+            //to not exceed the limit of fields in an embed (25)
             //I don't like this, could propably improve it somehow
-            if ((counter % 4 === 0 || counter === 2) && counter !== 0 && counter !== g.players.length) {
-
+            if ((counter - 2) % 3 === 0 && counter !== 0 && counter !== g.players.length) {
                 if (g.players.length === 2) break;
 
-                MsgHelper.sendEmbed(message, embed);
+                message.channel.send({embeds: [embed]});
                 embed = new EmbedBuilder()
                     .setColor("#0099ff")
             }
             counter++;
         }
 
-        MsgHelper.sendEmbed(message, embed);
+        // MsgHelper.sendEmbed(message, embed);
+        message.channel.send({embeds: [embed]});
     }
 
-    static sortPlayers(players: RawPlayer[], winnerAl: number): RawPlayer[] {
-        return [
-            ...players.filter(p => p.alliance === winnerAl),
-            ...players.filter(p => p.alliance !== winnerAl)
-        ];
+    static async GetPlayerByIds(players: RawPlayer[], containsAIs: boolean, apiResponded: boolean): Promise<PlayerInfo[]> {
+        let response: Player[] | string;
+        if (apiResponded) {
 
-    }
+            const ids: number[] = !containsAIs
+            ? players.map(p => p.id)
+            : players.filter(p => !isPlayerAI(p)).map(p => p.id);
 
-    static getWinnersAndLosers(players: RawPlayer[], winnerAl: number): { winners: RawPlayer[], losers: RawPlayer[] } {
-        const winners: RawPlayer[] = [];
-        const losers: RawPlayer[] = [];
-
-
-        for (const player of players) {
-            const n = players.length;
-
-            if (player.alliance >= n / 2) {
-                winnerAl === 1 ? winners.push(player) : losers.push(player);
-            } else {
-                winnerAl === 0 ? winners.push(player) : losers.push(player);
+            try {
+                response = await getPlayersByIds(ids);
+            } catch (e) {
+                if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
+                    console.log("API offline");
+                } else {
+                    console.log('failed to get players by ids', e);
+                }
+                response = 'Error'
             }
 
-
+            if (typeof response === 'string') {
+                console.log('logPlayers', response);
+                response = [];
+            }
+        } else {
+            response = [];
         }
 
+        //decides which elo to return
+        const rp = players[0];
+        const elo = rp.deck.franchise === "SD2" ? players.length > 2 ? "sdTeamGameElo" : "sdElo"
+            : players.length > 2 ? "warnoTeamGameElo" : "warnoElo";
 
-        return {winners: winners, losers: losers}
+
+        // const output: ReplayPlayerWithEloDto[] = [];
+        const output: PlayerInfo[] = [];
+
+        players.forEach(rp => {
+            const player = response.filter(p => p.id === rp.id)[0];
+
+            if (player) {
+                output.push({
+                    player: rp,
+                    mostUsedNickname: player.nickname,
+                    discordId: player.discordId,
+                    sodbotElo: player[elo],
+                    oldSodbotElo: null
+                });
+            } else {
+                output.push({
+                    player: rp,
+                    mostUsedNickname: rp.name,
+                    discordId: null,
+                    sodbotElo: null,
+                    oldSodbotElo: null
+                });
+            }
+        });
+
+        return output;
     }
 
-    static getGameMode(mapName: string): string {
-        switch (mapName) {
-            case 'CQC':
-                return 'Closer Combat';
-            case 'BKT':
-                return 'Breakthrough';
-            case 'DEST':
-                return 'Destruction';
-            default:
-                return 'Conquest';
-        }
-    }
-
-    static duration(seconds: number): string {
+    static formatDuration(seconds: number): string {
         return `${Math.floor(seconds / 60)} Minutes and ${seconds % 60} Seconds`
     }
+}
 
+declare interface PlayerInfo {
+    player: RawPlayer;
+    mostUsedNickname: string | null;
+    discordId?: string;
+    sodbotElo?: number;
+    oldSodbotElo?: number;
 }

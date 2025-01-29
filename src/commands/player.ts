@@ -1,239 +1,181 @@
-import {Embed, Message, User} from "discord.js";
-import { DiscordBot, MsgHelper } from "../general/discordBot";
-import { EmbedBuilder } from "discord.js";
-import { EloLadderElement, DB} from "../general/db";
-import { RatingEngine } from "../results/rating";
-import { misc } from "sd2-data";
-import { Logs } from "../general/logs";
-import e = require("express");
-import { PermissionsSet } from "../general/permissions";
-import { CommonUtil } from "../general/common";
-import { CommandDB } from "./Command";
+import { DiscordBot, } from "../general/discordBot";
+import {ChatInputCommandInteraction, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
+import { PlayerPutDto, PlayerRank} from "../db/models/player";
+import {getLeaderboard, getPlayerAliases, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
 
-export class PlayerCommand extends CommandDB{
-    public constructor(database:DB){
-        super(database);
-    }
-    private async getPlayer(message:Message,input:string[],perms:PermissionsSet){
-        const embed = new EmbedBuilder();
-        let player:string;
-        let icon:string
-        //Determine the target player
-        if(input.length == 0){
-            player = message.author.id
-            icon = message.author.displayAvatarURL()
-        }else if(input.length == 1){
-            player = input[0].slice(3,-1) //this is magic.
-            const usr = message.mentions.users.first();
-            icon = usr.displayAvatarURL()
-        }else{
-            MsgHelper.reply(message,`This command can only query 1 player at a time`)
+export class PlayerCommand  {
+
+    private async registerPlayer(interaction: ChatInputCommandInteraction): Promise<void> {
+
+        const id = interaction.options.getNumber("eugenid");
+
+        if(!id || id < 0) {
+            await interaction.reply("Invalid player ID");
             return;
         }
-        const Elos = await this.database.getDiscordElos(player,message.channel.id,message.guild.id);
-        console.log(Elos)
-        if(Elos == null ){
-            if(input.length == 0)
-                MsgHelper.reply(message,`You are not currently registered to the bot, please use $register "EugenId" to register to the bot`)
-            else
-                MsgHelper.reply(message,`That player is not currently registered to the bot, the player needs to use $register "EugenId" to register to the bot`)
-            return
+
+        await interaction.deferReply();
+
+        const input: PlayerPutDto = {
+            discordId: interaction.user.id,
+            nickname: interaction.user.username
         }
-        embed.setTitle("Player Details")
-        embed.setColor("#75D1EA")
-        embed.addFields([{name: "Player Name", value:"<@!"+player+">",inline:false}]);
-        embed.setThumbnail(icon) ;
-        // Add ELO Data
-        if (perms.isChannelEloShown){            
-            this.addFieldToEmbed(embed, "Channel Rating", Math.round(Elos.channelElo).toString(),true);
-        }
-        if(perms.isServerEloShown){
-            this.addFieldToEmbed(embed, "Server Rating", Math.round(Elos.serverElo).toString(),true);
-        } 
-        if(perms.isGlobalEloShown){
-            embed.addFields([{name:"Global Rating",value:Math.round(Elos.globalElo).toString(), inline:true},
-                                    {name: "\u200b", value:"\u200b",inline:true }]);
-        }    
-        // Extract recent games
-        const xx = await this.database.getReplaysByEugenId(Elos.eugenId)
-        let uploadDate = "";
-        let opponent = "";
-        let playerDiv = "";
-        let opponentDiv = "";
-        let gameMap = "";
-        let gameResult = "";
-        let numGames = 0;
-        //Check that rows were returned (ie Game Replays for this player exist)
-        if(xx.rows.length > 0 ){  
-            embed.addFields([
-                {name:"Recent 1v1 Matches", value:"-----------------------------------------------------", inline:false}
-            ])
-            if(xx.rows.length > 3){
-                numGames = 3;
-            } else {
-                numGames = xx.rows.length;
-            } 
-            for (let i = 0; i < numGames; i++) {        
-                const x = xx.rows[i];
-                try{
-                    const replayString = x.replay as string;
-                    const replayJson = JSON.parse(replayString);
 
-                    console.log(replayJson.players.length)
-                //Check that each row is a 1v1 match    
-                if (replayJson.players.length == 2){
-                    //Identify the date uploaded
-                    uploadDate = CommonUtil.formatDate(x.uploadedAt as Date)
-                    //Identify who the opponent was
-                    if (replayJson.players[0].id != Elos.eugenId){
-                        opponent = replayJson.players[0].name + "\n";
-                        opponentDiv = replayJson.players[0].deck.division
-                        playerDiv = replayJson.players[1].deck.division
-                    }else{
-                        opponent = replayJson.players[1].name + "\n";
-                        opponentDiv = replayJson.players[1].deck.division
-                        playerDiv = replayJson.players[0].deck.division
-                    }
-                    //Identify the map played
-                    gameMap = misc.map[replayJson.map_raw] + "\n";
-                    //Identify the result 
-                    if (replayJson.result.victory > 3) {
-                        for (const player of replayJson.players) {
-                            if (replayJson.ingamePlayerId = player.alliance)
-                                if (player.name = Elos.eugenId)
-                                    gameResult = "Victory" + "\n"
-                                    else
-                                    gameResult = "Defeat" + "\n" 
-                        }  
-                    } else if (replayJson.result.victory < 3) {
-                        for (const player of replayJson.players) {
-                            if (replayJson.ingamePlayerId = player.alliance)
-                                if (player.name = Elos.eugenId)
-                                    gameResult = "Defeat" + "\n"
-                                    else
-                                    gameResult = "Victory" + "\n"        
-                        }  
-                    } else {
-                           gameResult = "Draw" + "\n"
-                    }
-                    embed.addFields([
-                        {name:"Uploaded", value: uploadDate,inline:true},
-                        {name:"Map", value: gameMap, inline:true},
-                        {name:"Result", value: gameResult,inline:true},
-                        {name:"Player Division", value: playerDiv,inline:false},
-                        {name:"Opponent Division", value: opponentDiv,inline:true},
-                        {name:"Opponent", value: opponent,inline:true},
-                        {name:"---------------------------", value: "\u200b",inline:false}
-                    ])
-                }
-                }catch(err){
-                    console.log("Error happended here")
-                    console.error(err)
-                }
-            }
-        }
-        else {
-            console.log("No Games found")
-        }
-        //Send Final Embed  
-        message.reply({embeds: [embed]});
-    }
+        let response = await updatePlayersDiscordId(id, input);
 
-
-    private pad(num:number):string {
-        var rounded = Math.round(num*10)/10
-        var fixed = rounded.toFixed(1)
-        return fixed.padEnd(7);
-    }
-
-
-    private async getLadder(message:Message, input:string[], perms:PermissionsSet){
-        let ladder:EloLadderElement[]
-        if(perms.isGlobalEloShown)
-            ladder = await this.database.getGlobalLadder();
-        else
-            ladder = await this.database.getServerLadder(message.guild.id);
-
-
-        const embed = new EmbedBuilder();
-        embed.setTitle("Top Players")
-        embed.setColor("#75D1EA")
-        var playerDetails = ""
-        var yearAgoTime = new Date()
-        yearAgoTime.setFullYear(yearAgoTime.getFullYear()-1)
-        let x = 0;
-        let playerFound = false;
-        while(x < ladder.length ||  (playerFound && x >= 25)){
-            if (yearAgoTime < ladder[x].lastActive ){
-                if( x < 15){
-                    if(ladder[x].discordId != "null"){
-                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
-                        if(ladder[x].discordId == message.author.id) playerFound = true;
-                    }else{
-                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003 " + ladder[x].name + "\n"
-                    }
-                }else{
-                    if(ladder[x].discordId != "null" && ladder[x].discordId == message.author.id){
-                        playerDetails += ladder[x].rank + ":    \u2003" + this.pad(ladder[x].elo) + "\u2003<@!" + ladder[x].discordId + "> \n"
-
-                    }
-                }
-            }
-            x++;
-        }
-        
-        if(ladder.length == 0 || playerDetails.length == 0){
-            MsgHelper.reply(message,"Noone uploaded a ranked replay within a year. The ladder is empty.")
+        if(typeof response === 'string') {
+            await interaction.editReply(response);
             return;
         }
-        embed.addFields([{name: "Pos      Elo           Name", value:playerDetails, inline:true}])
-        //Send Final Embed
-        //embed.setDescription("For full global leaderboard please goto http://eugenplz.com") --site isn't ready
-        embed.setFooter({text:"Only those players who have been involved in a submitted match in the last year will appear in the ladder"})
 
-        MsgHelper.sendEmbed(message,embed);
+        await interaction.editReply(`Player ${id} registered.`);
     }
 
+    private async leaderboard(interaction: ChatInputCommandInteraction): Promise<void> {
+        const eloType = interaction.options.getString("elo_type") ?? "sdElo";
 
-    
-        //Register a player to the bot
-        private register(message:Message, input:string[]):void{
-            if(input.length == 1 && Number(input[0])){
-                (async () => {
-                    let user = await this.database.getDiscordUserFromEugenId(Number(input[0]))
-                    if(user){
-                        if(user.id = message.author.id){
-                            MsgHelper.reply(message,"you are already registered to Eugen account " + input[0])
-                            Logs.log("Eugen account "+ input[0] + "is already registered to user " + user.id )
-                        }else{
-                            user.id =(message.author.id)
-                            await this.database.setDiscordUser(user);
-                            MsgHelper.reply(message,"Eugen account " + input[0] + " has been updated to your discord userid")
-                            Logs.log("Changed eugen account "+ input[0] + " to user " + user.id )
-                        }
-                    }else{
-                        console.log(Number(message.author.id))
-                        user = {
-                            id: (message.author.id),
-                            playerId: Number(input[0]),
-                            serverAdmin: [],
-                            globalAdmin: false,
-                            impliedName: message.author.username
-                        }
-                        await this.database.setDiscordUser(user);
-                        MsgHelper.reply(message,"Eugen account " + input[0] + " has been added to the Player Database and connected to your Discord userid")
-                        Logs.log("Added eugen account "+ input[0] + " to user " + user.id )
-                    }
-                })()
+        await interaction.deferReply();
+
+        const players = await getLeaderboard(eloType);
+
+        if(typeof players === 'string') {
+            await interaction.editReply("Failed to get leaderboard.");
+            return;
+        }
+
+        let value = "No players found"
+
+        if(players.length > 0) {
+            value = "```\n";
+            const longestRank = this.getLongestRank(players);
+            const longestName = this.getLongestName(players);
+
+            players.map((player, index) => {
+                value += `${player.rank.toString().padStart(longestRank)}. ${player.name.substring(0, longestName).padEnd(longestName)}   ${player.elo.toFixed(2)}\n`;
+            });
+            value += "```";
+        }
+
+        await this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Top 10 players by ${eloType}`);
+    }
+
+    private async playerRank(interaction: ChatInputCommandInteraction): Promise<void> {
+        const eloType = interaction.options.getString("elo_type") ?? "sdElo";
+        // const id = interaction.user.id;
+
+        let idInput = interaction.options.getNumber("eugenid");
+
+        let id: string;
+
+        if(!idInput){
+            id = interaction.user.id;
+        }
+        else{
+            if(idInput < 0){
+                await interaction.reply("Invalid player ID");
+
+                return;
             }
+            id = idInput.toString();
         }
 
-        private addFieldToEmbed(embed:EmbedBuilder,field:string,value:string,inline:boolean):EmbedBuilder{
-            return embed.addFields([{name:field,value:value,inline:inline}])
+
+        await interaction.deferReply();
+
+        const players = await getPlayerRank(id, eloType);
+
+        if(typeof players === 'string') {
+            await interaction.editReply(players);
+            return;
         }
-        public addCommands(bot:DiscordBot):void{
-            bot.registerCommand("player",this.getPlayer.bind(this));
-            bot.registerCommand("ladder",this.getLadder.bind(this));
-            bot.registerCommand("register",this.register.bind(this));
+
+        const longestRank = this.getLongestRank(players);
+        const longestName = this.getLongestName(players);
+
+        let value:string = "```\n";
+        players.map((player, index) => {
+            value += `${player.rank.toString().padStart(longestRank)}. ${player.name.substring(0, longestName).padEnd(longestName)}   ${player.elo.toFixed(2)}\n`;
+        });
+        value += "```";
+
+        await this.editReplyEmbed(interaction, [{name: '\u200b', value: value, inline: false}], `Rank of <@${interaction.user.id}> ${eloType}`);
+    }
+
+    private async editReplyEmbed(interaction: ChatInputCommandInteraction, embeds: EmbedField[], description:string): Promise<void>{
+        const embed = new EmbedBuilder()
+            .setTitle("Leaderboard")
+            .setDescription(description)
+            .setColor("Blue");
+
+
+        embed.addFields(embeds);
+
+        await interaction.editReply({embeds: [embed]});
+    }
+    private getLongestRank(players: PlayerRank[]): number {
+        return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
+    }
+
+    private async Snitch(interaction: ChatInputCommandInteraction){
+        const id = interaction.options.getNumber("eugenid");
+
+        if(!id) {
+            await interaction.reply("Invalid player ID");
+            return;
         }
+
+        await interaction.deferReply();
+
+        const response = await getPlayerAliases(id);
+
+        if(typeof response === 'string') {
+            await interaction.editReply(response);
+            return;
+        }
+
+
+        let value = 'The most used known aliases are: **';
+        response.aliases.forEach((alias) => {
+            value += alias + ', ';
+        });
+
+        value = value.substring(0, value.length-2) + '**';
+
+        await interaction.editReply(value);
+    }
+
+    private getLongestName(players: PlayerRank[]): number {
+        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 17);
+    }
+
+    public addCommands(bot: DiscordBot): void {
+        const registerPlayer = new SlashCommandBuilder().setName("register").setDescription("Register a player");
+
+        registerPlayer.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(true));
+
+        bot.registerCommand(registerPlayer, this.registerPlayer.bind(this));
+
+        const leaderBoard = new SlashCommandBuilder().setName("leaderboard").setDescription("Get the leaderboard");
+        leaderBoard.addStringOption(option => option.setName("elo_type").setDescription("Elo type. Default: SD 1v1").setRequired(false)
+            .addChoices({name: "SD 1v1", value: "SdElo"}, {name: "Warno 1v1", value: "WarnoElo"},
+                {name: "SD TeamGame", value: "SdTeamGameElo"}, {name: "Warno TeamGame", value: "WarnoTeamGameElo"}));
+
+        bot.registerCommand(leaderBoard, this.leaderboard.bind(this));
+
+        const playerRank = new SlashCommandBuilder().setName("rank").setDescription("Get player rank");
+
+        playerRank.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(false));
+
+        playerRank.addStringOption(option => option.setName("elo_type").setDescription("Elo type. Default: SD 1v1").setRequired(false)
+            .addChoices({name: "SD 1v1", value: "SdElo"}, {name: "Warno 1v1", value: "WarnoElo"},
+                {name: "SD TeamGame", value: "SdTeamGameElo"}, {name: "Warno TeamGame", value: "WarnoTeamGameElo"}));
+
+        bot.registerCommand(playerRank, this.playerRank.bind(this));
+
+        const snitch = new SlashCommandBuilder().setName("snitch").setDescription("Returns known aliases of given ID");
+        snitch.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(true));
+
+        bot.registerCommand(snitch, this.Snitch.bind(this));
+
+    }
 }

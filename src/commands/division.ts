@@ -1,55 +1,47 @@
-import {Embed, Message} from "discord.js";
+import { Embed, SlashCommandBuilder, ChatInputCommandInteraction, SlashCommandIntegerOption } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { EmbedBuilder } from "discord.js";
+import { join } from "path";
 
 
 //@todo clean up array mess in this file created by addition of divsion alias names.
 export class DivisionCommand {
     private bans: Map<string, Map<number, boolean>> = new Map<string, Map<number, boolean>>(); // 2d array of playerIds to banned divisions.
 
-    private randomDiv(message: Message, input: string[]): void {
+    private randomDiv(input: ChatInputCommandInteraction): void {
 
-        Logs.log("command Random Division with Inputs " + JSON.stringify(input));
-
-        let divCount = 1;
+        let divCount = input.options.getInteger("count") ?? 1;
         let divs: DivisionStruct[] = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
 
-        if (input.length > 0) {
-            const inputArgs = input[0].toLowerCase().split(' ');
+        const side = input.options.getString("side");
 
-            const divCountIndex = inputArgs.findIndex((x) => !isNaN(Number(x)));
-
-            divCount = divCountIndex == -1 ? 1 : Number(inputArgs.splice(divCountIndex, 1));
-
-            if (divCount > 20) {
-                MsgHelper.reply(message, "Please select less than 21 divisions.")
-                return;
-            }
-
-            if (inputArgs.length > 1) {
-                MsgHelper.reply(message, "Allowed arguments are 'axis', 'allies' or 'warno' and a number of divisions to pick. Example: $rdiv axis 3")
-                return;
-            }
-
-
-            if (inputArgs.length == 1) { // I'm lucky my programming teacher will never see this. I'm too tired sorry 
-                const side = inputArgs[0];
-                if (side !== "axis" && side !== "allies" && side !== "warno") {
-                    MsgHelper.reply(message, "Unknown faction, please specify 'axis' or 'allies' or 'warno' as a faction if you want to pick a certain faction or choose a warno division.");
-                    return;
-                }
-                if (side == "allies") divs = divisions.divisionsAllies;
-                if (side == "axis") divs = divisions.divisionsAxis;
-                if (side == "warno") divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
-            }
+        switch (side) {
+            case "allies":
+                divs = divisions.divisionsAllies;
+                break;
+            case "axis":
+                divisions.divisionsAxis;
+                break;
+            case "nato":
+                divs = divisions.divisionsNato;
+                break;
+            case "pact":
+                divs = divisions.divisionsPact;
+                break;
+            case "warno":
+                divs = [...divisions.divisionsNato, ...divisions.divisionsPact];
+                break;
+            default:
+                divs = [...divisions.divisionsAllies, ...divisions.divisionsAxis];
         }
 
-        if (divs?.length == 0 || divs?.length < divCount) {
-            MsgHelper.reply(message, "There aren't enough divs to pick from. If some are banned, you might wanna unban them. To unban all type $resetdivs.");
+
+        if (divs.length < divCount) {
+            MsgHelper.reply(input, `There aren't enough divs to pick from. There are ${divs.length} divisions to choose from.`);
             return;
         }
 
@@ -68,38 +60,43 @@ export class DivisionCommand {
         //In case some smartass enters 0
         response = response.length > 3 ? response.substring(0, response.length - 2) : "No divisions available.";
 
-        MsgHelper.reply(message, response);
+        MsgHelper.reply(input, response);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private allDivs(message: Message, input: string[]): void {
-        let allieddivs = "";
-        let axisdivs = "";
-        for (let i = 0; i < divisions.divisionsAllies.length; i++) {
-            if (divisions.divisionsAllies[i]) allieddivs += divisions.divisionsAllies[i].name + '\n';
-            //if(divisions.divisionsAllies[i]) alliedalias = divisions.divisionsAllies[i].alias;
-            if (divisions.divisionsAxis[i]) axisdivs += divisions.divisionsAxis[i].name + '\n';
+    private allDivs(input: ChatInputCommandInteraction): void {
+        let alliedDivs = "";
+        let axisDivs = "";
 
-            //if(divisions.divisionsAxis[i]) axisalias = divisions.divisionsAxis[i].alias;
-        }
-        const alliedDivsEmbed = new EmbedBuilder()
-            .setTitle("-- All Divisions --");
-        alliedDivsEmbed.addFields({ name: 'Allied Divisions', value: allieddivs, inline: true });
 
-        let axisDivsEmbed = new EmbedBuilder();
-        axisDivsEmbed = axisDivsEmbed.addFields({ name: "Axis Divisions", value: axisdivs, inline: true });
-        message.channel.send({embeds: [alliedDivsEmbed, axisDivsEmbed]});
+        const alliedDivsEmbed = new EmbedBuilder().setTitle("-- All Divisions --");
+
+        alliedDivs = divisions.divisionsAllies.slice(0, divisions.divisionsAllies.length / 2).map(x => x.name).join('\n');
+        alliedDivsEmbed.addFields({ name: '\u200b', value: alliedDivs, inline: true });
+
+        alliedDivs = divisions.divisionsAllies.slice(divisions.divisionsAllies.length / 2).map(x => x.name).join('\n');
+        alliedDivsEmbed.addFields({ name: '\u200b', value: alliedDivs, inline: true });
+
+
+        const axisDivsEmbed = new EmbedBuilder();
+        axisDivs = divisions.divisionsAxis.slice(0, divisions.divisionsAxis.length / 2)
+            .map(x => "\u200b" + x.name).join('\n');
+        axisDivsEmbed.addFields({ name: '\u200b', value: axisDivs, inline: true });
+
+        axisDivs = divisions.divisionsAxis.slice(divisions.divisionsAxis.length / 2)
+            .map(x => "\u200b" + x.name).join('\n');
+        axisDivsEmbed.addFields({ name: '\u200b', value: axisDivs, inline: true });
+
+        MsgHelper.sendEmbeds(input, [alliedDivsEmbed, axisDivsEmbed]);
     }
 
-    private unbanDivision(message: Message, input: string[]): void {
-        if (input.length == 0) {
-            MsgHelper.reply(message, `I don't know what that division is, please use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
-            return;
-        }
+    private unbanDivision(chatInput: ChatInputCommandInteraction, input: string[]): void {
+
+
         if (input[0].toLocaleLowerCase() == "all") {
-            this.bans[message.author.id] = null;
-            Logs.log(message.author.id + " has unbanned all");
-            MsgHelper.reply(message, 'unbanned all divisions');
+            this.bans[chatInput.user.id] = null;
+            Logs.log(chatInput.user.id + " has unbanned all");
+            MsgHelper.reply(chatInput, 'unbanned all divisions');
             return;
         }
         for (const line of input) {
@@ -117,7 +114,7 @@ export class DivisionCommand {
             }
             if (target.length == 0) {
                 MsgHelper.say(
-                    message,
+                    chatInput,
                     `I don't know what that division is, did you mean ***${CommonUtil.lexicalGuesser(line, divs.map(x => {
                         return x["name"]
                     }))
@@ -125,20 +122,20 @@ export class DivisionCommand {
                 );
                 return;
             } else {
-                this.bans[message.author.id][target[0].id] = null;
-                Logs.log(message.author.id + " has unbanned " + JSON.stringify(target[0]))
-                MsgHelper.reply(message, target[0].name + " has been unbanned.")
+                this.bans[chatInput.user.id][target[0].id] = null;
+                Logs.log(chatInput.user.id + " has unbanned " + JSON.stringify(target[0]))
+                MsgHelper.reply(chatInput, target[0].name + " has been unbanned.")
                 let all = false;
-                for (const z of this.bans[message.author.id]) {
+                for (const z of this.bans[chatInput.user.id]) {
                     all = z || all;
                 }
                 console.log(all);
-                if (!all) this.bans[message.author.id] = null;
+                if (!all) this.bans[chatInput.user.id] = null;
             }
         }
     }
 
-    private banDivision(message: Message, input: string[]): void {
+    private banDivision(message: ChatInputCommandInteraction, input: string[]): void {
         if (input.length == 0) {
             MsgHelper.reply(message, `Please specify a division to ban. Use ${CommonUtil.config("prefix")}alldivs, to get the list of divisions.`)
             return;
@@ -171,24 +168,24 @@ export class DivisionCommand {
                 })));
                 return;
             } else {
-                if (!this.bans[message.author.id]) {
-                    this.bans[message.author.id] = new Map();
+                if (!this.bans[message.user.id]) {
+                    this.bans[message.user.id] = new Map();
                 }
-                this.bans[message.author.id][target[0].id] = true;
-                Logs.log(message.author.id + " has banned " + JSON.stringify(target[0]))
+                this.bans[message.user.id][target[0].id] = true;
+                Logs.log(message.user.id + " has banned " + JSON.stringify(target[0]))
                 MsgHelper.reply(message, target[0].name + " has been banned.")
             }
         }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private unbanDivisionAll(message: Message, input: string[]): void {
+    private unbanDivisionAll(message: ChatInputCommandInteraction, input: string[]): void {
         this.unbanDivision(message, ["all"]);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private bannedDivisions(message: Message, input: string[]): void {
-        const bannedDivs: Map<number, boolean> = this.bans[message.author.id];
+    private bannedDivisions(message: ChatInputCommandInteraction, input: string[]): void {
+        const bannedDivs: Map<number, boolean> = this.bans[message.user.id];
         if (!bannedDivs) {
             MsgHelper.reply(message, "You have no banned Divisions");
             return;
@@ -206,19 +203,34 @@ export class DivisionCommand {
                 ret += "`" + name + "`,";
             }
             ret = ret.slice(0, ret.length - 1);
-            Logs.log(message.author.id + " requested list of banned divisions " + JSON.stringify(bannedDivs));
+            Logs.log(message.user.id + " requested list of banned divisions " + JSON.stringify(bannedDivs));
             MsgHelper.reply(message, ret)
 
         }
     }
 
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("rdiv", this.randomDiv.bind(this));
-        bot.registerCommand("alldivs", this.allDivs.bind(this));
-        bot.registerCommand("divs", this.allDivs.bind(this));
-        bot.registerCommand("unbandiv", this.unbanDivision.bind(this));
-        bot.registerCommand("resetdivs", this.unbanDivisionAll.bind(this));
-        bot.registerCommand("bandiv", this.banDivision.bind(this));
-        bot.registerCommand("banneddivs", this.bannedDivisions.bind(this));
+        const rdiv = new SlashCommandBuilder().setName("rdiv").setDescription("Returns random division");
+        rdiv.addStringOption(option => option.setName("side").addChoices(
+            { name: "sd2", value: "sd2" }, { name: "warno", value: "warno" },
+            { name: "axis", value: "axis" }, { name: "allies", value: "allies" },
+            { name: "nato", value: "nato" }, { name: "pact", value: "pact" })
+            .setRequired(false).setDescription("Choose side or game to choose divisions from. Default: 'sd2'"))
+
+            .addIntegerOption(option =>
+                option.setName('count').setDescription("Number of divisions to get. Default: 1")
+                    .setRequired(false).setMinValue(1).setMaxValue(20));
+
+
+        bot.registerCommand(rdiv, this.randomDiv.bind(this));
+
+        const allDivs = new SlashCommandBuilder().setName("alldivs").setDescription("Returns all divisions");
+        bot.registerCommand(allDivs, this.allDivs.bind(this));
+
+        //temporarily disabled, will revive this after I'll start using a database, otherwise it sucks
+        // bot.registerCommand("unbandiv", this.unbanDivision.bind(this));
+        // bot.registerCommand("resetdivs", this.unbanDivisionAll.bind(this));
+        // bot.registerCommand("bandiv", this.banDivision.bind(this));
+        // bot.registerCommand("banneddivs", this.bannedDivisions.bind(this));
     }
 }

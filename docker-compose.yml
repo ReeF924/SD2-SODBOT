@@ -1,5 +1,4 @@
 # version: '3'
-
 # services:
 #   sodbot:
 #     restart: always
@@ -20,3 +19,28 @@
 #     default:
 #         external:
 #             name: web
+
+version: '3.8'
+
+services:
+  api:
+    image: reef90/sodbotapi:1.0.0
+    container_name: api
+    ports:
+      - "5278:5278"
+    restart: always
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+
+  sodbot:
+    image: reef90/sodbot:2.0.0
+    container_name: sbil
+    ports:
+      - "3000:8080"
+    restart: always
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:5278
+      - ConnectionStrings__DatabaseConnection=${CONNECTION_STRING}
+

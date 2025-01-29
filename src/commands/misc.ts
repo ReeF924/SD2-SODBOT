@@ -1,18 +1,8 @@
-import {Message, EmbedBuilder} from "discord.js";
-import {CommonUtil} from "../general/common";
-import {DiscordBot, MsgHelper} from "../general/discordBot";
-import {DeckParser} from "sd2-utilities/lib/parser/deckParser"
-import {CommandDB} from "./Command";
-import {DB} from "../general/db";
-import {Logs} from "../general/logs";
-import {AdminCommand} from "./admin";
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { DiscordBot, MsgHelper } from "../general/discordBot";
+import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
 
-
-export class MiscCommand extends CommandDB {
-
-    public constructor(database: DB) {
-        super(database);
-    }
+export class MiscCommand {
 
     private piatReplies = [
         "Hit! We're Airborne. We don't start fights, we finish 'em!",
@@ -103,100 +93,63 @@ export class MiscCommand extends CommandDB {
 
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private flip(message: Message, input: string[]): void {
+    private flip(input: ChatInputCommandInteraction): void {
         if (Math.random() > 0.5) {
-            MsgHelper.reply(message, "Heads");
+            MsgHelper.reply(input, "Heads");
             return;
         }
-        MsgHelper.reply(message, "Tails");
+        MsgHelper.reply(input, "Tails");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private faction(message: Message, input: string[]): void {
+    private faction(input: ChatInputCommandInteraction): void {
+        const game = input.options.getString("game", false) ?? "sd2";
+
         if (Math.random() > 0.5) {
-            MsgHelper.reply(message, "Axis");
+            MsgHelper.reply(input, game == "sd2" ? "Axis" : "Pact");
+            return;
         }
-        MsgHelper.reply(message, "Allied");
+        MsgHelper.reply(input, game == "sd2" ? "Allies" : "Nato");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private help(message: Message, input: string[]): void {
-        const embed = new EmbedBuilder()
-            .setTitle("Help")
-            .setDescription("prefix commands with " + CommonUtil.config('prefix'))
-            .addFields([
-                {name: "Maps", value: "rdiv (axis|allies): get a random division from unbanned pool", inline: true},
-                {
-                    name: "Divisions", value:
-                        "rmap (axis|allies): get a random division from unbanned pool. Can be filtered by allied/axis \n" +
-                        "divisions", inline: true
-                },
-                {name: "Misc", value: '', inline: true}
-            ])
-        message.channel.send({embeds: [embed]});
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private piat(message: Message, input: string[]): void {
+    private piat(input: ChatInputCommandInteraction): void {
         const i = Math.random();
 
-        if (message.author.id === '607962880154927113') { //I had to...
+        if (input.user.id === '607962880154927113') { //I had to...
             const replies = this.piatReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
             MsgHelper.reply(
-                message,
+                input,
                 replies[Math.floor(Math.random() * replies.length)],
             );
             return;
         }
 
 
-        if (i > 0.80) {
+        if (i > 0.9) {
             MsgHelper.reply(
-                message,
+                input,
                 this.piatReplies[Math.floor(Math.random() * this.piatReplies.length)],
             );
-        } else if (i > 0.05) {
-            MsgHelper.reply(message, "Miss!");
+        } else if (i > 0.1) {
+            MsgHelper.reply(input, "Miss!");
             return;
-        } else {
-            (MsgHelper.reply(message, `You hit!`),
+        }
+        else if (i > 0.05) {
+            MsgHelper.reply(input, "Miss!");
+            input.followUp({ content: "You actually hit, but noone will ever believe you...", ephemeral: true });
+            return;
+        }
+        else {
+            (MsgHelper.reply(input, `You hit!`),
                 setTimeout(() => {
-                    MsgHelper.reply(message, `Just kidding, you didn't.`);
+                    input.followUp("Just kidding, you didn't.");
                 }, 5000));
         }
     }
 
-    private ptrd(message: Message, input: string[]): void {
-        const name = message.author.username;
-        const k = Math.random();
-        const i = Math.random();
-        if (i > 0.80) {
-            MsgHelper.reply(
-                message,
-                this.ptrdReplies[Math.floor(Math.random() * this.ptrdReplies.length)],
-            );
-        } else {
-            MsgHelper.reply(message, "Miss!");
-            return;
-        }
-    }
 
-    private laws(message: Message, input: string[]): void {
-        const name = message.author.username;
-        const k = Math.random();
-        const i = Math.random();
-        if (i > 0.70) {
-            MsgHelper.reply(
-                message,
-                this.sodbotReplies3[Math.floor(Math.random() * this.sodbotReplies3.length)],
-            );
-        } else {
-            MsgHelper.reply(message, "Miss!");
-            return;
-        }
-    }
-
-    private deck(message: Message, input: string[]): void {
+    private deck(message: ChatInputCommandInteraction, input: string[]): void {
         let embed = new EmbedBuilder();
         if (String.length > 0) {
             const deck = DeckParser.parse(input[0])
@@ -237,23 +190,23 @@ export class MiscCommand extends CommandDB {
                 cstr += i + "\n"
             }
             embed = embed.addFields([
-                {name: "A Phase", value: astr, inline: true},
-                {name: "B Phase", value: bstr, inline: true},
-                {name: "C Phase", value: cstr, inline: true}
+                { name: "A Phase", value: astr, inline: true },
+                { name: "B Phase", value: bstr, inline: true },
+                { name: "C Phase", value: cstr, inline: true }
             ]);
-            embed = embed.setFooter({text: "counts are in # of cards, not # of units"})
-            message.channel.send({embeds: [embed]});
+            embed = embed.setFooter({ text: "counts are in # of cards, not # of units" })
+            message.channel.send({ embeds: [embed] });
         }
     }
 
-    private info(message: Message, input: string[]): void {
+    private info(input: ChatInputCommandInteraction): void {
         const embed = new EmbedBuilder()
             .setTitle("SODBOT III Info")
             .setDescription("SODBOT III is is the latest version of the Steel Division 2 bot")
             .addFields([
                 {
                     name: "History",
-                    value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game.  The bot is now hosted on several Discord servers, all contributing to a Global ELO score for players of Steel Division 2.",
+                    value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game. The main developers were RoguishTiger and P.URI.Tanner. The bot is now hosted on several Discord servers.",
                     inline: false
                 },
                 {
@@ -261,17 +214,24 @@ export class MiscCommand extends CommandDB {
                         "SD Nerd HQ Team", inline: false
                 }
             ])
-        message.author.send({embeds: [embed]});
+        MsgHelper.sendEmbeds(input, [embed]);
     }
 
     public addCommands(bot: DiscordBot): void {
-        bot.registerCommand("flip", this.flip.bind(this));
-        bot.registerCommand("faction", this.faction.bind(this));
-        bot.registerCommand("help", this.help.bind(this));
-        bot.registerCommand("piat", this.piat.bind(this));
-        bot.registerCommand("ptrd", this.ptrd.bind(this));
-        bot.registerCommand("laws", this.laws.bind(this));
-        bot.registerCommand("deck", this.deck.bind(this));
-        bot.registerCommand("info", this.info.bind(this));
+        const flip = new SlashCommandBuilder().setName("flip").setDescription("Flip a coin");
+        bot.registerCommand(flip, this.flip.bind(this));
+
+        const faction = new SlashCommandBuilder().setName("faction").setDescription("Randomly select a faction");
+        faction.addStringOption(option => option.setName("game").setDescription("Filter by game. Default: sd2")
+            .setChoices({ name: "sd2", value: "sd2" }, { name: "warno", value: "warno" }).setRequired(false));
+        bot.registerCommand(faction, this.faction.bind(this));
+
+        const piat = new SlashCommandBuilder().setName("piat").setDescription("Fire the piat");
+        bot.registerCommand(piat, this.piat.bind(this));
+
+        // bot.registerCommand("deck", this.deck.bind(this));
+
+        const info = new SlashCommandBuilder().setName("info").setDescription("Get lore about the bot.");
+        bot.registerCommand(info, this.info.bind(this));
     }
 }

@@ -1,9 +1,10 @@
 {
-  "prefix": "$",
   "logFileName": "log.txt",
   "botName": "SODBOT II ",
   "version": "1.1.0",
   "token": "",
+  "clientId": "1120804622307709010",
+  "guildId": "854228138945937408",
   "tts_enabled_global": true,
   "max_purge_num": 20,
   "k_value": 32,
