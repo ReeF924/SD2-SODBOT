@@ -10,7 +10,6 @@ import { DiscordBot } from "./general/discordBot";
 
 import * as smp from 'source-map-support';
 import { Logs } from "./general/logs";
-import { DB } from "./general/db";
 import { DivisionCommand } from './commands/division';
 import { MapCommand } from './commands/map';
 
