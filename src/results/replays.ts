@@ -3,9 +3,9 @@ import {GameParser, RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameP
 import {misc} from "sd2-data"
 import * as axios from "axios"
 import {uploadReplay} from "../db/services/replaysService";
-import {getPlayersByIds} from "../db/services/playerService";
+import {getPlayersByIds, isPlayerAI} from "../db/services/playerService";
 import {Player} from "../db/models/player";
-import {ReplayWithOldEloDto} from "../db/models/replay";
+import {UploadReplayResponse} from "../db/models/replay";
 
 const ax = axios.default;
 
@@ -32,7 +32,7 @@ export class Replays {
             return null;
         }
 
-        let replay: ReplayWithOldEloDto = null;
+        let replay: UploadReplayResponse = null;
         //uploads replay to the database
         try {
             replay = await Replays.uploadReplay(g, message);
@@ -53,7 +53,7 @@ export class Replays {
         return apiResponded ? g : null;
     }
 
-    private static async uploadReplay(g: RawGameData, message: Message): Promise<ReplayWithOldEloDto> {
+    private static async uploadReplay(g: RawGameData, message: Message): Promise<UploadReplayResponse> {
         const response = await uploadReplay(g,
             {
                 uploadedAt: message.createdAt,
@@ -88,12 +88,12 @@ export class Replays {
     }
 
 
-    static async sendEmbed(message: Message, g: RawGameData, apiResponded: boolean, replay: ReplayWithOldEloDto = null): Promise<void> {
+    static async sendEmbed(message: Message, g: RawGameData, apiResponded: boolean, replay: UploadReplayResponse = null): Promise<void> {
         let players: PlayerInfo[] = [];
-
+        const containsAIs = g.aiCount != 0;
 
         if (!replay) {
-            players = await Replays.GetPlayerByIds(g.players, apiResponded);
+            players = await Replays.GetPlayerByIds(g.players, containsAIs, apiResponded);
         } else {
             for (const player of replay.replayPlayers) {
                 const p = g.players.find(r => r.id === player.playerId);
@@ -149,9 +149,9 @@ export class Replays {
             //show discord if he has one or show most used name (if it's different)
             let embedPlayerField = this.blankEmbedField;
             if (player.discordId) {
-                embedPlayerField = {name: "Discord", value: `<@${player.discordId}>`, inline: false};
+                embedPlayerField = {name: "Discord", value: `<@${player.discordId}>`, inline: true};
             } else if (player.player.name.trim().toLowerCase() != player.mostUsedNickname.trim().toLowerCase()) {
-                embedPlayerField = {name: "Most used name", value: player.mostUsedNickname, inline: false};
+                embedPlayerField = {name: "Most used name", value: player.mostUsedNickname, inline: true};
             }
 
             let eloText: string = "Unknown";
@@ -166,20 +166,24 @@ export class Replays {
                 }
             }
 
+            let embedDivIncome: EmbedField = {name: "Division", value: player.player.deck!.division, inline: false};
+            if (player.player.deck!.franchise === "SD2") {
+                embedDivIncome = {name: "Division + Income", value: player.player.deck!.division + " + " + player.player.deck.income, inline: false};
+            }
+
+            const playerIsAI = isPlayerAI(player.player);
+
             embed.addFields(
                 [{name: "\u200b", value: sep, inline: false},
                     {name: "Player", value: player.player.name, inline: true},
                     embedPlayerField,
-                    {name: "EugenElo\tSodbotElo", value: `${player.player.elo.toFixed(2)}  \t${eloText}`, inline: true},
-                    {name: "EugenId", value: player.player.id.toString(), inline: true},
-                    {name: "Division", value: player.player.deck!.division, inline: false},
+                    !playerIsAI ? {name: "EugenId", value: player.player.id.toString(), inline: true} : this.blankEmbedField,
+                    {name: "EugenElo", value: player.player.elo.toFixed(2), inline: false},
+                    !playerIsAI ? {name: "SodbotElo", value: eloText, inline: false} : {name: "\u200b", value: "\u200b", inline: false},
+                    embedDivIncome,
                     {name: "Deck Code", value: player.player.deck.raw.code, inline: false}
                 ]);
 
-
-            if (player.player.deck!.franchise === "SD2") {
-                embed.addFields([{name: "Income", value: player.player.deck!.income, inline: true}]);
-            }
 
             //every third player, but in the beginning there can be only 2 players (basic info)
             //to not exceed the limit of fields in an embed (25)
@@ -198,12 +202,16 @@ export class Replays {
         message.channel.send({embeds: [embed]});
     }
 
-    static async GetPlayerByIds(players: RawPlayer[], apiResponded: boolean): Promise<PlayerInfo[]> {
+    static async GetPlayerByIds(players: RawPlayer[], containsAIs: boolean, apiResponded: boolean): Promise<PlayerInfo[]> {
         let response: Player[] | string;
         if (apiResponded) {
-            try {
-                response = await getPlayersByIds(players.map(p => p.id));
 
+            const ids: number[] = !containsAIs
+            ? players.map(p => p.id)
+            : players.filter(p => !isPlayerAI(p)).map(p => p.id);
+
+            try {
+                response = await getPlayersByIds(ids);
             } catch (e) {
                 if (e.cause.code === "ECONNREFUSED" && e instanceof TypeError) {
                     console.log("API offline");
@@ -244,7 +252,7 @@ export class Replays {
             } else {
                 output.push({
                     player: rp,
-                    mostUsedNickname: player.nickname,
+                    mostUsedNickname: rp.name,
                     discordId: null,
                     sodbotElo: null,
                     oldSodbotElo: null

@@ -12,7 +12,7 @@ export interface ReplayDto {
     mapType: MapType | null;
     victoryCondition: VictoryCondition;
     durationSec: number;
-    replayType?: SkillLevel | null;
+    skillLevel?: SkillLevel | null;
     replayPlayers: ReplayPlayerDto[];
 }
 
@@ -28,7 +28,7 @@ export interface ReplayPlayerDto {
     deckCode: string;
 }
 
-export interface ReplayWithOldEloDto{
+export interface UploadReplayResponse{
     id: number;
     sessionId: string;
     uploadedIn: string;
@@ -41,15 +41,15 @@ export interface ReplayWithOldEloDto{
     mapType: MapType | null;
     victoryCondition: VictoryCondition;
     durationSec: number;
-    replayType?: SkillLevel | null;
-    replayPlayers: ReplayPlayerWithEloDto[];
+    skillLevel?: SkillLevel | null;
+    replayPlayers: UploadReplayPlayerResponse[];
 }
 
-export interface ReplayPlayerWithEloDto extends ReplayPlayerDto {
+export interface UploadReplayPlayerResponse extends ReplayPlayerDto {
     mostUsedNickname: string;
-    discordId: string;
+    discordId: string | null;
     sodbotElo: number;
-    oldSodbotElo: number;
+    oldSodbotElo: number | null;
 }
 
 export enum MapType {

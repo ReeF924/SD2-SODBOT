@@ -139,8 +139,7 @@ export class PlayerCommand  {
             value += alias + ', ';
         });
 
-
-        value = value.slice(0, value.length-1) + '**';
+        value = value.substring(0, value.length-2) + '**';
 
         await interaction.editReply(value);
     }

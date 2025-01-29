@@ -1,12 +1,13 @@
-import {MapType, ReplayDto, ReplayPlayerDto, ReplayWithOldEloDto, VictoryCondition} from "../models/replay";
+import {MapType, ReplayDto, ReplayPlayerDto, UploadReplayResponse, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
 import {Franchise} from "../models/admin";
 import {apiErrorMessage} from "../db";
+import {createWriteStream} from "node:fs";
 
 interface UploadReplayResult{
     message: string;
-    replay: ReplayWithOldEloDto;
+    replay: UploadReplayResponse;
 }
 
 interface UploadInformation {
@@ -62,7 +63,7 @@ async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformati
         mapType: mapType,
         victoryCondition: victoryCondition,
         durationSec: data.result.duration,
-        replayType: null,
+        skillLevel: null,
         replayPlayers: [
             ...data.players.map(player => convertToReplayPlayerDto(player)),
         ]
@@ -83,7 +84,7 @@ export function convertToReplayPlayerDto(player: RawPlayer): ReplayPlayerDto {
     }
 }
 
-export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformation): Promise<ReplayWithOldEloDto | string> {
+export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformation): Promise<UploadReplayResponse | string> {
     if (data.players.some(w => w.deck.division.startsWith("ERROR"))) {
         return "Unknown division";
     }
@@ -97,7 +98,6 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
 
     const url = process.env.API_URL + "/replays";
 
-
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -110,8 +110,7 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
         const res: UploadReplayResult = await response.json();
 
         if (!response.ok && response.status !== 409) {
-            const errorText: apiErrorMessage = await response.json();
-            const errorMessage = `Failed to upload replay try: ${errorText.message}`;
+            const errorMessage = `Failed to upload replay try: ${res.message}`;
             console.log(errorMessage, response);
 
             return "Failed to upload replay (API Error)";
@@ -123,6 +122,6 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
     } catch (e) {
         console.log("Failed to upload replay catch, error: ", e)
 
-        return "Failed to upload replay (Bot Error";
+        return "Failed to upload replay";
     }
 }

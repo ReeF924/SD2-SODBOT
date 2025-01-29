@@ -2,6 +2,7 @@ import {Player, PlayerAliases, PlayerPutDto, PlayerRank} from "../models/player"
 import {apiErrorMessage} from '../db';
 import axios from 'axios';
 import {Logs} from "../../general/logs";
+import {RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 
 
 export async function getPlayer(id: number): Promise<Player | string> {
@@ -62,6 +63,9 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
     // return 'Unknown error'
 }
 
+export function isPlayerAI(p:RawPlayer):boolean{
+    return p.aiLevel < 10 && p.name.includes("AI") && p.level === 0;
+}
 
 export async function updatePlayersDiscordId(id: number , input: PlayerPutDto): Promise<Player | string> {
 
