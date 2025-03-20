@@ -1,11 +1,10 @@
-import { Embed, SlashCommandBuilder, ChatInputCommandInteraction, SlashCommandIntegerOption } from "discord.js";
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { DiscordBot, MsgHelper } from "../general/discordBot";
 import type { DivisionStruct } from "sd2-data";
 import { divisions } from "sd2-data";
 import { CommonUtil } from "../general/common";
 import { Logs } from "../general/logs";
 import { EmbedBuilder } from "discord.js";
-import { join } from "path";
 
 
 //@todo clean up array mess in this file created by addition of divsion alias names.

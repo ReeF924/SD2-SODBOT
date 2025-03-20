@@ -1,8 +1,7 @@
-import {Player, PlayerAliases, PlayerPutDto, PlayerRank} from "../models/player";
-import {apiErrorMessage} from '../db';
+import { Player, PlayerAliases, PlayerPutDto, PlayerRank } from "../models/player";
 import axios from 'axios';
-import {Logs} from "../../general/logs";
-import {RawPlayer} from "sd2-utilities/lib/parser/gameParser";
+import { Logs } from "../../general/logs";
+import { RawPlayer } from "sd2-utilities/lib/parser/gameParser";
 
 
 export async function getPlayer(id: number): Promise<Player | string> {
@@ -63,11 +62,11 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
     // return 'Unknown error'
 }
 
-export function isPlayerAI(p:RawPlayer):boolean{
+export function isPlayerAI(p: RawPlayer): boolean {
     return p.aiLevel < 10 && p.name.includes("AI") && p.level === 0;
 }
 
-export async function updatePlayersDiscordId(id: number , input: PlayerPutDto): Promise<Player | string> {
+export async function updatePlayersDiscordId(id: number, input: PlayerPutDto): Promise<Player | string> {
 
     const url = process.env.API_URL + "/players/" + id.toString();
 
@@ -101,7 +100,7 @@ export async function updatePlayersDiscordId(id: number , input: PlayerPutDto): 
     }
 }
 
-export async function getLeaderboard(eloType:string): Promise<PlayerRank[] | string> {
+export async function getLeaderboard(eloType: string): Promise<PlayerRank[] | string> {
 
     const url = process.env.API_URL + "/players/rank?pageNumber=1&pageSize=10&eloType=" + eloType;
 
@@ -122,7 +121,7 @@ export async function getLeaderboard(eloType:string): Promise<PlayerRank[] | str
     }
 }
 
-export async function getPlayerRank(playerId:string, eloType: string): Promise<PlayerRank[] | string> {
+export async function getPlayerRank(playerId: string, eloType: string): Promise<PlayerRank[] | string> {
 
     const url = process.env.API_URL + "/players/rank/" + playerId + "?eloType=" + eloType;
 
@@ -133,7 +132,7 @@ export async function getPlayerRank(playerId:string, eloType: string): Promise<P
             return await response.json() as PlayerRank[];
         }
 
-        if(response.status === 404) {
+        if (response.status === 404) {
             const errorMessage: apiErrorMessage = await response.json();
             Logs.error("Failed to get leaderboard: " + errorMessage.message);
             return errorMessage.message;
@@ -150,20 +149,20 @@ export async function getPlayerRank(playerId:string, eloType: string): Promise<P
 export const getPlayerAliases = async (id: number): Promise<PlayerAliases | string> => {
     const url = process.env.API_URL + "/players/aliases/" + id;
 
-    try{
+    try {
         const response = await fetch(url);
 
-        if(response.ok){
+        if (response.ok) {
             return await response.json() as PlayerAliases;
         }
 
-        if(response.status === 404){
+        if (response.status === 404) {
             return "Player not found";
         }
 
         return "Failed to get player aliases";
     }
-    catch (e){
+    catch (e) {
         Logs.error('Error while getting player aliases: ' + e);
         return 'Failed to get player aliases';
     }
