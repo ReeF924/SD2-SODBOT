@@ -34,7 +34,7 @@ async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformati
         default:
             return "Wrong victory condition";
     }
-    const franchise = data.players[0].deck.franchise === "SD2" ? Franchise.sd2 : Franchise.warno;
+    const franchise = data.franchise === "SD2" ? Franchise.sd2 : Franchise.warno;
 
     let mapType: MapType | null = null;
 
@@ -63,12 +63,12 @@ async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformati
         durationSec: data.result.duration,
         skillLevel: null,
         replayPlayers: [
-            ...data.players.map(player => convertToReplayPlayerDto(player)),
+            ...data.players.map(player => convertToReplayPlayerDto(player, data.franchise)),
         ]
     };
 }
 
-export function convertToReplayPlayerDto(player: RawPlayer): ReplayPlayerDto {
+export function convertToReplayPlayerDto(player: RawPlayer, franchise:"SD2" | "WARNO"): ReplayPlayerDto {
     return {
         playerId: player.id,
         nickname: player.name,
@@ -77,7 +77,7 @@ export function convertToReplayPlayerDto(player: RawPlayer): ReplayPlayerDto {
         victory: player.winner,
         division: player.deck.raw.division,
         faction: player.deck.faction,
-        income: player.deck.franchise === "SD2" ? player.deck.raw.income : null,
+        income: franchise === "SD2" ? player.deck.raw.income : null,
         deckCode: player.deck.raw.code
     }
 }

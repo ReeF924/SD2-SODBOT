@@ -22,7 +22,7 @@ export class Replays {
         
         try {
             //checks if the replay is valid to be uploaded to the db
-            if (game.validForUpload === null) {
+            if (game.invalidForUpload === null) {
                 const replay = await Replays.uploadReplay(game, message);
 
                 for (const player of replay.replayPlayers) {
@@ -39,7 +39,7 @@ export class Replays {
             }
             //if it doesn't get uploaded, get it directly
             else {
-                players = await Replays.GetPlayerByIds(game.players, game.aiCount != 0);
+                players = await Replays.GetPlayerByIds(game.players, game.aiCount != 0, game.franchise);
             }
         }
             //if there's an error, just use only the info available
@@ -100,24 +100,24 @@ export class Replays {
 
         //send the embed with response (split to make it simpler to understand)
         if (players.length <= 2) {
-            await this.sendEmbed_1v1(message, players, embed);
+            await this.sendEmbed_1v1(message, players, embed, g.franchise);
             return;
         }
 
-        await this.sendEmbed_teamGame(message, players, embed);
+        await this.sendEmbed_teamGame(message, players, embed, g.franchise);
     }
 
-    static async sendEmbed_1v1(message: Message, players: PlayerInfo[], embed: EmbedBuilder) {
+    static async sendEmbed_1v1(message: Message, players: PlayerInfo[], embed: EmbedBuilder, franchise: "SD2" | "WARNO") {
         const playerSeparator: string = "-------------------------------------------";
 
         for (const player of players) {
-            this.addPlayerFieldsToEmbed(embed, player, playerSeparator);
+            this.addPlayerFieldsToEmbed(embed, player, playerSeparator, franchise);
         }
         // MsgHelper.sendEmbed(message, embed);
         message.channel.send({embeds: [embed]});
     }
 
-    static async sendEmbed_teamGame(message: Message, players: PlayerInfo[], embed: EmbedBuilder) {
+    static async sendEmbed_teamGame(message: Message, players: PlayerInfo[], embed: EmbedBuilder, franchise: "SD2" | "WARNO") {
 
         //randomly chooses which team goes first (so you cannot tell who win from it)
         if(Math.random() > 0.5){
@@ -142,7 +142,7 @@ export class Replays {
                 playerResult = player.raw.winner;
             }
 
-            this.addPlayerFieldsToEmbed(embed, player, sep);
+            this.addPlayerFieldsToEmbed(embed, player, sep, franchise);
 
             //every third player, but in the beginning there can be only 2 players (because of the replay info)
             //to not exceed the limit of fields in an embed (25)
@@ -193,7 +193,7 @@ export class Replays {
         return response;
     }
 
-    private static addPlayerFieldsToEmbed(embed: EmbedBuilder, player: PlayerInfo, sep:string) {
+    private static addPlayerFieldsToEmbed(embed: EmbedBuilder, player: PlayerInfo, sep:string, franchise: "SD2" | "WARNO") {
         const playerIsAI = isPlayerAI(player.raw);
 
 
@@ -222,7 +222,7 @@ export class Replays {
 
         //if the game is SD, add income as well
         let embedDivIncome: EmbedField = {name: "Division", value: player.raw.deck!.division, inline: true};
-        if (player.raw.deck!.franchise === "SD2") {
+        if (franchise === "SD2") {
             embedDivIncome = {
                 name: "Division + Income",
                 value: player.raw.deck!.division + "\n" + player.raw.deck.income,
@@ -266,7 +266,7 @@ export class Replays {
         return result.substring(0, result.length - 1) + "```";
     }
 
-    static async GetPlayerByIds(players: RawPlayer[], containsAIs: boolean): Promise<PlayerInfo[]> {
+    static async GetPlayerByIds(players: RawPlayer[], containsAIs: boolean, franchise: "SD2" | "WARNO"): Promise<PlayerInfo[]> {
         let response: Player[] | string;
 
         const ids: number[] = !containsAIs
@@ -283,8 +283,7 @@ export class Replays {
         }
 
         //decides which elo to return
-        const rp = players[0];
-        const elo = rp.deck.franchise === "SD2" ? players.length > 2 ? "sdTeamGameElo" : "sdElo"
+        const elo = franchise === "SD2" ? players.length > 2 ? "sdTeamGameElo" : "sdElo"
             : players.length > 2 ? "warnoTeamGameElo" : "warnoElo";
 
 

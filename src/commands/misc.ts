@@ -152,7 +152,7 @@ export class MiscCommand {
     private deck(message: ChatInputCommandInteraction, input: string[]): void {
         let embed = new EmbedBuilder();
         if (String.length > 0) {
-            const deck = DeckParser.parse(input[0])
+            const deck = DeckParser.deckParse(input[0])
             embed = embed.setTitle(deck.division);
             embed = embed.setDescription(deck.income);
             const a = [];
@@ -164,7 +164,7 @@ export class MiscCommand {
                     u += unit.count + "x "
                 }
                 u += unit.name;
-                if (unit.raw.transportid != -1) {
+                if (unit.raw.transportId != -1) {
                     u += " in " + unit.transport
                 }
                 if (unit.xp == 1) u += " ☆"
