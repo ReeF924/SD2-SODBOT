@@ -227,12 +227,7 @@ export class AdminCommand {
                 const r = replays[j];
                 try {
                     //makes it a bit faster
-                    if ((i + j) % 3 === 0) {
-                        await Replays.extractReplayInfo(message, r.url, false);
-                    }
-                    else{
-                        Replays.extractReplayInfo(message, r.url, false);
-                    }
+                    await Replays.responseToReplay(message, r.url, false);
 
                     counter++;
 
@@ -300,7 +295,6 @@ export class AdminCommand {
 
 
             fetched.forEach(message => {
-                const d = new Date(message.createdTimestamp);
                 console.log('crt TimeStamp: ', message.createdAt.toDateString());
                 messages.push(message)
             });

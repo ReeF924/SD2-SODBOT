@@ -105,6 +105,7 @@ export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformat
             body: JSON.stringify(replay)
         });
 
+        // @ts-ignore
         const res: UploadReplayResult = await response.json();
 
         if (!response.ok && response.status !== 409) {

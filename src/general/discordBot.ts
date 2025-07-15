@@ -56,8 +56,6 @@ export class DiscordBot {
             this.onMessage(message);
         });
 
-        const token = process.env.DISCORD_TOKEN;
-
         this.initBot(!broadcast);
 
     }
@@ -107,14 +105,14 @@ export class DiscordBot {
             return;
         }
 
-        //logs the commmand and its args (for debugging in production lmao (bro I swear people are able to fuck up the bot in ways I just can't imagine))
+        //logs the command and its args (for debugging in production lmao (bro I swear people are able to fuck up the bot in ways I just can't imagine))
         console.log(`User ${interaction.user.username} in ${interaction.guild.name}:${interaction.channel.name} used ${interaction.commandName} with args ${JSON.stringify(interaction.options)}`);
 
         interaction.inRawGuild()
 
         const command: SodbotCommand | undefined = this.DiscordClient.commands.get(interaction.commandName);
 
-        //propably not needed, but y not :D
+        //probably not needed
         if (!command) {
             await interaction.reply("unknown command");
             return;
@@ -140,9 +138,10 @@ export class DiscordBot {
             // Logs.log(`Replay: sent by ${message.author.username} in ${message.guild.name} in channel ${channel.name}`);
 
             try {
-                Replays.extractReplayInfo(message, r.url);
+                Replays.responseToReplay(message, r.url);
             } catch (e) {
                 Logs.error(e);
+                                                                //my discord ID (Reef)
                 message.reply('Error processing replay, contact <@607962880154927113>');
             }
         });
@@ -160,8 +159,7 @@ export class DiscordBot {
     }
 
     public async getGuilds(): Promise<Collection<string, Guild>> {
-        const data = this.DiscordClient.guilds.cache;
-        return data;
+        return this.DiscordClient.guilds.cache;
     }
 }
 

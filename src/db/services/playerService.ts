@@ -11,7 +11,8 @@ export async function getPlayer(id: number): Promise<Player | string> {
     const response = await fetch(url);
 
     if (response.ok) {
-        return await response.json();
+        const ret = await response.json();
+        return ret.player as Player;
     }
 
     if (response.status === 404) {
@@ -36,17 +37,18 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
     const response = fetch(url);
     response.catch(e => Logs.error(`Error while getting player by ids: ${e}`));
 
-    const anwser = await response;
+    const answer = await response;
 
-    if (anwser.ok) {
-        return await anwser.json() as Promise<Player[]>;
+    if (answer.ok) {
+        const ret = await answer.json();
+        return ret.players as Promise<Player[]>;
     }
 
-    if (anwser.status === 404) {
+    if (answer.status === 404) {
         return "Player not found";
     }
 
-    Logs.log("Failed to get players: " + anwser.statusText);
+    Logs.log("Failed to get players: " + answer.statusText);
     return "Error when getting player";
 
     // } catch (e) {
@@ -62,6 +64,7 @@ export async function getPlayersByIds(ids: number[]): Promise<Player[] | string>
     // return 'Unknown error'
 }
 
+//best I can do for now, it works, so... :)
 export function isPlayerAI(p: RawPlayer): boolean {
     return p.aiLevel < 10 && p.name.includes("AI") && p.level === 0;
 }
@@ -79,7 +82,8 @@ export async function updatePlayersDiscordId(id: number, input: PlayerPutDto): P
             body: JSON.stringify(input)
         });
         if (response.ok) {
-            return await response.json() as Player;
+            const ret = await response.json();
+            return ret.player as Player;
         }
         if (response.status === 400) {
             const errorMessage: apiErrorMessage = await response.json();
@@ -108,7 +112,8 @@ export async function getLeaderboard(eloType: string): Promise<PlayerRank[] | st
         const response = await fetch(url);
 
         if (response.ok) {
-            return await response.json() as PlayerRank[];
+            const ret = await response.json();
+            return ret.players as PlayerRank[];
         }
 
         const errorMessage: apiErrorMessage = await response.json();
@@ -129,7 +134,8 @@ export async function getPlayerRank(playerId: string, eloType: string): Promise<
         const response = await fetch(url);
 
         if (response.ok) {
-            return await response.json() as PlayerRank[];
+            const ret = await response.json();
+            return ret.players as PlayerRank[];
         }
 
         if (response.status === 404) {
@@ -153,7 +159,8 @@ export const getPlayerAliases = async (id: number): Promise<PlayerAliases | stri
         const response = await fetch(url);
 
         if (response.ok) {
-            return await response.json() as PlayerAliases;
+            const ret = await response.json();
+            return ret.player as PlayerAliases
         }
 
         if (response.status === 404) {

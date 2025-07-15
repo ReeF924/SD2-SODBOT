@@ -13,7 +13,8 @@ export async function getChannel(id: string): Promise<dbChannel | string> {
 
 
     if (response.ok) {
-        return await response.json();
+        const ret = await response.json();
+        return ret.channel;
     }
     if (response.status === 404) {
         const resMess: apiErrorMessage = await response.json();
@@ -38,10 +39,10 @@ export async function postChannel(guild: dbGuildPostDto): Promise<dbChannel | st
         body: JSON.stringify(guild)
     });
 
-    const channel = await response.json();
+    const obj = await response.json();
 
     if (response.ok) {
-        return channel;
+        return obj.channel;
     }
 
     return "Error posting channel: " + response.statusText;
