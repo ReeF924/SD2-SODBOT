@@ -19,7 +19,7 @@ Logs.init();
 smp.install();
 
 Logs.log("Starting Bot");
-const bot = new DiscordBot(database);
+const bot = new DiscordBot();
 
 const adminCommand: AdminCommand = new AdminCommand(bot);
 const playerCommand: PlayerCommand = new PlayerCommand();

@@ -1,7 +1,6 @@
 import { Logs } from "./logs";
 import * as fs from 'fs';
 import * as Levenshtein from 'levenshtein';
-import { DB } from "./db";
 export class CommonUtil {
 
     static configData: Map<string, unknown> = new Map<string, unknown>();

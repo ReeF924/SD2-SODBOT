@@ -145,7 +145,7 @@ export class PlayerCommand  {
     }
 
     private getLongestName(players: PlayerRank[]): number {
-        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 17);
+        return Math.min(players.reduce((a, b) => a.name.length > b.name.length ? a : b).name.length, 15);
     }
 
     public addCommands(bot: DiscordBot): void {

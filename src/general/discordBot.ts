@@ -17,11 +17,7 @@ import {
 
 import { Logs } from "./logs";
 import { Replays } from "../results/replays";
-import { Permissions, PermissionsSet } from "./permissions"
-import { DB } from "./db";
 import brc from "../scripts/broadcast";
-
-export type BotCommand = (message: Message, input: string[], perm?: PermissionsSet) => void;
 
 export const admins: string[] = ["607962880154927113"];
 
@@ -42,11 +38,9 @@ export class SodbotCommand {
 export class DiscordBot {
     public DiscordClient: DiscordClient;
     // private commands: Map<string, BotCommand> = new Map<string, BotCommand>();
-    private database: DB;
 
-    constructor(database: DB, broadcast: boolean = false) {
+    constructor(broadcast: boolean = false) {
         //this.loadBlacklist();
-        this.database = database;
 
         const intents = new IntentsBitField([IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages,
             IntentsBitField.Flags.GuildMembers ,IntentsBitField.Flags.MessageContent]);
@@ -62,16 +56,12 @@ export class DiscordBot {
             this.onMessage(message);
         });
 
-        this.database = database;
-
         const token = process.env.DISCORD_TOKEN;
 
-        this.initBot(database, !broadcast);
+        this.initBot(!broadcast);
 
     }
-    private async initBot(database: DB, registerCommands: boolean = true): Promise<void> {
-        this.database = database;
-
+    private async initBot(registerCommands: boolean = true): Promise<void> {
         const token = process.env.DISCORD_TOKEN;
 
         await this.DiscordClient.login(token);

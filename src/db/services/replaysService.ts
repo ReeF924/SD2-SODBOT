@@ -2,8 +2,6 @@ import {MapType, ReplayDto, ReplayPlayerDto, UploadReplayResponse, VictoryCondit
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
 import {Franchise} from "../models/admin";
-import {apiErrorMessage} from "../db";
-import {createWriteStream} from "node:fs";
 
 interface UploadReplayResult{
     message: string;

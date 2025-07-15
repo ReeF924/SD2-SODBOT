@@ -94,7 +94,7 @@ export class Replays {
 
         if (!replay) {
             players = await Replays.GetPlayerByIds(g.players, containsAIs, apiResponded);
-        } else {
+        } else if(replay.replayPlayers !== undefined) {
             for (const player of replay.replayPlayers) {
                 const p = g.players.find(r => r.id === player.playerId);
 
@@ -105,6 +105,17 @@ export class Replays {
                     sodbotElo: player.sodbotElo,
                     oldSodbotElo: player.oldSodbotElo
                 });
+            }
+        }
+        else{
+            for (const player of g.players) {
+                players.push({
+                    player: player,
+                    mostUsedNickname: player.name,
+                    discordId: null,
+                    sodbotElo: null,
+                    oldSodbotElo: null,
+                })
             }
         }
 

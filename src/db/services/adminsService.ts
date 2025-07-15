@@ -1,7 +1,7 @@
 import { dbChannel, dbGuildPostDto } from "../models/admin";
 import { Logs } from "../../general/logs";
 
-interface apiErrorMessage {
+export interface apiErrorMessage {
     message: string;
 }
 export async function getChannel(id: string): Promise<dbChannel | string> {
