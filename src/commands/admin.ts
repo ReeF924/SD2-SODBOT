@@ -124,6 +124,11 @@ export class AdminCommand {
 
     private async setReplayType(interaction: ChatInputCommandInteraction) {
 
+        if(!interaction.guild){
+            MsgHelper.reply(interaction, "Cannot be used in DMs");
+            return;
+        }
+
         const type = interaction.options.getString("type");
 
         if (type === null) {
@@ -181,6 +186,12 @@ export class AdminCommand {
     }
 
     private async yoink(interaction: ChatInputCommandInteraction): Promise<void> {
+
+        if(!interaction.guild){
+            MsgHelper.reply(interaction, "Cannot be used in DMs");
+            return;
+        }
+
         const reefy = await this.bot.getAdmin();
 
         if (!this.checkAccess(interaction)) {

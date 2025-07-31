@@ -1,6 +1,6 @@
 import { DiscordBot, } from "../general/discordBot";
 import {ChatInputCommandInteraction, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
-import { PlayerPutDto, PlayerRank} from "../db/models/player";
+import { PlayerPutDto, PlayerRank, PlayerAliases} from "../db/models/player";
 import {getLeaderboard, getPlayerAliases, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
 
 export class PlayerCommand  {
@@ -116,7 +116,7 @@ export class PlayerCommand  {
         return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
     }
 
-    private async Snitch(interaction: ChatInputCommandInteraction){
+    private async snitch(interaction: ChatInputCommandInteraction){
         const id = interaction.options.getNumber("eugenid");
 
         if(!id) {
@@ -135,13 +135,19 @@ export class PlayerCommand  {
 
 
         let value = 'The most used known aliases are: **';
-        response.aliases.forEach((alias) => {
+
+        const playerWithAliases = response as PlayerAliases;
+
+        playerWithAliases.aliases.forEach((alias) => {
             value += alias + ', ';
         });
 
         value = value.substring(0, value.length-2) + '**';
 
         await interaction.editReply(value);
+    }
+
+    private async getDeck(interaction: ChatInputCommandInteraction){
     }
 
     private getLongestName(players: PlayerRank[]): number {
@@ -175,7 +181,10 @@ export class PlayerCommand  {
         const snitch = new SlashCommandBuilder().setName("snitch").setDescription("Returns known aliases of given ID");
         snitch.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(true));
 
-        bot.registerCommand(snitch, this.Snitch.bind(this));
+        bot.registerCommand(snitch, this.snitch.bind(this));
+
+        //const deck = new SlashCommandBuilder().setName("deck").setDescription("Returns deck code from a specified replay (/help for details)");
+        //deck.addNumberOption(option => option.setName("replayid").setDescription("Id of wanted replay"))
 
     }
 }

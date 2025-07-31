@@ -63,7 +63,7 @@ export class DivisionCommand {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private allDivs(input: ChatInputCommandInteraction): void {
+    private async allDivs(input: ChatInputCommandInteraction): Promise<void> {
         let alliedDivs = "";
         let axisDivs = "";
 
@@ -88,7 +88,7 @@ export class DivisionCommand {
 
         MsgHelper.sendEmbeds(input, [alliedDivsEmbed, axisDivsEmbed]);
     }
-
+    /*
     private unbanDivision(chatInput: ChatInputCommandInteraction, input: string[]): void {
 
 
@@ -207,7 +207,7 @@ export class DivisionCommand {
 
         }
     }
-
+    */
     public addCommands(bot: DiscordBot): void {
         const rdiv = new SlashCommandBuilder().setName("rdiv").setDescription("Returns random division");
         rdiv.addStringOption(option => option.setName("side").addChoices(

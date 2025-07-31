@@ -228,13 +228,18 @@ export class HelpCommand {
                 inline: false
             },
             {
+              name: "/deck",
+              value:"Returns ",
+              inline: false
+            },
+            {
                 name: "Replay Location On Your PC",
                 value: "First thing is to navigate in-game to Profile/Replays and ensure the check box \"Cloud\" is unchecked on the replay, this will ensure a copy of the game has been saved to your local device.",
                 inline: false
             },
             {
                 name: "\u200b",
-                value: "Not every computer is the same but generally you can find your locally saved replay files under -\nC:/user/xxxxxx/SavedGames/EugenSystems/SteelDivision 2/",
+                value: "Not every computer is the same but generally you can find your locally saved replay files under -\nC:/users/%%Username%%/SavedGames/EugenSystems/(WARNO OR Steel Division 2)",
                 inline: false
             }
         ])

@@ -6,6 +6,7 @@ import {uploadReplay} from "../db/services/replaysService";
 import {getPlayersByIds, isPlayerAI} from "../db/services/playerService";
 import {Player} from "../db/models/player";
 import {UploadReplayResponse} from "../db/models/replay";
+import {MsgHelper} from "../general/discordBot";
 
 const ax = axios.default;
 
@@ -114,10 +115,15 @@ export class Replays {
             this.addPlayerFieldsToEmbed(embed, player, playerSeparator, franchise);
         }
         // MsgHelper.sendEmbed(message, embed);
-        message.channel.send({embeds: [embed]});
+        await MsgHelper.sendEmbedMessage(message, [embed]);
     }
 
     static async sendEmbed_teamGame(message: Message, players: PlayerInfo[], embed: EmbedBuilder, franchise: "SD2" | "WARNO") {
+
+        if(!MsgHelper.HasSendMessagePerms(message)){
+            await MsgHelper.AlertAdminsAndUser(message, MsgHelper.getAlert(message));
+            return;
+        }
 
         //randomly chooses which team goes first (so you cannot tell who win from it)
         if(Math.random() > 0.5){
@@ -159,16 +165,15 @@ export class Replays {
             //every third player (without the first 2)
             if ((counter - 2) % 3 === 0)
             {
+                //don't have to use the function in MsgHelper, the permissions are already checked for
                 message.channel.send({embeds: [embed]});
 
                 embed = new EmbedBuilder().setColor("#0099ff")
             }
             counter++;
         }
-
-    // MsgHelper.sendEmbed(message, embed);
-        message.channel.send({embeds: [embed]});
     }
+
 
     //gets data out of replay
     private static async extractReplayInfo(url: string): Promise<RawGameData | null> {

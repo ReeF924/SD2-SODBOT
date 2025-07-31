@@ -1,5 +1,9 @@
 import {Franchise} from "./admin";
 
+export interface Replay extends ReplayDto{
+    id: number;
+}
+
 export interface ReplayDto {
     sessionId: string;
     uploadedIn: string;

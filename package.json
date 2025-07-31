@@ -1,6 +1,6 @@
 {
   "name": "sodbot_2",
-  "version": "2.0.15",
+  "version": "2.0.19",
   "description": "",
   "main": "src/main.ts",
   "scripts": {

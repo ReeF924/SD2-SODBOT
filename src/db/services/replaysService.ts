@@ -1,4 +1,4 @@
-import {MapType, ReplayDto, ReplayPlayerDto, UploadReplayResponse, VictoryCondition} from "../models/replay";
+import {MapType, Replay, ReplayDto, ReplayPlayerDto, UploadReplayResponse, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
 import {Franchise} from "../models/admin";
@@ -12,6 +12,76 @@ interface UploadInformation {
     uploadedIn: string;
     uploadedBy: string;
     uploadedAt: Date;
+}
+
+export async function getReplay(id:number) : Promise<Replay | string>{
+    const url = process.env.API_URL + "/replays/" + id;
+
+    try {
+        const response = await fetch(url);
+
+        if(response.ok){
+            const ret = await response.json();
+            return ret.replay as Replay;
+        }
+
+        if(response.status === 404){
+            return "Replay not found.";
+        }
+
+        return "Error occurred while retrieving replay.";
+
+    }
+    catch (error) {
+        console.log(`Error while retrieving replay in guild --- ` + error);
+    }
+
+    return "Error occurred while retrieving replay.";
+}
+
+export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformation): Promise<UploadReplayResponse | string> {
+
+
+    if (data.players.some(w => w.deck.division.startsWith("ERROR"))) {
+        return "Unknown division";
+    }
+
+    const replay: ReplayDto | string = await convertToReplayDto(data, uploadInfo);
+
+
+    if (typeof replay === "string") {
+        return replay;
+    }
+
+    const url = process.env.API_URL + "/replays";
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(replay)
+        });
+
+        // @ts-ignore
+        const res: UploadReplayResult = await response.json();
+
+        if (!response.ok && response.status !== 409) {
+            const errorMessage = `Failed to upload replay try: ${res.message}`;
+            console.log(errorMessage, response);
+
+            return "Failed to upload replay (API Error)";
+        }
+
+        //Successfully uploaded or duplicate
+        return res.replay;
+
+    } catch (e) {
+        console.log("Failed to upload replay catch, error: ", e)
+
+        return "Failed to upload replay";
+    }
 }
 
 async function convertToReplayDto(data: RawGameData, uploadInfo: UploadInformation): Promise<ReplayDto | string> {
@@ -79,48 +149,5 @@ export function convertToReplayPlayerDto(player: RawPlayer, franchise:"SD2" | "W
         faction: player.deck.faction,
         income: franchise === "SD2" ? player.deck.raw.income : null,
         deckCode: player.deck.raw.code
-    }
-}
-
-export async function uploadReplay(data: RawGameData, uploadInfo: UploadInformation): Promise<UploadReplayResponse | string> {
-    if (data.players.some(w => w.deck.division.startsWith("ERROR"))) {
-        return "Unknown division";
-    }
-
-    const replay: ReplayDto | string = await convertToReplayDto(data, uploadInfo);
-
-
-    if (typeof replay === "string") {
-        return replay;
-    }
-
-    const url = process.env.API_URL + "/replays";
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(replay)
-        });
-
-        // @ts-ignore
-        const res: UploadReplayResult = await response.json();
-
-        if (!response.ok && response.status !== 409) {
-            const errorMessage = `Failed to upload replay try: ${res.message}`;
-            console.log(errorMessage, response);
-
-            return "Failed to upload replay (API Error)";
-        }
-
-        //Successfully uploaded or duplicate
-        return res.replay;
-
-    } catch (e) {
-        console.log("Failed to upload replay catch, error: ", e)
-
-        return "Failed to upload replay";
     }
 }

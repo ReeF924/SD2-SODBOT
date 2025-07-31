@@ -4,7 +4,7 @@ import { DeckParser } from "sd2-utilities/lib/parser/deckParser"
 
 export class MiscCommand {
 
-    private piatReplies = [
+    private piatReplies:string[] = [
         "Hit! We're Airborne. We don't start fights, we finish 'em!",
         "Hit! Up the Ox and Bucks. Up the Ox and Bucks.",
         "Hit! There are few things more fundamentally encouraging and stimulating than seeing someone else die.",
@@ -46,53 +46,12 @@ export class MiscCommand {
 
     ];
 
-    private ptrdReplies = [
-        "Hit! Target destroyed!",
-        "Miss! Mission failed. We'll get em next time!",
-        "Miss! Damn it where's my .50 cal",
-        "Miss! Are you even trying to hit anymore?",
-        "Oh come on, that shot was pathetic... Put your back into it!",
-        "Bounce! You do know that is a King Tiger right?",
-        "Hit! Your name is unknown. Your deed is immortal.",
-        "Hit! For Mother Russia",
-        "Hit! We blew him away",
-        "Hit!, Target Neutralised!",
-        "Hit!, Keep those trucks coming",
-        "Hit!, Ura!",
-        "Hit! Never tell a soldier that he does not know the cost of war.",
-        "Hit! Every war is different, every war is the same",
-        "Hit! Oh no, there are PRTD squads in our rear",
-        "Hit! In the silence of the night, we will always hear the screams.",
-        "Miss! Maybe you need the piat instead",
-        "Hit! Only the dead have seen the end of war",
-        "Hit! In war there are no prizes for runner-up",
-        "Hit!, Another cheese platter sir",
-        "Hit!, sneaky sneaky you little ptrd squad",
-        "Hit!, hi ho hi ho a transport sniping we go"
-    ];
+    private krugReplies: string[] = [
 
-    private sodbotReplies3 = [
-        "Hit! Target destroyed!",
-        "Hit! We blew him away",
-        "Hit! They drew first blood!",
-        "Hit! Don't push it or I'll give you a war you won't believe.",
-        "Hit! I want them to know that death is coming, and there is nothing they can do to stop it.",
-        "Hit! Old men start it, young men fight It, nobody wins, everybody in the middle dies, and nobody tells the truth!",
-        "Hit! Live for nothing or die for something.",
-        "Hit! I like the smell of napalm in the morning. It smells like... victory.",
-        "Hit! Terminate... with extreme prejudice.",
-        "Miss! You can either surf, or you can fight!",
-        "Miss! I am sick and tired of filling body bags with your dumb fucking mistakes.",
-        "Miss! These tit-sucking children could not guard a Turkish whorehouse; much less do anything worthwhile inside of it!",
-        "Miss! Come on Marine, you can do better than that",
-        "Hit! Every war is different, every war is the same",
-        "Hit! To survive war you gotta become war",
-        "Hit!  I eat Green Berets for breakfast. And right now, I'm very hungry!",
-        "Hit! A strange game, the only winning move is to not play"
     ];
 
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     private flip(input: ChatInputCommandInteraction): void {
         if (Math.random() > 0.5) {
             MsgHelper.reply(input, "Heads");
@@ -101,7 +60,6 @@ export class MiscCommand {
         MsgHelper.reply(input, "Tails");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private faction(input: ChatInputCommandInteraction): void {
         const game = input.options.getString("game", false) ?? "sd2";
 
@@ -112,7 +70,6 @@ export class MiscCommand {
         MsgHelper.reply(input, game == "sd2" ? "Allies" : "Nato");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private piat(input: ChatInputCommandInteraction): void {
         const i = Math.random();
 
@@ -195,7 +152,7 @@ export class MiscCommand {
                 { name: "C Phase", value: cstr, inline: true }
             ]);
             embed = embed.setFooter({ text: "counts are in # of cards, not # of units" })
-            message.channel.send({ embeds: [embed] });
+            MsgHelper.sendEmbeds(message, [embed])
         }
     }
 
@@ -206,7 +163,7 @@ export class MiscCommand {
             .addFields([
                 {
                     name: "History",
-                    value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game. The main developers were RoguishTiger and P.URI.Tanner. The bot is now hosted on several Discord servers.",
+                    value: "SODBOT and SODBOT II were originally created by Mbetts to be used in the SDleague as a tool to support the SD2 community in playing matches.\n\nThe latest version, SODBOT III, has built upon this early work of Mbetts to enhanced the existing bot and include several new functions to further improve enjoyment of the game. The main developers were RoguishTiger and P.URI.Tanner. The bot is currently hosted on several Discord servers.",
                     inline: false
                 },
                 {

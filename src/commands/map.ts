@@ -183,7 +183,7 @@ export class MapCommand {
         MsgHelper.sendEmbeds(input, [embed]);
     }
 
-
+    /*
     private unbanMap(chatInput: ChatInputCommandInteraction): void {
         // if (input.length == 0) {
         //     MsgHelper.replyPing(message, `I don't know what that map is, please use ${CommonUtil.config("prefix")}maps, to get the list of all maps.`)
@@ -254,6 +254,7 @@ export class MapCommand {
             }
         }
     }
+     */
     public addCommands(bot: DiscordBot): void {
 
         const rmap: SlashCommandBuilder = new SlashCommandBuilder().setName("rmap").setDescription("Random map picker");
@@ -276,14 +277,14 @@ export class MapCommand {
 
         //@todo I don't even know if warno is somehow implemented..
         //for you can only ban and unban one map per command, wanna fix that later
-        const unbanMap = new SlashCommandBuilder().setName("unbanmap").setDescription("Unban a map");
-        unbanMap.addStringOption(option => option.setName("map").setDescription("Map to unban. 'All' unbans all maps. Seperate multiple maps with comma.").setRequired(true));
-        bot.registerCommand(unbanMap, this.unbanMap.bind(this));
+        //const unbanMap = new SlashCommandBuilder().setName("unbanmap").setDescription("Unban a map");
+        //unbanMap.addStringOption(option => option.setName("map").setDescription("Map to unban. 'All' unbans all maps. Seperate multiple maps with comma.").setRequired(true));
+        //bot.registerCommand(unbanMap, this.unbanMap.bind(this));
 
-        const banMap = new SlashCommandBuilder().setName("banmap").setDescription("Ban a map");
-        banMap.addStringOption(option => option.setName("map").setDescription("Map to ban. Seperate multiple maps with comma.").setRequired(true));
+        //const banMap = new SlashCommandBuilder().setName("banmap").setDescription("Ban a map");
+        //banMap.addStringOption(option => option.setName("map").setDescription("Map to ban. Seperate multiple maps with comma.").setRequired(true));
 
-        bot.registerCommand(banMap, this.banMap.bind(this));
+        //bot.registerCommand(banMap, this.banMap.bind(this));
         //bot.registerCommand("defaultMapPool",this.defaultMapPool); @todo
     }
 }
