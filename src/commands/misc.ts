@@ -137,18 +137,17 @@ export class MiscCommand {
     }
 
     public async krug(input: ChatInputCommandInteraction): Promise<void> {
-            const i = Math.random();
+        const i = Math.random();
 
-            /*
-            if (input.user.id === '607962880154927113') { //I had to...
-            const replies = this.krugReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
-            await MsgHelper.reply(
-                input,
-                replies[Math.floor(Math.random() * replies.length)],
-            );
-            return;
-            }
-        */
+        if (input.user.id === '607962880154927113') { //I had to...
+        const replies = this.krugReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
+        await MsgHelper.reply(
+            input,
+            replies[Math.floor(Math.random() * replies.length)],
+        );
+        return;
+        }
+
 
         if (i > 0.75) {
             await MsgHelper.reply(
