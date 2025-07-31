@@ -47,7 +47,38 @@ export class MiscCommand {
     ];
 
     private krugReplies: string[] = [
-
+        "Miss, the start of the East German space program",
+        "Miss, likely gonna strike London like a V2",
+        "Miss, that was your own MIG, you idiot.",
+        "Hit, be careful or this might create a black hole.",
+        "Hit, this could have killed the death star.",
+        "Miss, you blew up your own morphine depot...",
+        "Hit, you should go to Vegas today!",
+        "Miss, you like suffering don't you?",
+        "Miss, that was the ISS you moron.",
+        "Miss, please stop, you are bankrupting the whole pact with the ammo consumption.",
+        "Hit, Genosse sie sind ein Genie!",
+        "Miss, you should drink some Schnapps to help the aim.",
+        "Miss, another 200 supplies gone!",
+        "Miss, ECM is a strong enemy.",
+        "Hit, Krug OP.",
+        "Hit, Krug OP.",
+        "Hit, another F15 down!",
+        "Hit, nothing compares to Krug.",
+        "Hit, elite vet Krug never misses!",
+        "Hit. Can't hit, won't miss!",
+        "Hit, every Kub's vet dream!",
+        "Hit, every Kub wants to be like you!",
+        "Miss, the missile will reach the Moon in approximately 3 minutes.",
+        "Hit, truly a rare phenomenon.",
+        "Hit, every airspammer's worst nightmare.",
+        "Hit, no SEAD plane can stop me now!",
+        "Hit, no plane is safe when I'm in town!",
+        "Hit, even Billy the Kid envies that accuracy.",
+        "Miss, what did you expect?",
+        "Miss, happens to the best of us.",
+        "Miss, happens to the best of us.",
+        "Miss, Hans is doing his best, don't get mad."
     ];
 
 
@@ -83,7 +114,7 @@ export class MiscCommand {
         }
 
 
-        if (i > 0.9) {
+        if (i > 0.85) {
             MsgHelper.reply(
                 input,
                 this.piatReplies[Math.floor(Math.random() * this.piatReplies.length)],
@@ -98,10 +129,46 @@ export class MiscCommand {
             return;
         }
         else {
-            (MsgHelper.reply(input, `You hit!`),
+            MsgHelper.reply(input, `You hit!`),
                 setTimeout(() => {
                     input.followUp("Just kidding, you didn't.");
-                }, 5000));
+                }, 5000);
+        }
+    }
+
+    public async krug(input: ChatInputCommandInteraction): Promise<void> {
+            const i = Math.random();
+
+            /*
+            if (input.user.id === '607962880154927113') { //I had to...
+            const replies = this.krugReplies.filter((reply) => reply.toLowerCase().startsWith('hit'));
+            await MsgHelper.reply(
+                input,
+                replies[Math.floor(Math.random() * replies.length)],
+            );
+            return;
+            }
+        */
+
+        if (i > 0.75) {
+            await MsgHelper.reply(
+                input,
+                this.krugReplies[Math.floor(Math.random() * this.krugReplies.length)],
+            );
+        } else if (i > 0.1) {
+            await MsgHelper.reply(input, "Miss!");
+            return;
+        }
+        else if (i > 0.05) {
+            await MsgHelper.reply(input, "Miss!");
+            await input.followUp({ content: "You actually hit, but no-one will ever believe you...", ephemeral: true });
+            return;
+        }
+        else {
+            await MsgHelper.reply(input, `You hit!`)
+                setTimeout(() => {
+                    input.followUp("Just kidding, you didn't.");
+                }, 5000);
         }
     }
 
@@ -185,6 +252,9 @@ export class MiscCommand {
 
         const piat = new SlashCommandBuilder().setName("piat").setDescription("Fire the piat");
         bot.registerCommand(piat, this.piat.bind(this));
+
+        const krug = new SlashCommandBuilder().setName("krug").setDescription("Fire the krug");
+        bot.registerCommand(krug, this.krug.bind(this));
 
         // bot.registerCommand("deck", this.deck.bind(this));
 

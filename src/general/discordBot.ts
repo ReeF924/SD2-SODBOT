@@ -52,7 +52,6 @@ export class DiscordBot {
         this.DiscordClient.on("interactionCreate", (interaction: ChatInputCommandInteraction) => this.onInteraction(interaction));
 
         this.DiscordClient.on("messageCreate", async (message: Message) => {
-            console.log("messageCreate");
             if (message.author.bot) return;
             await this.onMessage(message);
         });
@@ -68,7 +67,7 @@ export class DiscordBot {
         if (!registerCommands) return;
 
         const rest = new REST().setToken(process.env.DISCORD_TOKEN);
-        this.registerCommands(rest);
+        await this.registerCommands(rest);
     }
 
     public registerCommand(slashCommand: SlashCommandBuilder, commandBody: (interaction: ChatInputCommandInteraction) => Promise<void>): void {
@@ -79,9 +78,9 @@ export class DiscordBot {
         try {
             const commandsArray = this.DiscordClient.commands.map(command => command.data.toJSON());
 
-            const data = await rest.put(Routes.applicationCommands(this.DiscordClient.user.id), {
-                body: commandsArray
-            });
+            await rest.put(Routes.applicationCommands(this.DiscordClient.user.id),
+                {body: commandsArray}
+            );
 
             Logs.log(`Successfully reloaded application (/) commands.`);
         } catch (error) {
