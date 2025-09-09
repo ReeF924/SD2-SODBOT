@@ -63,10 +63,12 @@ export class PlayerCommand  {
         const eloType = interaction.options.getString("elo_type") ?? "sdElo";
         // const id = interaction.user.id;
 
+        //Check if user provided his id
         let idInput = interaction.options.getNumber("eugenid");
 
         let id: string;
 
+        //if not, then put in his discord ID
         if(!idInput){
             id = interaction.user.id;
         }

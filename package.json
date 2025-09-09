@@ -1,6 +1,6 @@
 {
   "name": "sodbot_2",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "src/main.ts",
   "scripts": {
@@ -27,7 +27,6 @@
     "dotenv": "16.0.1",
     "express": "^5.1.0",
     "file-type": "^16.5.0",
-    "fs": "^0.0.1-security",
     "ip-regex": "^2.1.0",
     "jsonfile": "^6.1.0",
     "levenshtein": "~1.0",
