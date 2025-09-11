@@ -68,7 +68,7 @@ export class PlayerCommand  {
 
         let id: string;
 
-        //if not, then put in his discord ID
+        //if not, then put in his discord ID (API accepts both)
         if(!idInput){
             id = interaction.user.id;
         }

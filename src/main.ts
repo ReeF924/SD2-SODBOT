@@ -12,6 +12,7 @@ import * as smp from 'source-map-support';
 import { Logs } from "./general/logs";
 import { DivisionCommand } from './commands/division';
 import { MapCommand } from './commands/map';
+import {ReplayReportsCommand} from "./commands/replayReports";
 
 CommonUtil.init();
 Logs.init();
@@ -28,7 +29,7 @@ const divCommand: DivisionCommand = new DivisionCommand();
 const mapCommand: MapCommand = new MapCommand();
 const helpCommand: HelpCommand = new HelpCommand();
 const matchCommand: MatchupCommand = new MatchupCommand();
-
+const replayReportCommand: ReplayReportsCommand = new ReplayReportsCommand();
 adminCommand.addCommands();
 playerCommand.addCommands(bot);
 miscCommand.addCommands(bot);
@@ -36,3 +37,4 @@ divCommand.addCommands(bot);
 mapCommand.addCommands(bot);
 helpCommand.addCommands(bot);
 matchCommand.addCommands(bot);
+replayReportCommand.addCommands(bot);

@@ -1,6 +1,6 @@
 {
   "name": "sodbot_2",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "main": "src/main.ts",
   "scripts": {
@@ -31,8 +31,10 @@
     "jsonfile": "^6.1.0",
     "levenshtein": "~1.0",
     "lodash": "^4.17.21",
-    "sd2-data": "^0.8.13",
-    "sd2-utilities": "^0.2.7",
+    "pupeteer": "^0.0.1",
+    "puppeteer": "^24.19.0",
+    "sd2-data": "^0.8.16",
+    "sd2-utilities": "^0.2.8",
     "typescript": "^5.5.4",
     "winston": "3.3.3",
     "winston-azure-transport": "3.0.5"

@@ -56,6 +56,37 @@ export interface UploadReplayPlayerResponse extends ReplayPlayerDto {
     oldSodbotElo: number | null;
 }
 
+export class ReplayReport {
+    host:ReplayReportPlayer;
+    guest:ReplayReportPlayer;
+    channelId:string;
+    persistentSearch: boolean
+}
+
+export class ReplayReportPlayer{
+    constructor(discordId: string) {
+        this.discordId = discordId;
+    }
+
+    discordId:string;
+    divBans:string[] = [];
+    mapBans:string[] = [];
+    divPicks:DivPickWithOrder[] = [];
+    mapPicks:MapPickWithOrder[] = [];
+}
+
+export interface PickOrder{
+    order:number
+}
+
+export interface DivPickWithOrder extends PickOrder{
+    pick:number;
+}
+
+export interface MapPickWithOrder extends PickOrder{
+    pick:string;
+}
+
 export enum MapType {
     _1v1,
     _2v2,

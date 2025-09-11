@@ -1,4 +1,4 @@
-import {MapType, Replay, ReplayDto, ReplayPlayerDto, UploadReplayResponse, VictoryCondition} from "../models/replay";
+import {MapType, Replay, ReplayDto, ReplayPlayerDto, UploadReplayResponse, ReplayReport, ReplayReportPlayer, PickWithOrder, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
 import {Franchise} from "../models/admin";
@@ -150,4 +150,38 @@ export function convertToReplayPlayerDto(player: RawPlayer, franchise:"SD2" | "W
         income: franchise === "SD2" ? player.deck.raw.income : null,
         deckCode: player.deck.raw.code
     }
+}
+
+export async function uploadReplayReport(report: ReplayReport): Promise<void> {
+
+    const url = process.env.API_URL + "/replays/bans";
+
+    try {
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(report)
+        });
+
+        // @ts-ignore
+        const res: UploadReplayResult = await response.json();
+
+        if (!response.ok && response.status !== 409) {
+            const errorMessage = `Failed to upload replay try: ${res.message}`;
+            console.log(errorMessage, response);
+
+            return "Failed to upload replay (API Error)";
+        }
+
+        //Successfully uploaded or duplicate
+        return res.replay;
+
+    } catch (e) {
+        console.log("Failed to upload replay catch, error: ", e)
+
+        return "Failed to upload replay";
+    }
+
 }
