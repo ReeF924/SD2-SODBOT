@@ -5,7 +5,7 @@ import {
     getLeaderboard,
     getPlayer,
     getPlayerAliases,
-    getPlayerRank,
+    getPlayerRank, guessPlayerFromDiscordId,
     updatePlayersDiscordId
 } from "../db/services/playerService";
 
@@ -160,12 +160,32 @@ export class PlayerCommand  {
 
         const discordId:string = interaction.user.id;
 
-        //get player fetch request with discordId
-        //if exists respond: "your <id> ; already registered
-        //return
+        await interaction.deferReply();
 
-        const player = getPlayer(discordId);
+        const [statusCode, player] = await guessPlayerFromDiscordId(discordId);
 
+        if(statusCode === 0){
+            await interaction.editReply("Unexpected error.");
+            return;
+        }
+
+        if(statusCode === 404){
+           await interaction.editReply("Results inconclusive. Couldn't guess eugen ID reliably.");
+           return;
+        }
+
+       if(player === null){
+           await interaction.editReply("Unexpected error.");
+           return;
+       }
+
+       let response = `Player id is ${player.id}`;
+
+       if(statusCode === 208){
+          response += " Not yet registered.";
+       }
+
+       await interaction.editReply(response);
     }
 
     private getLongestName(players: PlayerRank[]): number {
@@ -201,6 +221,11 @@ export class PlayerCommand  {
 
         bot.registerCommand(snitch, this.snitch.bind(this));
 
+        const whoami = new SlashCommandBuilder().setName("whoami")
+            .setDescription("Guesses Eugen ID from replays you've uploaded." +
+                " Unreliable, if most of uploads weren't your games.");
+
+        bot.registerCommand(whoami, this.whoami.bind(this));
         //const deck = new SlashCommandBuilder().setName("deck").setDescription("Returns deck code from a specified replay (/help for details)");
         //deck.addNumberOption(option => option.setName("replayid").setDescription("Id of wanted replay"))
 

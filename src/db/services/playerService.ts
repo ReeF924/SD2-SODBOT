@@ -23,6 +23,38 @@ export async function getPlayer(id: number | string): Promise<Player | string> {
     return "Error when getting player";
 }
 
+
+
+export async function guessPlayerFromDiscordId(discordId:string): Promise<[number, Player | null]> {
+
+    const url = process.env.API_URL + "/players/guessPlayerFromDiscordId/" + discordId;
+
+    let ret:any;
+    const response = await fetch(url);
+    try{
+        ret = await response.json();
+    }
+    catch(err){
+        Logs.error("Error getting player");
+        return [0, null];
+    }
+
+    if(response.status === 208){
+        return [208, ret.player];
+    }
+
+    if (response.status == 200) {
+        return [200, ret.player];
+    }
+
+    if (response.status === 404) {
+        return [404, null];
+    }
+
+    Logs.error("Error getting player: " + response.statusText);
+    return [0, null];
+}
+
 export async function getPlayersByIds(ids: number[]): Promise<Player[] | string> {
 
     let url = process.env.API_URL + "/players/getPlayersByIds";
