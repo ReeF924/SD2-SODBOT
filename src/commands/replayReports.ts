@@ -192,7 +192,6 @@ export class ReplayReportsCommand {
         return div.id;
     }
 
-
     public addCommands(bot: DiscordBot):void {
 
        const pabUpload = new SlashCommandBuilder().setName("pabupload").setDescription("Upload url to completed picks and bans");

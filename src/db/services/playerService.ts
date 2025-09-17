@@ -4,7 +4,7 @@ import { Logs } from "../../general/logs";
 import { RawPlayer } from "sd2-utilities/lib/parser/gameParser";
 
 
-export async function getPlayer(id: number): Promise<Player | string> {
+export async function getPlayer(id: number | string): Promise<Player | string> {
 
     const url = process.env.API_URL + "/players/" + id;
 
@@ -176,6 +176,8 @@ export const getPlayerAliases = async (id: number): Promise<PlayerAliases | stri
 
 
 }
+
+
 
 
 

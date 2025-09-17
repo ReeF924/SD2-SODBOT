@@ -1,7 +1,13 @@
 import { DiscordBot, } from "../general/discordBot";
 import {ChatInputCommandInteraction, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
 import { PlayerPutDto, PlayerRank, PlayerAliases} from "../db/models/player";
-import {getLeaderboard, getPlayerAliases, getPlayerRank, updatePlayersDiscordId} from "../db/services/playerService";
+import {
+    getLeaderboard,
+    getPlayer,
+    getPlayerAliases,
+    getPlayerRank,
+    updatePlayersDiscordId
+} from "../db/services/playerService";
 
 export class PlayerCommand  {
 
@@ -114,6 +120,7 @@ export class PlayerCommand  {
 
         await interaction.editReply({embeds: [embed]});
     }
+
     private getLongestRank(players: PlayerRank[]): number {
         return players.reduce((a, b) => a.rank.toString().length > b.rank.toString().length ? a : b).rank.toString().length;
     }
@@ -149,7 +156,16 @@ export class PlayerCommand  {
         await interaction.editReply(value);
     }
 
-    private async getDeck(interaction: ChatInputCommandInteraction){
+    private async whoami(interaction: ChatInputCommandInteraction){
+
+        const discordId:string = interaction.user.id;
+
+        //get player fetch request with discordId
+        //if exists respond: "your <id> ; already registered
+        //return
+
+        const player = getPlayer(discordId);
+
     }
 
     private getLongestName(players: PlayerRank[]): number {
