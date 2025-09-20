@@ -156,9 +156,10 @@ export function convertToReplayPlayerDto(player: RawPlayer, franchise:"SD2" | "W
 export async function uploadReplayReport(report: ReplayReport): Promise<Replay[] | string> {
 
     const url = process.env.API_URL + "/replays/bans";
+    let response:Response;
     let ret:any;
     try {
-        const response = await fetch(url, {
+        response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -172,7 +173,7 @@ export async function uploadReplayReport(report: ReplayReport): Promise<Replay[]
         return "Failed to upload report";
     }
 
-    if(response.statusCode === 500 || response.statusCode === 404 || response.statusCode === 400) {
+    if(response.status === 500 || response.status === 404 || response.status === 400) {
         return ret.message;
     }
 

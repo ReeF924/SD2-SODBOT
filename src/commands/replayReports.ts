@@ -90,8 +90,11 @@ export class ReplayReportsCommand {
         let reply = "Appended to these matchups: ";
 
        ret.forEach(r => {
-           reply += `\n ${r.replayPlayers[0].nickname} ${divisions.divisionsById[r.replayPlayers[0].division]}` +
-                    ` vs ${r.replayPlayers[1].nickname} ${divisions.divisionsById[r.replayPlayers[1].division]} Uploaded: ${r.uploadedAt}`;
+           const date = new Date(r.uploadedAt);
+           reply += `\n ${r.replayPlayers[0].nickname} ${divisions.divisionsById[r.replayPlayers[0].division].name}` +
+                    ` vs ${r.replayPlayers[1].nickname} ${divisions.divisionsById[r.replayPlayers[1].division].name}` +
+               ` **Uploaded: ${date.getDay()}-${date.getMonth()}-${date.getFullYear()}` +
+               ` ${date.getHours()}:${date.getMinutes()}**`
        });
 
         await interaction.editReply(reply);
@@ -154,6 +157,10 @@ export class ReplayReportsCommand {
             }
         }
         return player;
+    }
+
+    private async cancelLastUpload(interaction: ChatInputCommandInteraction){
+
     }
 
     //orders the picks in the order of games played
