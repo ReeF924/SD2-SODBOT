@@ -181,8 +181,8 @@ export class PlayerCommand  {
 
        let response = `Player id is ${player.id}`;
 
-       if(statusCode === 208){
-          response += " Not yet registered.";
+       if(statusCode === 200){
+          response += ". Not yet registered.";
        }
 
        await interaction.editReply(response);

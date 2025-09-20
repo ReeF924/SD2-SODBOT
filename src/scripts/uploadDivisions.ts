@@ -34,5 +34,5 @@ const url = process.env.API_URL + '/divisions';
 
     const newDivs = await response.json();
 
-    console.log('divisions added:', newDivs);
+    console.log('divisions added:', newDivs.divisions);
 })();

@@ -3,6 +3,7 @@ import {ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
 import puppeteer, {Page} from "puppeteer";
 import {ReplayReport, ReplayReportPlayer, PickOrder} from "../db/models/replay";
 import {divisions} from "sd2-data"
+import {uploadReplayReport} from "../db/services/replaysService";
 
 
 export class ReplayReportsCommand {
@@ -53,27 +54,47 @@ export class ReplayReportsCommand {
 
         await page.goto(url, { waitUntil: "networkidle2" });
 
-        const host = this.getDivisionsFromPABSession(page, interaction.user.id, 'host');
-        const guest = this.getDivisionsFromPABSession(page, guestUserId, 'guest');
+        let hostPromise:Promise<ReplayReportPlayer>;
+        let guestPromise:Promise<ReplayReportPlayer>;
 
+        try{
+            hostPromise = this.getDivisionsFromPABSession(page, interaction.user.id, 'host');
+            guestPromise = this.getDivisionsFromPABSession(page, guestUserId, 'guest');
+        }
+        catch(err){
+            console.log("Error while getting data from P&B webiste: ", err);
+            await interaction.editReply("Error while uploading report. Please contact admin.");
+        }
 
         const report: ReplayReport = {
-            host: await host,
-            guest: await guest,
+            host: await hostPromise,
+            guest: await guestPromise,
             channelId: interaction.channelId,
             persistentSearch: interaction.options.getBoolean("search_all") ?? false
         }
 
        this.normalisePickOrder(report);
 
+        console.log(report);
 
 
+        //await interaction.editReply("Finished.");
 
-        
+        const ret = await uploadReplayReport(report);
 
+        if(typeof(ret) === "string"){
+           await interaction.editReply(ret);
+           return;
+        }
 
-        await interaction.editReply("Finished.");
+        let reply = "Appended to these matchups: ";
 
+       ret.forEach(r => {
+           reply += `\n ${r.replayPlayers[0].nickname} ${divisions.divisionsById[r.replayPlayers[0].division]}` +
+                    ` vs ${r.replayPlayers[1].nickname} ${divisions.divisionsById[r.replayPlayers[1].division]} Uploaded: ${r.uploadedAt}`;
+       });
+
+        await interaction.editReply(reply);
     }
 
     private async getDivisionsFromPABSession(page: Page, playerId:string, playerType: "host" | "guest"):Promise<ReplayReportPlayer>{
@@ -92,7 +113,7 @@ export class ReplayReportsCommand {
                 player.mapBans.push(ban.substring(1));
             }
             else{
-                player.divBans.push(ban);
+                player.divBans.push(this.getDivisionIdFromName(ban));
             }
         });
 
@@ -135,6 +156,7 @@ export class ReplayReportsCommand {
         return player;
     }
 
+    //orders the picks in the order of games played
     private normalisePickOrder(report:ReplayReport){
 
         const sortFunc = (a: PickOrder, b: PickOrder) => {
@@ -177,13 +199,16 @@ export class ReplayReportsCommand {
     }
 
     private getDivisionIdFromName(divName:string):number{
+
         let div = divisions.divisionsPact.find(div => div.name === divName);
 
         if(div){
             return div.id;
         }
 
-        div = divisions.divisionsPact.find(div => div.name === divName);
+        const divs = divisions.divisionsNato;
+
+        div = divisions.divisionsNato.find(div => div.name === divName);
 
         if(!div){
             throw new Error("Unable to find division by name! Div name: " + divName);
@@ -203,7 +228,7 @@ export class ReplayReportsCommand {
            .setDescription("Mention the user that joined the P&B session."));
 
        pabUpload.addBooleanOption(option => option.setName("search_all")
-           .setDescription("Looks through all replays in this channel. Default max. age: 7 days"));
+           .setDescription("Looks through all replays in this channel. Don't use unless necessary! Default max. age: 7 days"));
 
        bot.registerCommand(pabUpload, this.picksAndBansUpload.bind(this));
     }

@@ -39,12 +39,8 @@ export async function guessPlayerFromDiscordId(discordId:string): Promise<[numbe
         return [0, null];
     }
 
-    if(response.status === 208){
-        return [208, ret.player];
-    }
-
-    if (response.status == 200) {
-        return [200, ret.player];
+    if(response.status === 200 || response.status == 208){
+        return [response.status, ret.player];
     }
 
     if (response.status === 404) {

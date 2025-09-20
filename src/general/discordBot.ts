@@ -8,11 +8,10 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
     Collection,
-    BaseInteraction, ChatInputCommandInteraction,
+    ChatInputCommandInteraction,
     REST,
     Routes,
-    GuildManager,
-    Guild, TextChannel, User, DMChannel, DiscordAPIError, PermissionsBitField, GuildMember
+    Guild, TextChannel, User, PermissionsBitField, GuildMember
 } from "discord.js";
 
 import { Logs } from "./logs";
@@ -101,7 +100,7 @@ export class DiscordBot {
         if (!interaction.isChatInputCommand()){
             console.log("Unknown command");
 
-            MsgHelper.reply(interaction, "Unknown command. Try /help", true);
+            await MsgHelper.reply(interaction, "Unknown command. Try /help", true);
             return;
         }
 
@@ -121,18 +120,28 @@ export class DiscordBot {
 
         //probably not needed
         if (!command) {
-            await interaction.reply("unknown command");
+            await MsgHelper.reply(interaction, "Unknown command. Try /help", true);
             return;
         }
 
-        await command.execute(interaction);
+        try{
+            await command.execute(interaction);
+        }
+        catch(error) {
+            console.error("Error while executing slash command: ",error);
+           if(interaction.deferred){
+               await interaction.editReply("Error while executing a command.");
+               return;
+           }
+           await MsgHelper.reply(interaction, "Error while executing a command.");
+        }
     }
 
     private async onMessage(message: Message) {
 
         //the bot might not have a permission to write in the channel, this alerts the admins and the sender
         if (message.content.startsWith("$")) {
-            message.reply("Please use / instead of $ for commands. For more information, use /help");
+            await message.reply("Please use / instead of $ for commands. For more information, use /help");
             return;
         }
 
@@ -172,12 +181,12 @@ export class DiscordBot {
 
 export class MsgHelper {
 
-    public static reply(interaction: ChatInputCommandInteraction, content: string, secret: boolean = false) {
+    public static async reply(interaction: ChatInputCommandInteraction, content: string, secret: boolean = false) {
         return interaction.reply({ content: content, ephemeral: secret });
     }
 
-    public static sendEmbeds(interaction: ChatInputCommandInteraction, content: EmbedBuilder[], secret: boolean = false) {
-        return interaction.reply({ embeds: content, ephemeral: secret });
+    public static async sendEmbeds(interaction: ChatInputCommandInteraction, content: EmbedBuilder[], secret: boolean = false) {
+        return await interaction.reply({ embeds: content, ephemeral: secret });
     }
 
     public static async sendMessage(m:Message, message:string) {

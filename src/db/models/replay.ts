@@ -69,7 +69,7 @@ export class ReplayReportPlayer{
     }
 
     discordId:string;
-    divBans:string[] = [];
+    divBans:number[] = [];
     mapBans:string[] = [];
     divPicks:DivPickWithOrder[] = [];
     mapPicks:MapPickWithOrder[] = [];

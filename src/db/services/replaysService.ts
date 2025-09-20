@@ -1,7 +1,8 @@
-import {MapType, Replay, ReplayDto, ReplayPlayerDto, UploadReplayResponse, ReplayReport, ReplayReportPlayer, PickWithOrder, VictoryCondition} from "../models/replay";
+import {MapType, Replay, ReplayDto, ReplayPlayerDto, UploadReplayResponse, ReplayReport, VictoryCondition} from "../models/replay";
 import {RawGameData, RawPlayer} from "sd2-utilities/lib/parser/gameParser";
 import {misc} from "sd2-data";
 import {Franchise} from "../models/admin";
+import {response} from "express";
 
 interface UploadReplayResult{
     message: string;
@@ -152,36 +153,28 @@ export function convertToReplayPlayerDto(player: RawPlayer, franchise:"SD2" | "W
     }
 }
 
-export async function uploadReplayReport(report: ReplayReport): Promise<void> {
+export async function uploadReplayReport(report: ReplayReport): Promise<Replay[] | string> {
 
     const url = process.env.API_URL + "/replays/bans";
-
+    let ret:any;
     try {
         const response = await fetch(url, {
-            method: "PUT",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(report)
         });
-
-        // @ts-ignore
-        const res: UploadReplayResult = await response.json();
-
-        if (!response.ok && response.status !== 409) {
-            const errorMessage = `Failed to upload replay try: ${res.message}`;
-            console.log(errorMessage, response);
-
-            return "Failed to upload replay (API Error)";
-        }
-
-        //Successfully uploaded or duplicate
-        return res.replay;
-
-    } catch (e) {
-        console.log("Failed to upload replay catch, error: ", e)
-
-        return "Failed to upload replay";
+        ret = await response.json();
+    }
+    catch (error) {
+        console.error("Error while fetching API:", error);
+        return "Failed to upload report";
     }
 
+    if(response.statusCode === 500 || response.statusCode === 404 || response.statusCode === 400) {
+        return ret.message;
+    }
+
+   return ret.replays;
 }
