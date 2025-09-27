@@ -129,11 +129,6 @@ export class DiscordBot {
         }
         catch(error) {
             console.error("Error while executing slash command: ",error);
-           if(interaction.deferred){
-               await interaction.editReply("Error while executing a command.");
-               return;
-           }
-           await MsgHelper.reply(interaction, "Error while executing a command.");
         }
     }
 

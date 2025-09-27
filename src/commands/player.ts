@@ -1,6 +1,7 @@
 import { DiscordBot, } from "../general/discordBot";
 import {ChatInputCommandInteraction, EmbedBuilder, EmbedField, SlashCommandBuilder} from "discord.js";
 import { PlayerPutDto, PlayerRank, PlayerAliases} from "../db/models/player";
+import {ReplayReportsCommand} from "./replayReports"
 import {
     getLeaderboard,
     getPlayer,
@@ -27,14 +28,36 @@ export class PlayerCommand  {
             nickname: interaction.user.username
         }
 
-        let response = await updatePlayersDiscordId(id, input);
+        let [message, player] = await updatePlayersDiscordId(id, input);
 
-        if(typeof response === 'string') {
-            await interaction.editReply(response);
+        await interaction.editReply(message);
+    }
+
+    private async adminUnregisterPlayer(interaction: ChatInputCommandInteraction): Promise<void> {
+
+        if(!ReplayReportsCommand.reportAdmins.includes(interaction.user.id)){
+            await interaction.reply("You don't have permission to use this command");
             return;
         }
 
-        await interaction.editReply(`Player ${id} registered.`);
+        const player = interaction.options.getUser("user");
+
+        await this.unregisterPlayer(interaction, player.id);
+    }
+
+    private async unregisterPlayer(interaction: ChatInputCommandInteraction, discordId:string|null = null): Promise<void> {
+        await interaction.deferReply();
+
+        discordId ??= interaction.user.id;
+
+        const input: PlayerPutDto = {
+            discordId: null,
+            nickname: interaction.user.username
+        }
+
+        let [message, player] = await updatePlayersDiscordId(discordId, input);
+
+        await interaction.editReply(message);
     }
 
     private async leaderboard(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -193,11 +216,22 @@ export class PlayerCommand  {
     }
 
     public addCommands(bot: DiscordBot): void {
-        const registerPlayer = new SlashCommandBuilder().setName("register").setDescription("Register a player");
-
+        const registerPlayer = new SlashCommandBuilder().setName("register").setDescription("Registers a player");
         registerPlayer.addNumberOption(option => option.setName("eugenid").setDescription("Player's Eugen ID (/help for more).").setRequired(true));
-
         bot.registerCommand(registerPlayer, this.registerPlayer.bind(this));
+
+
+        const unregisterPlayer = new SlashCommandBuilder().setName("unregister").setDescription("Unregisters a player");
+        bot.registerCommand(unregisterPlayer, this.unregisterPlayer.bind(this));
+
+        const adminUnregisterPlayer = new SlashCommandBuilder().setName("admin_unregister")
+            .setDescription("Unregisters a player. (Only for admins)");
+
+        adminUnregisterPlayer.addUserOption(option => option.setName("user")
+            .setDescription("Ping the player to unregister from sodbot.").setRequired(true));
+
+        bot.registerCommand(adminUnregisterPlayer, this.adminUnregisterPlayer.bind(this));
+
 
         const leaderBoard = new SlashCommandBuilder().setName("leaderboard").setDescription("Get the leaderboard");
         leaderBoard.addStringOption(option => option.setName("elo_type").setDescription("Elo type. Default: SD 1v1").setRequired(false)

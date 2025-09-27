@@ -58,7 +58,7 @@ export class Replays {
                     discordId: null,
                     sodbotElo: null,
                     oldSodbotElo: null,
-                })
+                });
             }
         }
 

@@ -97,9 +97,11 @@ export function isPlayerAI(p: RawPlayer): boolean {
     return p.aiLevel < 10 && p.name.includes("AI") && p.level === 0;
 }
 
-export async function updatePlayersDiscordId(id: number, input: PlayerPutDto): Promise<Player | string> {
+export async function updatePlayersDiscordId(id: number | string, input: PlayerPutDto): Promise<[string, Player|null]> {
 
-    const url = process.env.API_URL + "/players/" + id.toString();
+    const url = typeof(id) === 'number'
+        ? process.env.API_URL + "/players/" + id.toString()
+        : process.env.API_URL + "/players/discordId/" + id;
 
     try {
         const response = await fetch(url, {
@@ -109,26 +111,40 @@ export async function updatePlayersDiscordId(id: number, input: PlayerPutDto): P
             },
             body: JSON.stringify(input)
         });
+
+        const ret = await response.json();
+
         if (response.ok) {
-            const ret = await response.json();
-            return ret.player as Player;
-        }
-        if (response.status === 400) {
-            const errorMessage: apiErrorMessage = await response.json();
-            return errorMessage.message;
+            return [ret.message, ret.player];
         }
 
-        if (response.status === 409) {
-            const errorMessage: apiErrorMessage = await response.json();
-            return errorMessage.message;
+        if(response.status === 400 && ret.player !== undefined) {
+            return [ret.message, ret.player];
+        }
+
+        if(response.status === 409){
+
+            //already registered
+            if(ret.player!.discordId === input.discordId){
+                return ["Already registered. Please unregister first.", ret.player];
+            }
+
+            //someone else is registered as this id
+            const message =  `<@${ret.player!.discordId}>` +
+            " already registered as this ID. If you're sure this is your ID contact the admins.";
+           return [message, ret.player]
+        }
+
+        if (response.status === 400 || response.status === 404) {
+            return [ret.message, null];
         }
 
         Logs.error("Bad response while uploading player: " + response.statusText);
-        return 'Failed to upload player';
+        return ['Failed to upload player', null];
 
     } catch (e) {
         Logs.error('Error while uploading player :' + e);
-        return 'Failed to upload player';
+        return ['Failed to upload player', null];
     }
 }
 
