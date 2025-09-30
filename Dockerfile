@@ -1,4 +1,4 @@
-FROM node:21-slim
+FROM node:20-slim
 
 #for the puppeteer dependency
 #RUN apt-get update && apt-get install -y \
@@ -31,7 +31,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci --omit=dev
 
 COPY . .
 
