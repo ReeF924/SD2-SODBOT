@@ -1,12 +1,21 @@
 import {DiscordBot, MsgHelper} from "../general/discordBot";
 import {ChatInputCommandInteraction, SlashCommandBuilder, User} from "discord.js";
-import puppeteer, {Page} from "puppeteer";
+import puppeteer, {Browser, Page} from "puppeteer";
 import {ReplayReport, ReplayReportPlayer, PickOrder} from "../db/models/replay";
 import {divisions} from "sd2-data"
 import {uploadReplayReport} from "../db/services/replaysService";
 
 
 export class ReplayReportsCommand {
+
+    public browser:Browser = null;
+
+    public async init(){
+        this.browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+    }
 
     //todo just a temporary solution
     public static reportAdmins: string[] = [
@@ -19,6 +28,10 @@ export class ReplayReportsCommand {
     ];
 
     private async picksAndBansUpload(interaction: ChatInputCommandInteraction, host:User|null = null) {
+
+        if(this.browser === null){
+           await this.init();
+        }
 
         const guestUser = interaction.options.getUser("guest");
 
@@ -53,13 +66,7 @@ export class ReplayReportsCommand {
 
         await interaction.deferReply()
 
-
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-
-        const page = await browser.newPage();
+        const page = await this.browser.newPage();
 
         const url = "https://aoe2cm.net/draft/" + sessionCode;
 
@@ -74,6 +81,9 @@ export class ReplayReportsCommand {
         } catch (err) {
             console.log("Error while getting data from P&B webiste: ", err);
             await interaction.editReply("Error while uploading report. Please contact admin.");
+            console.log("Closing page:");
+            await page.close();
+            return;
         }
 
         const report: ReplayReport = {
@@ -82,6 +92,8 @@ export class ReplayReportsCommand {
             channelId: interaction.channelId,
             persistentSearch: interaction.options.getBoolean("search_all") ?? false
         }
+
+        await page.close();
 
         this.normalisePickOrder(report);
 
@@ -100,8 +112,6 @@ export class ReplayReportsCommand {
             //the discord timestamp format
             reply += `\n ${r.replayPlayers[0].nickname} vs ${r.replayPlayers[1].nickname}` +
                 '; Uploaded: ' + '<t:' + Math.floor(date.getTime() / 1000) + ':f\>';
-
-
         });
 
         await interaction.editReply(reply);
@@ -226,7 +236,7 @@ export class ReplayReportsCommand {
 
     private getDivisionIdFromName(divName: string): number {
 
-        let div = divisions.divisionsPact.find(div => div.name === divName);
+        let div = divisions.divisionsPact.find(div => div.name.toLowerCase() === divName.toLowerCase());
 
         if (div) {
             return div.id;
@@ -234,7 +244,7 @@ export class ReplayReportsCommand {
 
         const divs = divisions.divisionsNato;
 
-        div = divisions.divisionsNato.find(div => div.name === divName);
+        div = divisions.divisionsNato.find(div => div.name.toLowerCase() === divName.toLowerCase());
 
         if (!div) {
             throw new Error("Unable to find division by name! Div name: " + divName);
