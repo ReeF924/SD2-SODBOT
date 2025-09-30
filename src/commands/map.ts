@@ -270,10 +270,10 @@ export class MapCommand {
             .addBooleanOption(option => option.setName("banned").setDescription("Include banned maps. Default: True")
                 .setRequired(false));
 
-        //bot.registerCommand(rmap, this.randomMap.bind(this));
+        bot.registerCommand(rmap, this.randomMap.bind(this));
 
         const maps = new SlashCommandBuilder().setName("allmaps").setDescription("List all maps");
-        //bot.registerCommand(maps, this.allMaps.bind(this));
+        bot.registerCommand(maps, this.allMaps.bind(this));
 
         //@todo I don't even know if warno is somehow implemented..
         //for you can only ban and unban one map per command, wanna fix that later

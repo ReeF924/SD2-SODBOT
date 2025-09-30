@@ -86,10 +86,6 @@ export class DiscordBot {
             // And of course, make sure you catch and log any errors!
             console.error(error);
         }
-        const commands = await this.DiscordClient.application.commands.fetch({ force: true });
-        console.log(commands.map(c => c.name));
-
-        //console.log(await this.DiscordClient.application.commands.fetch());
     }
 
     public async getAdmin():Promise<User> {
